@@ -1,4 +1,6 @@
 import { visit, IndexPath } from '../index'
+import { access } from '../access'
+import { find, findIndexPath, findAll } from '../find'
 
 type Node = {
   name: string
@@ -108,4 +110,43 @@ it('stops in onLeave', () => {
 
   expect(enterNames).toEqual(['a', 'b', 'b1', 'b2'])
   expect(leaveNames).toEqual(['b1', 'b2', 'b'])
+})
+
+it('accesses node at index path', () => {
+  visit(example, {
+    onEnter: (child, indexPath) => {
+      const found = access(example, indexPath, { getChildren })
+      expect(found.name).toEqual(child.name)
+    },
+    getChildren,
+  })
+})
+
+describe('find', () => {
+  it('finds a node', () => {
+    const node = find(example, {
+      getChildren,
+      predicate: (node) => node.name === 'b1',
+    })
+
+    expect(node?.name).toEqual('b1')
+  })
+
+  it('finds all nodes', () => {
+    const nodes = findAll(example, {
+      getChildren,
+      predicate: (node) => node.name.startsWith('b'),
+    })
+
+    expect(nodes.map((node) => node.name)).toEqual(['b', 'b1', 'b2'])
+  })
+
+  it('finds a node index path', () => {
+    const indexPath = findIndexPath(example, {
+      getChildren,
+      predicate: (node, indexPath) => indexPath.join() === [0, 1].join(),
+    })
+
+    expect(indexPath).toEqual([0, 1])
+  })
 })
