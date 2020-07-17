@@ -1,8 +1,9 @@
-import { visit } from '../index'
+import { visit, IndexPath } from '../index'
 
 type Node = {
   name: string
   children?: Node[]
+  indexPath: IndexPath
 }
 
 function getChildren(node: Node): Node[] {
@@ -12,9 +13,24 @@ function getChildren(node: Node): Node[] {
 const example: Node = {
   name: 'a',
   children: [
-    { name: 'b', children: [{ name: 'b1' }, { name: 'b2' }] },
-    { name: 'c', children: [{ name: 'c1' }, { name: 'c2' }] },
+    {
+      name: 'b',
+      indexPath: [0],
+      children: [
+        { name: 'b1', indexPath: [0, 0] },
+        { name: 'b2', indexPath: [0, 1] },
+      ],
+    },
+    {
+      name: 'c',
+      indexPath: [1],
+      children: [
+        { name: 'c1', indexPath: [1, 0] },
+        { name: 'c2', indexPath: [1, 1] },
+      ],
+    },
   ],
+  indexPath: [],
 }
 
 it('traverses normally', () => {
@@ -22,10 +38,12 @@ it('traverses normally', () => {
   let leaveNames: string[] = []
 
   visit(example, {
-    onEnter: (child) => {
+    onEnter: (child, indexPath) => {
+      expect(indexPath).toEqual(child.indexPath)
       enterNames.push(child.name)
     },
-    onLeave: (child) => {
+    onLeave: (child, indexPath) => {
+      expect(indexPath).toEqual(child.indexPath)
       leaveNames.push(child.name)
     },
     getChildren,
