@@ -1,6 +1,7 @@
 import { visit, IndexPath } from '../index'
 import { access, accessPath } from '../access'
 import { find, findIndexPath, findAll } from '../find'
+import { withOptions } from '../withOptions'
 
 type Node = {
   name: string
@@ -156,5 +157,19 @@ describe('find', () => {
     })
 
     expect(indexPath).toEqual([0, 1])
+  })
+})
+
+describe('withOptions', () => {
+  it('binds options', () => {
+    const { find, access } = withOptions({ getChildren })
+
+    const node = find(example, {
+      predicate: (node) => node.name === 'b1',
+    })
+
+    expect(node?.name).toEqual('b1')
+
+    expect(access(example, [0, 0]).name).toEqual('b1')
   })
 })

@@ -2,7 +2,7 @@ import { IndexPath } from './indexPath'
 import { BaseOptions } from './options'
 import { visit, STOP } from './visit'
 
-type FindOptions<T> = BaseOptions<T> & {
+export type FindOptions<T> = BaseOptions<T> & {
   predicate: (node: T, indexPath: IndexPath) => boolean
 }
 
