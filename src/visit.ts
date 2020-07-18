@@ -11,14 +11,14 @@ export type VisitOptions<T> = BaseOptions<T> & {
   onLeave?(node: T, indexPath: IndexPath): LeaveReturnValue
 }
 
-export function visit<T>(node: T, options: VisitOptions<T>) {
+export function visit<T>(node: T, options: VisitOptions<T>): void {
   const normalizedOptions: Required<VisitOptions<T>> = {
     onEnter: () => {},
     onLeave: () => {},
     ...options,
   }
 
-  return visitInternal(node, normalizedOptions, [])
+  visitInternal(node, normalizedOptions, [])
 }
 
 function visitInternal<T>(
