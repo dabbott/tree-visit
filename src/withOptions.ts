@@ -7,22 +7,28 @@ import { find, findAll, findIndexPath, FindOptions } from './find'
 export type WithOptions<T> = {
   access(node: T, indexPath: IndexPath): T
   accessPath(node: T, indexPath: IndexPath): T[]
-  find(node: T, options: FindOptions<T>['predicate']): T | undefined
+  find(node: T, predicate: FindOptions<T>['predicate']): T | undefined
   find(
     node: T,
     options: Omit<FindOptions<T>, keyof BaseOptions<T>>
   ): T | undefined
-  findAll(node: T, options: FindOptions<T>['predicate']): T[]
+  findAll(node: T, predicate: FindOptions<T>['predicate']): T[]
   findAll(node: T, options: Omit<FindOptions<T>, keyof BaseOptions<T>>): T[]
   findIndexPath(
     node: T,
-    options: FindOptions<T>['predicate']
+    predicate: FindOptions<T>['predicate']
   ): IndexPath | undefined
   findIndexPath(
     node: T,
     options: Omit<FindOptions<T>, keyof BaseOptions<T>>
   ): IndexPath | undefined
-  visit(node: T, options: NonNullable<VisitOptions<T>>['onEnter']): void
+  /**
+   * Visit each node using preorder DFS traversal.
+   */
+  visit(node: T, onEnter: NonNullable<VisitOptions<T>>['onEnter']): void
+  /**
+   * Visit each node using DFS traversal.
+   */
   visit(node: T, options: Omit<VisitOptions<T>, keyof BaseOptions<T>>): void
 }
 
@@ -64,12 +70,12 @@ export function withOptions<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
         : findIndexPath(node, { ...baseOptions, ...predicateOrOptions }),
     visit: (
       node: T,
-      predicateOrOptions:
+      onEnterOrOptions:
         | NonNullable<VisitOptions<T>>['onEnter']
         | Omit<VisitOptions<T>, keyof BaseOptions<T>>
     ) =>
-      typeof predicateOrOptions === 'function'
-        ? visit(node, { ...baseOptions, onEnter: predicateOrOptions })
-        : visit(node, { ...baseOptions, ...predicateOrOptions }),
+      typeof onEnterOrOptions === 'function'
+        ? visit(node, { ...baseOptions, onEnter: onEnterOrOptions })
+        : visit(node, { ...baseOptions, ...onEnterOrOptions }),
   }
 }
