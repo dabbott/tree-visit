@@ -1,5 +1,5 @@
 import { visit, IndexPath } from '../index'
-import { access } from '../access'
+import { access, accessPath } from '../access'
 import { find, findIndexPath, findAll } from '../find'
 
 type Node = {
@@ -112,13 +112,21 @@ it('stops in onLeave', () => {
   expect(leaveNames).toEqual(['b1', 'b2', 'b'])
 })
 
-it('accesses node at index path', () => {
-  visit(example, {
-    onEnter: (child, indexPath) => {
-      const found = access(example, indexPath, { getChildren })
-      expect(found.name).toEqual(child.name)
-    },
-    getChildren,
+describe('access', () => {
+  it('accesses node at index path', () => {
+    visit(example, {
+      onEnter: (child, indexPath) => {
+        const found = access(example, indexPath, { getChildren })
+        expect(found.name).toEqual(child.name)
+      },
+      getChildren,
+    })
+  })
+
+  it('accesses node path', () => {
+    expect(
+      accessPath(example, [0, 1], { getChildren }).map((node) => node.name)
+    ).toEqual(['a', 'b', 'b2'])
   })
 })
 
