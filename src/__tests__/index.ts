@@ -162,14 +162,38 @@ describe('find', () => {
 
 describe('withOptions', () => {
   it('binds options', () => {
-    const { find, access } = withOptions({ getChildren })
+    const { find, access, visit } = withOptions({ getChildren })
 
-    const node = find(example, {
-      predicate: (node) => node.name === 'b1',
+    let enterNames: string[] = []
+
+    visit(example, {
+      onEnter: (child) => {
+        enterNames.push(child.name)
+      },
     })
 
-    expect(node?.name).toEqual('b1')
+    expect(enterNames).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
+
+    expect(
+      find(example, {
+        predicate: (node) => node.name === 'b1',
+      })?.name
+    ).toEqual('b1')
 
     expect(access(example, [0, 0]).name).toEqual('b1')
+  })
+
+  it('supports overloaded calls', () => {
+    const { find, visit } = withOptions({ getChildren })
+
+    let enterNames: string[] = []
+
+    visit(example, (child) => {
+      enterNames.push(child.name)
+    })
+
+    expect(enterNames).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
+
+    expect(find(example, (node) => node.name === 'b1')?.name).toEqual('b1')
   })
 })
