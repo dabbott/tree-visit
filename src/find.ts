@@ -3,9 +3,15 @@ import { BaseOptions } from './options'
 import { visit, STOP } from './visit'
 
 export type FindOptions<T> = BaseOptions<T> & {
+  /**
+   * Return `true` to include this node in the results.
+   */
   predicate: (node: T, indexPath: IndexPath) => boolean
 }
 
+/**
+ * Find a node matching a predicate function.
+ */
 export function find<T>(node: T, options: FindOptions<T>): T | undefined {
   let found: T | undefined
 
@@ -22,6 +28,9 @@ export function find<T>(node: T, options: FindOptions<T>): T | undefined {
   return found
 }
 
+/**
+ * Find all nodes matching a predicate function.
+ */
 export function findAll<T>(node: T, options: FindOptions<T>): T[] {
   let found: T[] = []
 
@@ -37,6 +46,9 @@ export function findAll<T>(node: T, options: FindOptions<T>): T[] {
   return found
 }
 
+/**
+ * Find the `IndexPath` of a node matching a predicate function.
+ */
 export function findIndexPath<T>(
   node: T,
   options: FindOptions<T>

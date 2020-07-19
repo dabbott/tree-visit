@@ -11,6 +11,20 @@ export type VisitOptions<T> = BaseOptions<T> & {
   onLeave?(node: T, indexPath: IndexPath): LeaveReturnValue
 }
 
+/**
+ * Visit each node in the tree, calling an optional `onEnter` and `onLeave` for each.
+ *
+ * From `onEnter`:
+ *
+ * - return nothing or `undefined` to continue
+ * - return `"skip"` to skip the children of that node and the subsequent `onLeave`
+ * - return `"stop"` to end traversal
+ *
+ * From `onLeave`:
+ *
+ * - return nothing or `undefined` to continue
+ * - return `"stop"` to end traversal
+ */
 export function visit<T>(node: T, options: VisitOptions<T>): void {
   const normalizedOptions: Required<VisitOptions<T>> = {
     onEnter: () => {},
