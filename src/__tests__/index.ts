@@ -2,7 +2,7 @@ import { visit, IndexPath } from '../index'
 import { access, accessPath } from '../access'
 import { find, findIndexPath, findAll } from '../find'
 import { withOptions } from '../withOptions'
-import { diagram, DiagramOptions } from '../diagram'
+import { diagram } from '../diagram'
 
 type Node = {
   name: string
@@ -223,6 +223,50 @@ describe('diagram', () => {
 
     expect(
       diagram(singleChild, { getChildren, getLabel: getMultilineLabel })
+    ).toMatchSnapshot()
+  })
+
+  it('generates box diagram', () => {
+    expect(
+      diagram(example, { type: 'box', getChildren, getLabel })
+    ).toMatchSnapshot()
+  })
+
+  it('generates uneven box diagram', () => {
+    const node: Node = {
+      name: 'a',
+      children: [
+        {
+          name: 'hello',
+          indexPath: [0],
+        },
+        {
+          name: 'c',
+          indexPath: [1],
+        },
+      ],
+      indexPath: [],
+    }
+
+    expect(
+      diagram(node, { type: 'box', getChildren, getLabel })
+    ).toMatchSnapshot()
+  })
+
+  it('generates single child box', () => {
+    const node: Node = {
+      name: 'a',
+      children: [
+        {
+          name: 'okay',
+          indexPath: [0],
+        },
+      ],
+      indexPath: [],
+    }
+
+    expect(
+      diagram(node, { type: 'box', getChildren, getLabel })
     ).toMatchSnapshot()
   })
 })

@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`diagram generates box diagram 1`] = `
+"           ┌───┐           
+           │ a │           
+           └─┬─┘           
+      ┌──────┴──────┐      
+    ┌─┴─┐         ┌─┴─┐    
+    │ b │         │ c │    
+    └─┬─┘         └─┬─┘    
+   ┌──┴───┐      ┌──┴───┐  
+┌──┴─┐ ┌──┴─┐ ┌──┴─┐ ┌──┴─┐
+│ b1 │ │ b2 │ │ c1 │ │ c2 │
+└────┘ └────┘ └────┘ └────┘"
+`;
+
 exports[`diagram generates folder diagram 1`] = `
 "a
 ├── b
@@ -39,6 +53,26 @@ path:
 `;
 
 exports[`diagram generates folder diagram with single child case 1`] = `"a / b / b1"`;
+
+exports[`diagram generates single child box 1`] = `
+" ┌───┐ 
+ │ a │ 
+ └──┬┘ 
+    │   
+┌───┴──┐
+│ okay │
+└──────┘"
+`;
+
+exports[`diagram generates uneven box diagram 1`] = `
+"     ┌───┐     
+     │ a │     
+     └─┬─┘     
+    ┌──┴────┐  
+┌───┴───┐ ┌─┴─┐
+│ hello │ │ c │
+└───────┘ └───┘"
+`;
 
 exports[`withOptions supports overloaded calls 1`] = `
 "a
