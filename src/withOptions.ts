@@ -3,10 +3,13 @@ import { visit, VisitOptions } from './visit'
 import { IndexPath } from './indexPath'
 import { access, accessPath } from './access'
 import { find, findAll, findIndexPath, FindOptions } from './find'
+import { DiagramOptions, diagram } from './diagram'
 
 export type WithOptions<T> = {
   access(node: T, indexPath: IndexPath): T
   accessPath(node: T, indexPath: IndexPath): T[]
+  diagram(node: T, getLabel: DiagramOptions<T>['getLabel']): string
+  diagram(node: T, options: DiagramOptions<T>): string
   find(node: T, predicate: FindOptions<T>['predicate']): T | undefined
   find(
     node: T,
@@ -41,6 +44,15 @@ export function withOptions<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
   return {
     access: (node, indexPath) => access(node, indexPath, baseOptions),
     accessPath: (node, indexPath) => accessPath(node, indexPath, baseOptions),
+    diagram: (
+      node: T,
+      getLabelOrOptions:
+        | DiagramOptions<T>['getLabel']
+        | Omit<DiagramOptions<T>, keyof BaseOptions<T>>
+    ) =>
+      typeof getLabelOrOptions === 'function'
+        ? diagram(node, { ...baseOptions, getLabel: getLabelOrOptions })
+        : diagram(node, { ...baseOptions, ...getLabelOrOptions }),
     find: (
       node: T,
       predicateOrOptions:

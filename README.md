@@ -20,6 +20,7 @@ Most functions, such as `getChildren`, `predicate`, `onEnter`, and `onLeave`, ar
 
 - [access](#access)
 - [accessPath](#accessPath)
+- [diagram](#diagram)
 - [find](#find)
 - [findAll](#findAll)
 - [findIndexPath](#findIndexPath)
@@ -84,6 +85,39 @@ const rootNode = {
 
 access(rootNode, [1, 0], { getChildren })
 // #=> [{ name: 'a', children: [...] }, { name: 'c', children: [...] }, { name: 'd' }]
+```
+
+---
+
+### `diagram`
+
+Generate a diagram of the tree, as a string.
+
+**Type**: `function diagram<T>(node: T, options: DiagramOptions<T>): string`
+
+#### Example
+
+```js
+import { diagram } from 'tree-visit'
+
+const getChildren = (node) => node.children || []
+const getLabel = (node) => node.name
+
+const rootNode = {
+  name: 'a',
+  children: [
+    { name: 'b' },
+    {
+      name: 'c',
+      children: [{ name: 'd' }],
+    },
+  ],
+}
+
+diagram(rootNode, { getChildren, getLabel })
+// #=> a
+// #=> ├── b
+// #=> └── c / d
 ```
 
 ---
