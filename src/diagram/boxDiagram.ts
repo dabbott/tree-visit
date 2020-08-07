@@ -1,5 +1,5 @@
-import { IndexPath } from './indexPath'
-import { DiagramOptions } from './diagram'
+import { IndexPath } from '../indexPath'
+import { DiagramOptions } from '../diagram'
 
 enum BoxDrawing {
   TopLeft = '┌',

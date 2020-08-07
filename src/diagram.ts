@@ -1,7 +1,7 @@
 import { IndexPath } from './indexPath'
 import { BaseOptions } from './options'
-import { boxDiagram } from './boxDiagram'
-import { directoryDiagram } from './directoryDiagram'
+import { boxDiagram } from './diagram/boxDiagram'
+import { directoryDiagram } from './diagram/directoryDiagram'
 
 export type DiagramType = 'directory' | 'box'
 

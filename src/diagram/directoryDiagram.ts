@@ -1,5 +1,5 @@
-import { DiagramOptions } from './diagram'
-import { IndexPath } from './indexPath'
+import { DiagramOptions } from '../diagram'
+import { IndexPath } from '../indexPath'
 
 enum LinePrefix {
   Child = `├── `,
