@@ -20,23 +20,24 @@ type Box = {
 }
 
 function wrapLabelInBox(label: string) {
-  const length = label.length
+  const lines = label.split('\n')
+  const length = Math.max(...lines.map((line) => line.length))
   const horizontalMargin = 1
   const width = length + horizontalMargin * 2 + 2
-  const height = 3
+  const height = 2 + lines.length
   const diagram = [
     [
       BoxDrawing.TopLeft,
       BoxDrawing.Horizontal.repeat(length + horizontalMargin * 2),
       BoxDrawing.TopRight,
     ],
-    [
+    ...lines.map((line) => [
       BoxDrawing.Vertical,
       ' '.repeat(horizontalMargin),
-      label,
+      line + (line.length < length ? ' '.repeat(length - line.length) : ''),
       ' '.repeat(horizontalMargin),
       BoxDrawing.Vertical,
-    ],
+    ]),
     [
       BoxDrawing.BottomLeft,
       BoxDrawing.Horizontal.repeat(length + horizontalMargin * 2),
@@ -65,7 +66,9 @@ function mergeBoxesHorizontal(boxes: Box[]): Box {
 
     for (let i = 0; i < height; i++) {
       contents.push(
-        result.contents[i] + ' '.repeat(horizontalMargin) + box.contents[i]
+        (result.contents[i] || ' '.repeat(result.width)) +
+          ' '.repeat(horizontalMargin) +
+          (box.contents[i] || ' '.repeat(box.width))
       )
     }
 

@@ -77,11 +77,11 @@ export function directoryDiagram<T>(
   return strings.join('\n')
 }
 
-function isMultiline(line: string): boolean {
+export function isMultiline(line: string): boolean {
   return line.includes('\n')
 }
 
-function prefixBlock(
+export function prefixBlock(
   block: string,
   prefix: string,
   multilinePrefix: string

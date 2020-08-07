@@ -232,6 +232,19 @@ describe('diagram', () => {
     ).toMatchSnapshot()
   })
 
+  it('generates multiline box diagram', () => {
+    expect(
+      diagram(example, {
+        type: 'box',
+        getChildren,
+        getLabel: (node: Node): string =>
+          node.name === 'b'
+            ? `name: ${node.name}\npath: ${node.indexPath.join('.')}`
+            : `name: ${node.name}`,
+      })
+    ).toMatchSnapshot()
+  })
+
   it('generates uneven box diagram', () => {
     const node: Node = {
       name: 'a',

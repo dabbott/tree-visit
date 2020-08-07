@@ -54,6 +54,21 @@ path:
 
 exports[`diagram generates folder diagram with single child case 1`] = `"a / b / b1"`;
 
+exports[`diagram generates multiline box diagram 1`] = `
+"                    ┌─────────┐                    
+                    │ name: a │                    
+                    └────┬────┘                    
+            ┌────────────┴────────────┐            
+       ┌────┴────┐               ┌────┴────┐       
+       │ name: b │               │ name: c │       
+       │ path: 0 │               └────┬────┘       
+       └────┬────┘              ┌─────┴──────┐     
+      ┌─────┴──────┐      ┌─────┴────┐ ┌─────┴────┐
+┌─────┴────┐ ┌─────┴────┐ │ name: c1 │ │ name: c2 │
+│ name: b1 │ │ name: b2 │ └──────────┘ └──────────┘
+└──────────┘ └──────────┘                          "
+`;
+
 exports[`diagram generates single child box 1`] = `
 " ┌───┐ 
  │ a │ 
