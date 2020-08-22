@@ -186,6 +186,49 @@ describe('diagram', () => {
     expect(diagram(singleChild, { getChildren, getLabel })).toMatchSnapshot()
   })
 
+  it('respects flattenSingleChildNodes option', () => {
+    const singleChild: Node = {
+      name: 'a',
+      children: [
+        {
+          name: 'b',
+          indexPath: [0],
+          children: [{ name: 'b1', indexPath: [0, 0] }],
+        },
+      ],
+      indexPath: [],
+    }
+
+    expect(
+      diagram(singleChild, {
+        getChildren,
+        getLabel,
+        flattenSingleChildNodes: false,
+      })
+    ).toMatchSnapshot()
+  })
+
+  it('generates folder diagram with non-root single child case', () => {
+    const singleChild: Node = {
+      name: 'a',
+      children: [
+        {
+          name: 'b',
+          indexPath: [0],
+          children: [{ name: 'b1', indexPath: [0, 0] }],
+        },
+        {
+          name: 'c',
+          indexPath: [1],
+          children: [{ name: 'c1', indexPath: [1, 0] }],
+        },
+      ],
+      indexPath: [],
+    }
+
+    expect(diagram(singleChild, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
   it('generates folder diagram with hidden root', () => {
     const singleChild: Node = {
       name: '',

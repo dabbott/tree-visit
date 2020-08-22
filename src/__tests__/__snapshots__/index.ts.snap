@@ -52,6 +52,12 @@ path:
         path: 0.0"
 `;
 
+exports[`diagram generates folder diagram with non-root single child case 1`] = `
+"a
+├── b / b1
+└── c / c1"
+`;
+
 exports[`diagram generates folder diagram with single child case 1`] = `"a / b / b1"`;
 
 exports[`diagram generates multiline box diagram 1`] = `
@@ -87,6 +93,12 @@ exports[`diagram generates uneven box diagram 1`] = `
 ┌───┴───┐ ┌─┴─┐
 │ hello │ │ c │
 └───────┘ └───┘"
+`;
+
+exports[`diagram respects flattenSingleChildNodes option 1`] = `
+"a
+└── b
+    └── b1"
 `;
 
 exports[`withOptions supports overloaded calls 1`] = `

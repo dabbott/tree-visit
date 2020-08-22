@@ -30,13 +30,17 @@ function nodeDiagram<T>(
   if (children.length === 0) return [rootLine]
 
   // Special-case nodes with a single child, collapsing their labels to a single line
-  if (children.length === 1 && !isMultiline(label)) {
-    const lines = nodeDiagram(children[0], [...indexPath, 0], options)
+  if (
+    options.flattenSingleChildNodes !== false &&
+    children.length === 1 &&
+    !isMultiline(label)
+  ) {
+    const [line] = nodeDiagram(children[0], [...indexPath, 0], options)
     const hideRoot = indexPath.length === 0 && label === ''
-    lines[0].label = hideRoot
-      ? `/ ${lines[0].label}`
-      : `${rootLine.label} / ${lines[0].label}`
-    return lines
+    rootLine.label = hideRoot
+      ? `/ ${line.label}`
+      : `${rootLine.label} / ${line.label}`
+    return [rootLine]
   }
 
   const nestedLines: Line[] = children.flatMap((file, index, array) => {

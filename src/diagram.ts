@@ -8,6 +8,7 @@ export type DiagramType = 'directory' | 'box'
 export type DiagramOptions<T> = BaseOptions<T> & {
   getLabel: (node: T, indexPath: IndexPath) => string
   type?: DiagramType
+  flattenSingleChildNodes?: boolean
 }
 
 /**
