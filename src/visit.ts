@@ -1,3 +1,4 @@
+import { access } from './access'
 import { IndexPath } from './indexPath'
 import { BaseOptions } from './options'
 
@@ -32,33 +33,74 @@ export function visit<T>(node: T, options: VisitOptions<T>): void {
     ...options,
   }
 
-  visitInternal(node, normalizedOptions, [])
+  visitInternal(node, normalizedOptions)
+}
+
+type NodeWrapper<T> = {
+  node: T
+
+  /**
+   * The current traversal state of the node.
+   *
+   * undefined => not visited
+   * -1        => skipped
+   * n         => nth child
+   */
+  state?: number
+
+  /**
+   * Cached children, so we only call getChildren once per node
+   */
+  children?: T[]
 }
 
 function visitInternal<T>(
-  node: T,
-  options: Required<VisitOptions<T>>,
-  indexPath: IndexPath
+  root: T,
+  options: Required<VisitOptions<T>>
 ): void | 'stop' {
   const { onEnter, onLeave, getChildren } = options
 
-  const enterResult = onEnter(node, indexPath)
+  let indexPath: IndexPath = []
+  let stack: NodeWrapper<T>[] = [{ node: root }]
 
-  if (enterResult === STOP) return enterResult
+  while (stack.length > 0) {
+    let wrapper = stack[stack.length - 1]
 
-  if (enterResult === SKIP) return
+    // Visit the wrapped node
+    if (wrapper.state === undefined) {
+      const enterResult = onEnter(wrapper.node, indexPath)
 
-  const children = getChildren(node, indexPath)
+      if (enterResult === STOP) return enterResult
 
-  for (let i = 0; i < children.length; i++) {
-    indexPath.push(i)
+      wrapper.state = enterResult === SKIP ? -1 : 0
+    }
 
-    const childResult = visitInternal(children[i], options, indexPath)
+    const children = wrapper.children || getChildren(wrapper.node, indexPath)
+
+    if (!wrapper.children) {
+      wrapper.children = children
+    }
+
+    // If the node wasn't skipped
+    if (wrapper.state !== -1) {
+      // Visit the next child
+      if (wrapper.state < children.length) {
+        let currentIndex = wrapper.state
+
+        indexPath.push(currentIndex)
+        stack.push({ node: children[currentIndex] })
+
+        wrapper.state = currentIndex + 1
+
+        continue
+      }
+
+      const leaveResult = onLeave(wrapper.node, indexPath)
+
+      if (leaveResult === STOP) return leaveResult
+    }
 
     indexPath.pop()
-
-    if (childResult === STOP) return childResult
+    stack.pop()
   }
-
-  return onLeave(node, indexPath)
 }

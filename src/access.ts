@@ -11,11 +11,14 @@ export function access<T>(
   indexPath: IndexPath,
   options: BaseOptions<T>
 ): T {
-  if (indexPath.length === 0) return node
+  let path = indexPath.slice()
 
-  const children = options.getChildren(node, indexPath)
+  while (path.length > 0) {
+    let index = path.shift()!
+    node = options.getChildren(node, path)[index]
+  }
 
-  return access(children[indexPath[0]], indexPath.slice(1), options)
+  return node
 }
 
 /**
@@ -28,13 +31,14 @@ export function accessPath<T>(
   indexPath: IndexPath,
   options: BaseOptions<T>
 ): T[] {
-  if (indexPath.length === 0) return [node]
+  let path = indexPath.slice()
+  let result: T[] = [node]
 
-  const children = options.getChildren(node, indexPath)
-
-  const result = accessPath(children[indexPath[0]], indexPath.slice(1), options)
-
-  result.unshift(node)
+  while (path.length > 0) {
+    let index = path.shift()!
+    node = options.getChildren(node, path)[index]
+    result.push(node)
+  }
 
   return result
 }

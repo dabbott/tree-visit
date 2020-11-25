@@ -37,9 +37,36 @@ const example: Node = {
   indexPath: [],
 }
 
+function createNestedNode(depth: number): Node {
+  let count = 0
+
+  let root: Node = { name: `${count++}`, indexPath: [], children: [] }
+  let current = root
+
+  for (let i = 0; i < depth - 1; i++) {
+    let child: Node = {
+      name: `${count++}`,
+      indexPath: [...current.indexPath, 0],
+      children: [],
+    }
+
+    current.children?.push(child)
+
+    current = child
+  }
+
+  return root
+}
+
 it('traverses normally', () => {
   let enterNames: string[] = []
   let leaveNames: string[] = []
+  let getChildrenCount = 0
+
+  let countGetChildren = (node: Node) => {
+    getChildrenCount++
+    return getChildren(node)
+  }
 
   visit(example, {
     onEnter: (child, indexPath) => {
@@ -50,11 +77,27 @@ it('traverses normally', () => {
       expect(indexPath).toEqual(child.indexPath)
       leaveNames.push(child.name)
     },
+    getChildren: countGetChildren,
+  })
+
+  expect(getChildrenCount).toEqual(7)
+  expect(enterNames).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
+  expect(leaveNames).toEqual(['b1', 'b2', 'b', 'c1', 'c2', 'c', 'a'])
+})
+
+it('traverses deeply nested nodes', () => {
+  let enterNames: string[] = []
+
+  const nestedNode = createNestedNode(6000)
+
+  visit(nestedNode, {
+    onEnter: (child) => {
+      enterNames.push(child.name)
+    },
     getChildren,
   })
 
-  expect(enterNames).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
-  expect(leaveNames).toEqual(['b1', 'b2', 'b', 'c1', 'c2', 'c', 'a'])
+  expect(enterNames.length).toEqual(6000)
 })
 
 it('skips in onEnter', () => {
