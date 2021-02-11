@@ -1,6 +1,6 @@
 import { visit, IndexPath } from '../index'
 import { access, accessPath } from '../access'
-import { find, findIndexPath, findAll } from '../find'
+import { find, findIndexPath, findAll, findAllIndexPaths } from '../find'
 import { withOptions } from '../withOptions'
 import { diagram } from '../diagram'
 
@@ -202,6 +202,21 @@ describe('find', () => {
 
     expect(indexPath).toEqual([0, 1])
   })
+
+  it('finds all node index paths', () => {
+    const indexPaths = findAllIndexPaths(example, {
+      getChildren,
+      predicate: (node) => node.name.startsWith('b'),
+    })
+
+    expect(indexPaths).toEqual([[0], [0, 0], [0, 1]])
+
+    const nodes = indexPaths.map((indexPath) =>
+      access(example, indexPath, { getChildren })
+    )
+
+    expect(nodes.map((node) => node.name)).toEqual(['b', 'b1', 'b2'])
+  })
 })
 
 describe('diagram', () => {
@@ -394,7 +409,9 @@ describe('withOptions', () => {
   })
 
   it('supports overloaded calls', () => {
-    const { find, visit, diagram } = withOptions({ getChildren })
+    const { find, findAllIndexPaths, visit, diagram } = withOptions({
+      getChildren,
+    })
 
     let enterNames: string[] = []
 
@@ -405,6 +422,10 @@ describe('withOptions', () => {
     expect(enterNames).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
 
     expect(find(example, (node) => node.name === 'b1')?.name).toEqual('b1')
+
+    expect(
+      findAllIndexPaths(example, (node) => node.name.startsWith('b'))
+    ).toEqual([[0], [0, 0], [0, 1]])
 
     expect(diagram(example, (node) => node.name)).toMatchSnapshot()
   })

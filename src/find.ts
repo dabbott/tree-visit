@@ -68,3 +68,25 @@ export function findIndexPath<T>(
 
   return found
 }
+
+/**
+ * Find the `IndexPath` of all nodes matching a predicate function.
+ */
+export function findAllIndexPaths<T>(
+  node: T,
+  options: FindOptions<T>
+): IndexPath[] {
+  let found: IndexPath[] = []
+
+  visit(node, {
+    onEnter: (child, indexPath) => {
+      if (options.predicate(child, indexPath)) {
+        // Copy the indexPath, since indexPath may be mutated
+        found.push([...indexPath])
+      }
+    },
+    getChildren: options.getChildren,
+  })
+
+  return found
+}

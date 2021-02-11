@@ -2,7 +2,13 @@ import { BaseOptions } from './options'
 import { visit, VisitOptions } from './visit'
 import { IndexPath } from './indexPath'
 import { access, accessPath } from './access'
-import { find, findAll, findIndexPath, FindOptions } from './find'
+import {
+  find,
+  findAll,
+  findAllIndexPaths,
+  findIndexPath,
+  FindOptions,
+} from './find'
 import { DiagramOptions, diagram } from './diagram'
 
 export type WithOptions<T> = {
@@ -25,6 +31,14 @@ export type WithOptions<T> = {
     node: T,
     options: Omit<FindOptions<T>, keyof BaseOptions<T>>
   ): IndexPath | undefined
+  findAllIndexPaths(
+    node: T,
+    predicate: FindOptions<T>['predicate']
+  ): IndexPath[]
+  findAllIndexPaths(
+    node: T,
+    options: Omit<FindOptions<T>, keyof BaseOptions<T>>
+  ): IndexPath[]
   /**
    * Visit each node using preorder DFS traversal.
    */
@@ -80,6 +94,18 @@ export function withOptions<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
       typeof predicateOrOptions === 'function'
         ? findIndexPath(node, { ...baseOptions, predicate: predicateOrOptions })
         : findIndexPath(node, { ...baseOptions, ...predicateOrOptions }),
+    findAllIndexPaths: (
+      node: T,
+      predicateOrOptions:
+        | FindOptions<T>['predicate']
+        | Omit<FindOptions<T>, keyof BaseOptions<T>>
+    ) =>
+      typeof predicateOrOptions === 'function'
+        ? findAllIndexPaths(node, {
+            ...baseOptions,
+            predicate: predicateOrOptions,
+          })
+        : findAllIndexPaths(node, { ...baseOptions, ...predicateOrOptions }),
     visit: (
       node: T,
       onEnterOrOptions:

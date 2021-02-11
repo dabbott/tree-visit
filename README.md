@@ -212,6 +212,39 @@ findIndexPath(rootNode, { getChildren, predicate: (node) => node.name === 'd' })
 
 ---
 
+### `findAllIndexPaths`
+
+Find the `IndexPath` of all nodes matching a predicate function.
+
+**Type**: `findAllIndexPaths<T>(node: T, options: FindOptions<T>): T[]`
+
+#### Example
+
+```js
+import { findAllIndexPaths } from 'tree-visit'
+
+const getChildren = (node) => node.children || []
+
+const rootNode = {
+  name: 'a',
+  children: [
+    { name: 'b' },
+    {
+      name: 'c',
+      children: [{ name: 'd' }],
+    },
+  ],
+}
+
+findAllIndexPaths(rootNode, {
+  getChildren,
+  predicate: (node) => node.name === 'c' || node.name === 'd',
+})
+// #=> [[1], [1, 0]]
+```
+
+---
+
 ### `visit`
 
 Visit each node in the tree, calling an optional `onEnter` and `onLeave` for each.
