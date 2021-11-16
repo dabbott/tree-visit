@@ -8,6 +8,7 @@ import {
   findAllIndexPaths,
   findIndexPath,
   FindOptions,
+  FindOptionsTyped,
 } from './find'
 import { DiagramOptions, diagram } from './diagram'
 
@@ -21,8 +22,24 @@ export type WithOptions<T> = {
     node: T,
     options: Omit<FindOptions<T>, keyof BaseOptions<T>>
   ): T | undefined
+  find<S extends T>(
+    node: T,
+    predicate: FindOptionsTyped<T, S>['predicate']
+  ): S | undefined
+  find<S extends T>(
+    node: T,
+    options: Omit<FindOptionsTyped<T, S>, keyof BaseOptions<T>>
+  ): S | undefined
   findAll(node: T, predicate: FindOptions<T>['predicate']): T[]
   findAll(node: T, options: Omit<FindOptions<T>, keyof BaseOptions<T>>): T[]
+  findAll<S extends T>(
+    node: T,
+    predicate: FindOptionsTyped<T, S>['predicate']
+  ): S[]
+  findAll<S extends T>(
+    node: T,
+    options: Omit<FindOptionsTyped<T, S>, keyof BaseOptions<T>>
+  ): S[]
   findIndexPath(
     node: T,
     predicate: FindOptions<T>['predicate']

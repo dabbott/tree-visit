@@ -9,9 +9,21 @@ export type FindOptions<T> = BaseOptions<T> & {
   predicate: (node: T, indexPath: IndexPath) => boolean
 }
 
+export type FindOptionsTyped<T, S extends T> = BaseOptions<T> & {
+  /**
+   * Return `true` to include this node in the results.
+   */
+  predicate: (node: T, indexPath: IndexPath) => node is S
+}
+
 /**
  * Find a node matching a predicate function.
  */
+export function find<T>(node: T, options: FindOptions<T>): T | undefined
+export function find<T, S extends T>(
+  node: T,
+  options: FindOptionsTyped<T, S>
+): S | undefined
 export function find<T>(node: T, options: FindOptions<T>): T | undefined {
   let found: T | undefined
 
@@ -31,6 +43,11 @@ export function find<T>(node: T, options: FindOptions<T>): T | undefined {
 /**
  * Find all nodes matching a predicate function.
  */
+export function findAll<T>(node: T, options: FindOptions<T>): T[]
+export function findAll<T, S extends T>(
+  node: T,
+  options: FindOptionsTyped<T, S>
+): S[]
 export function findAll<T>(node: T, options: FindOptions<T>): T[] {
   let found: T[] = []
 
