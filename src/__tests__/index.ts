@@ -268,9 +268,7 @@ describe('diagram', () => {
 
   it('generates folder diagram', () => {
     expect(diagram(example, { getChildren, getLabel })).toMatchSnapshot()
-  })
 
-  it('generates folder diagram and flattens', () => {
     expect(
       diagram(example, { getChildren, getLabel, flattenSingleChildNodes: true })
     ).toMatchSnapshot()
@@ -290,20 +288,6 @@ describe('diagram', () => {
     }
 
     expect(diagram(singleChild, { getChildren, getLabel })).toMatchSnapshot()
-  })
-
-  it('generates folder diagram with single child case and flattens', () => {
-    const singleChild: Node = {
-      name: 'a',
-      children: [
-        {
-          name: 'b',
-          indexPath: [0],
-          children: [{ name: 'b1', indexPath: [0, 0] }],
-        },
-      ],
-      indexPath: [],
-    }
 
     expect(
       diagram(singleChild, {
@@ -333,25 +317,6 @@ describe('diagram', () => {
     }
 
     expect(diagram(singleChild, { getChildren, getLabel })).toMatchSnapshot()
-  })
-
-  it('generates folder diagram with non-root single child case and flattens', () => {
-    const singleChild: Node = {
-      name: 'a',
-      children: [
-        {
-          name: 'b',
-          indexPath: [0],
-          children: [{ name: 'b1', indexPath: [0, 0] }],
-        },
-        {
-          name: 'c',
-          indexPath: [1],
-          children: [{ name: 'c1', indexPath: [1, 0] }],
-        },
-      ],
-      indexPath: [],
-    }
 
     expect(
       diagram(singleChild, {
@@ -376,20 +341,6 @@ describe('diagram', () => {
     }
 
     expect(diagram(singleChild, { getChildren, getLabel })).toMatchSnapshot()
-  })
-
-  it('generates folder diagram with hidden root and flattens', () => {
-    const singleChild: Node = {
-      name: '',
-      children: [
-        {
-          name: 'b',
-          indexPath: [0],
-          children: [{ name: 'b1', indexPath: [0, 0] }],
-        },
-      ],
-      indexPath: [],
-    }
 
     expect(
       diagram(singleChild, {
@@ -404,9 +355,7 @@ describe('diagram', () => {
     expect(
       diagram(example, { getChildren, getLabel: getMultilineLabel })
     ).toMatchSnapshot()
-  })
 
-  it('generates folder diagram with multiline label and flattens', () => {
     expect(
       diagram(example, {
         getChildren,
@@ -432,20 +381,6 @@ describe('diagram', () => {
     expect(
       diagram(singleChild, { getChildren, getLabel: getMultilineLabel })
     ).toMatchSnapshot()
-  })
-
-  it('generates folder diagram with multiline label and single child case and flattens', () => {
-    const singleChild: Node = {
-      name: 'a',
-      children: [
-        {
-          name: 'b',
-          indexPath: [0],
-          children: [{ name: 'b1', indexPath: [0, 0] }],
-        },
-      ],
-      indexPath: [],
-    }
 
     expect(
       diagram(singleChild, { getChildren, getLabel: getMultilineLabel })

@@ -24,7 +24,7 @@ exports[`diagram generates folder diagram 1`] = `
     └── c2"
 `;
 
-exports[`diagram generates folder diagram and flattens 1`] = `
+exports[`diagram generates folder diagram 2`] = `
 "a
 ├── b
 │   ├── b1
@@ -40,7 +40,7 @@ exports[`diagram generates folder diagram with hidden root 1`] = `
     └── b1"
 `;
 
-exports[`diagram generates folder diagram with hidden root and flattens 1`] = `"/ b / b1"`;
+exports[`diagram generates folder diagram with hidden root 2`] = `"/ b / b1"`;
 
 exports[`diagram generates folder diagram with multiline label 1`] = `
 "name: a
@@ -59,7 +59,7 @@ path:
         path: 1.1"
 `;
 
-exports[`diagram generates folder diagram with multiline label and flattens 1`] = `
+exports[`diagram generates folder diagram with multiline label 2`] = `
 "name: a
 path: 
 ├── name: b
@@ -85,7 +85,7 @@ path:
         path: 0.0"
 `;
 
-exports[`diagram generates folder diagram with multiline label and single child case and flattens 1`] = `
+exports[`diagram generates folder diagram with multiline label and single child case 2`] = `
 "name: a
 path: 
 └── name: b
@@ -102,7 +102,7 @@ exports[`diagram generates folder diagram with non-root single child case 1`] = 
     └── c1"
 `;
 
-exports[`diagram generates folder diagram with non-root single child case and flattens 1`] = `
+exports[`diagram generates folder diagram with non-root single child case 2`] = `
 "a
 ├── b / b1
 └── c / c1"
@@ -114,7 +114,7 @@ exports[`diagram generates folder diagram with single child case 1`] = `
     └── b1"
 `;
 
-exports[`diagram generates folder diagram with single child case and flattens 1`] = `"a / b / b1"`;
+exports[`diagram generates folder diagram with single child case 2`] = `"a / b / b1"`;
 
 exports[`diagram generates multiline box diagram 1`] = `
 "                    ┌─────────┐                    
