@@ -37,6 +37,28 @@ const example: Node = {
   indexPath: [],
 }
 
+type TypeA = Node & {
+  type: 'a'
+}
+type TypeB = Node & {
+  type: 'b'
+}
+
+// We use this union of types to check if we successfully narrow the
+// type to a specific one of them using type predicates. TypeScript will
+// throw an error when compiling if we try to check e.g. type === 'a' on
+// an object of TypeB
+type TypedExample = TypeA | TypeB
+
+function getTypedChildren(typedNode: TypedExample): TypedExample[] {
+  return getChildren(typedNode).map((item) => ({ type: 'b', ...item }))
+}
+
+const typedExample: TypedExample = {
+  type: 'a',
+  ...example,
+}
+
 function createNestedNode(depth: number): Node {
   let count = 0
 
@@ -185,6 +207,16 @@ describe('find', () => {
     expect(node?.name).toEqual('b1')
   })
 
+  it('finds a typed node', () => {
+    const node = find<TypedExample, TypeA>(typedExample, {
+      getChildren: getTypedChildren,
+      predicate: (node): node is TypeA => node.type === 'a',
+    })
+
+    // This will throw a compiler error if not working correctly
+    expect(node && node.type === 'a').toEqual(true)
+  })
+
   it('finds all nodes', () => {
     const nodes = findAll(example, {
       getChildren,
@@ -192,6 +224,16 @@ describe('find', () => {
     })
 
     expect(nodes.map((node) => node.name)).toEqual(['b', 'b1', 'b2'])
+  })
+
+  it('finds all typed nodes', () => {
+    const nodes = findAll<TypedExample, TypeA>(typedExample, {
+      getChildren: getTypedChildren,
+      predicate: (node): node is TypeA => node.type === 'a',
+    })
+
+    // This will throw a compiler error if not working correctly
+    expect(nodes[0].type === 'a').toEqual(true)
   })
 
   it('finds a node index path', () => {
@@ -226,6 +268,10 @@ describe('diagram', () => {
 
   it('generates folder diagram', () => {
     expect(diagram(example, { getChildren, getLabel })).toMatchSnapshot()
+
+    expect(
+      diagram(example, { getChildren, getLabel, flattenSingleChildNodes: true })
+    ).toMatchSnapshot()
   })
 
   it('generates folder diagram with single child case', () => {
@@ -242,26 +288,12 @@ describe('diagram', () => {
     }
 
     expect(diagram(singleChild, { getChildren, getLabel })).toMatchSnapshot()
-  })
-
-  it('respects flattenSingleChildNodes option', () => {
-    const singleChild: Node = {
-      name: 'a',
-      children: [
-        {
-          name: 'b',
-          indexPath: [0],
-          children: [{ name: 'b1', indexPath: [0, 0] }],
-        },
-      ],
-      indexPath: [],
-    }
 
     expect(
       diagram(singleChild, {
         getChildren,
         getLabel,
-        flattenSingleChildNodes: false,
+        flattenSingleChildNodes: true,
       })
     ).toMatchSnapshot()
   })
@@ -285,6 +317,14 @@ describe('diagram', () => {
     }
 
     expect(diagram(singleChild, { getChildren, getLabel })).toMatchSnapshot()
+
+    expect(
+      diagram(singleChild, {
+        getChildren,
+        getLabel,
+        flattenSingleChildNodes: true,
+      })
+    ).toMatchSnapshot()
   })
 
   it('generates folder diagram with hidden root', () => {
@@ -301,11 +341,27 @@ describe('diagram', () => {
     }
 
     expect(diagram(singleChild, { getChildren, getLabel })).toMatchSnapshot()
+
+    expect(
+      diagram(singleChild, {
+        getChildren,
+        getLabel,
+        flattenSingleChildNodes: true,
+      })
+    ).toMatchSnapshot()
   })
 
   it('generates folder diagram with multiline label', () => {
     expect(
       diagram(example, { getChildren, getLabel: getMultilineLabel })
+    ).toMatchSnapshot()
+
+    expect(
+      diagram(example, {
+        getChildren,
+        getLabel: getMultilineLabel,
+        flattenSingleChildNodes: true,
+      })
     ).toMatchSnapshot()
   })
 
@@ -321,6 +377,10 @@ describe('diagram', () => {
       ],
       indexPath: [],
     }
+
+    expect(
+      diagram(singleChild, { getChildren, getLabel: getMultilineLabel })
+    ).toMatchSnapshot()
 
     expect(
       diagram(singleChild, { getChildren, getLabel: getMultilineLabel })
@@ -408,6 +468,22 @@ describe('withOptions', () => {
     expect(access(example, [0, 0]).name).toEqual('b1')
   })
 
+  it('supports typed finding', () => {
+    const { find, findAll } = withOptions({ getChildren: getTypedChildren })
+
+    expect(
+      find<TypeA>(typedExample, {
+        predicate: (node): node is TypeA => node.type === 'a',
+      })?.type === 'a'
+    ).toEqual(true)
+
+    expect(
+      findAll<TypeA>(typedExample, {
+        predicate: (node): node is TypeA => node.type === 'a',
+      })[0]?.type === 'a'
+    ).toEqual(true)
+  })
+
   it('supports overloaded calls', () => {
     const { find, findAllIndexPaths, visit, diagram } = withOptions({
       getChildren,
@@ -428,5 +504,11 @@ describe('withOptions', () => {
     ).toEqual([[0], [0, 0], [0, 1]])
 
     expect(diagram(example, (node) => node.name)).toMatchSnapshot()
+
+    expect(
+      diagram(example, {
+        getLabel: (node) => node.name,
+      })
+    ).toMatchSnapshot()
   })
 })

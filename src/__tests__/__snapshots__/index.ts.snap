@@ -24,9 +24,42 @@ exports[`diagram generates folder diagram 1`] = `
     └── c2"
 `;
 
-exports[`diagram generates folder diagram with hidden root 1`] = `"/ b / b1"`;
+exports[`diagram generates folder diagram 2`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+└── c
+    ├── c1
+    └── c2"
+`;
+
+exports[`diagram generates folder diagram with hidden root 1`] = `
+"
+└── b
+    └── b1"
+`;
+
+exports[`diagram generates folder diagram with hidden root 2`] = `"/ b / b1"`;
 
 exports[`diagram generates folder diagram with multiline label 1`] = `
+"name: a
+path: 
+├── name: b
+│   path: 0
+│   ├── name: b1
+│   │   path: 0.0
+│   └── name: b2
+│       path: 0.1
+└── name: c
+    path: 1
+    ├── name: c1
+    │   path: 1.0
+    └── name: c2
+        path: 1.1"
+`;
+
+exports[`diagram generates folder diagram with multiline label 2`] = `
 "name: a
 path: 
 ├── name: b
@@ -52,13 +85,36 @@ path:
         path: 0.0"
 `;
 
+exports[`diagram generates folder diagram with multiline label and single child case 2`] = `
+"name: a
+path: 
+└── name: b
+    path: 0
+    └── name: b1
+        path: 0.0"
+`;
+
 exports[`diagram generates folder diagram with non-root single child case 1`] = `
+"a
+├── b
+│   └── b1
+└── c
+    └── c1"
+`;
+
+exports[`diagram generates folder diagram with non-root single child case 2`] = `
 "a
 ├── b / b1
 └── c / c1"
 `;
 
-exports[`diagram generates folder diagram with single child case 1`] = `"a / b / b1"`;
+exports[`diagram generates folder diagram with single child case 1`] = `
+"a
+└── b
+    └── b1"
+`;
+
+exports[`diagram generates folder diagram with single child case 2`] = `"a / b / b1"`;
 
 exports[`diagram generates multiline box diagram 1`] = `
 "                    ┌─────────┐                    
@@ -95,13 +151,17 @@ exports[`diagram generates uneven box diagram 1`] = `
 └───────┘ └───┘"
 `;
 
-exports[`diagram respects flattenSingleChildNodes option 1`] = `
+exports[`withOptions supports overloaded calls 1`] = `
 "a
-└── b
-    └── b1"
+├── b
+│   ├── b1
+│   └── b2
+└── c
+    ├── c1
+    └── c2"
 `;
 
-exports[`withOptions supports overloaded calls 1`] = `
+exports[`withOptions supports overloaded calls 2`] = `
 "a
 ├── b
 │   ├── b1

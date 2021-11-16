@@ -12,3 +12,5 @@ jobs:
           node-version: '12.x'
       - run: yarn
       - run: yarn test
+      # Make sure tsc compiles
+      - run: yarn build

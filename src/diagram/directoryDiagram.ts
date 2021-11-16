@@ -31,7 +31,7 @@ function nodeDiagram<T>(
 
   // Special-case nodes with a single child, collapsing their labels to a single line
   if (
-    options.flattenSingleChildNodes !== false &&
+    options.flattenSingleChildNodes &&
     children.length === 1 &&
     !isMultiline(label)
   ) {
