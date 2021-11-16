@@ -569,5 +569,11 @@ describe('withOptions', () => {
     ).toEqual([[0], [0, 0], [0, 1]])
 
     expect(diagram(example, (node) => node.name)).toMatchSnapshot()
+
+    expect(
+      diagram(example, {
+        getLabel: (node) => node.name,
+      })
+    ).toMatchSnapshot()
   })
 })

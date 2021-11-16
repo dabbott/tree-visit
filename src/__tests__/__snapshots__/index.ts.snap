@@ -160,3 +160,13 @@ exports[`withOptions supports overloaded calls 1`] = `
     ├── c1
     └── c2"
 `;
+
+exports[`withOptions supports overloaded calls 2`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+└── c
+    ├── c1
+    └── c2"
+`;

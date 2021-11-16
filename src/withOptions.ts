@@ -16,7 +16,10 @@ export type WithOptions<T> = {
   access(node: T, indexPath: IndexPath): T
   accessPath(node: T, indexPath: IndexPath): T[]
   diagram(node: T, getLabel: DiagramOptions<T>['getLabel']): string
-  diagram(node: T, options: DiagramOptions<T>): string
+  diagram(
+    node: T,
+    options: Omit<DiagramOptions<T>, keyof BaseOptions<T>>
+  ): string
   find(node: T, predicate: FindOptions<T>['predicate']): T | undefined
   find(
     node: T,
