@@ -83,7 +83,7 @@ const rootNode = {
   ],
 }
 
-access(rootNode, [1, 0], { getChildren })
+accessPath(rootNode, [1, 0], { getChildren })
 // #=> [{ name: 'a', children: [...] }, { name: 'c', children: [...] }, { name: 'd' }]
 ```
 
