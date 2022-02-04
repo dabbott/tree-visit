@@ -18,10 +18,29 @@ import { DiagramOptions, diagram } from './diagram'
 type WithoutBase<O> = Omit<O, keyof BaseOptions<unknown>>
 
 export type WithOptions<T> = {
+  /**
+   * Returns a node by its `IndexPath`.
+   *
+   * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
+   */
   access(node: T, indexPath: IndexPath): T
+
+  /**
+   * Returns an array of each node in an `IndexPath`.
+   *
+   * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
+   */
   accessPath(node: T, indexPath: IndexPath): T[]
+
+  /**
+   * Generate a diagram of the tree, as a string.
+   */
   diagram(node: T, getLabel: DiagramOptions<T>['getLabel']): string
   diagram(node: T, options: WithoutBase<DiagramOptions<T>>): string
+
+  /**
+   * Find a node matching a predicate function.
+   */
   find(node: T, predicate: FindOptions<T>['predicate']): T | undefined
   find(node: T, options: WithoutBase<FindOptions<T>>): T | undefined
   find<S extends T>(
@@ -32,6 +51,10 @@ export type WithOptions<T> = {
     node: T,
     options: WithoutBase<FindOptionsTyped<T, S>>
   ): S | undefined
+
+  /**
+   * Find all nodes matching a predicate function.
+   */
   findAll(node: T, predicate: FindOptions<T>['predicate']): T[]
   findAll(node: T, options: WithoutBase<FindOptions<T>>): T[]
   findAll<S extends T>(
@@ -42,6 +65,10 @@ export type WithOptions<T> = {
     node: T,
     options: WithoutBase<FindOptionsTyped<T, S>>
   ): S[]
+
+  /**
+   * Find the `IndexPath` of a node matching a predicate function.
+   */
   findIndexPath(
     node: T,
     predicate: FindOptions<T>['predicate']
@@ -50,6 +77,10 @@ export type WithOptions<T> = {
     node: T,
     options: WithoutBase<FindOptions<T>>
   ): IndexPath | undefined
+
+  /**
+   * Find the `IndexPath` of all nodes matching a predicate function.
+   */
   findAllIndexPaths(
     node: T,
     predicate: FindOptions<T>['predicate']
