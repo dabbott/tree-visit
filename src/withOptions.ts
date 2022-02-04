@@ -2,6 +2,7 @@ import { BaseOptions } from './options'
 import { visit, VisitOptions } from './visit'
 import { IndexPath } from './indexPath'
 import { access, accessPath } from './access'
+import { flat } from './flat'
 import {
   find,
   findAll,
@@ -54,10 +55,19 @@ export type WithOptions<T> = {
     predicate: FindOptions<T>['predicate']
   ): IndexPath[]
   findAllIndexPaths(node: T, options: WithoutBase<FindOptions<T>>): IndexPath[]
+
+  /**
+   * Returns an array containing the root node and all of its descendants.
+   *
+   * This is analogous to `Array.prototype.flat` for flattening arrays.
+   */
+  flat(node: T): T[]
+
   /**
    * Visit each node using preorder DFS traversal.
    */
   visit(node: T, onEnter: NonNullable<VisitOptions<T>>['onEnter']): void
+
   /**
    * Visit each node using DFS traversal.
    */
@@ -109,6 +119,7 @@ export function withOptions<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
       typeof predicateOrOptions === 'function'
         ? findIndexPath(node, { ...baseOptions, predicate: predicateOrOptions })
         : findIndexPath(node, { ...baseOptions, ...predicateOrOptions }),
+    flat: (node: T) => flat(node, baseOptions),
     findAllIndexPaths: (
       node: T,
       predicateOrOptions:

@@ -24,6 +24,7 @@ Most functions, such as `getChildren`, `predicate`, `onEnter`, and `onLeave`, ar
 - [find](#find)
 - [findAll](#findAll)
 - [findIndexPath](#findIndexPath)
+- [flat](#flat)
 - [visit](#visit)
 - [withOptions](#withOptions)
 
@@ -287,6 +288,38 @@ visit(rootNode, {
   },
 })
 // #=> a, b, c, d
+```
+
+---
+
+### `flat`
+
+Returns an array containing the root node and all of its descendants.
+
+This is analogous to `Array.prototype.flat` for flattening arrays.
+
+**Type**: `function flat<T>(node: T, options: BaseOptions<T>): T[]`
+
+#### Example
+
+```js
+import { flat } from 'tree-visit'
+
+const getChildren = (node) => node.children || []
+
+const rootNode = {
+  name: 'a',
+  children: [
+    { name: 'b' },
+    {
+      name: 'c',
+      children: [{ name: 'd' }],
+    },
+  ],
+}
+
+flat(rootNode, { getChildren }).map((node) => node.name)
+// #=> ['a', 'b', 'c', 'd']
 ```
 
 ---

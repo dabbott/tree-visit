@@ -3,6 +3,7 @@ import { access, accessPath } from '../access'
 import { find, findIndexPath, findAll, findAllIndexPaths } from '../find'
 import { withOptions } from '../withOptions'
 import { diagram } from '../diagram'
+import { flat } from '../flat'
 
 type Node = {
   name: string
@@ -261,6 +262,24 @@ describe('find', () => {
   })
 })
 
+describe('flat', () => {
+  it('flattens a tree', () => {
+    const nodes = flat(example, {
+      getChildren,
+    })
+
+    expect(nodes.map((node) => node.name)).toEqual([
+      'a',
+      'b',
+      'b1',
+      'b2',
+      'c',
+      'c1',
+      'c2',
+    ])
+  })
+})
+
 describe('diagram', () => {
   const getLabel = (node: Node): string => node.name
   const getMultilineLabel = (node: Node): string =>
@@ -485,7 +504,7 @@ describe('withOptions', () => {
   })
 
   it('supports overloaded calls', () => {
-    const { find, findAllIndexPaths, visit, diagram } = withOptions({
+    const { find, findAllIndexPaths, visit, diagram, flat } = withOptions({
       getChildren,
     })
 
@@ -496,6 +515,16 @@ describe('withOptions', () => {
     })
 
     expect(enterNames).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
+
+    expect(flat(example).map((node) => node.name)).toEqual([
+      'a',
+      'b',
+      'b1',
+      'b2',
+      'c',
+      'c1',
+      'c2',
+    ])
 
     expect(find(example, (node) => node.name === 'b1')?.name).toEqual('b1')
 
