@@ -4,7 +4,7 @@ import { IndexPath } from '../indexPath'
 enum LinePrefix {
   Child = `├── `,
   LastChild = `└── `,
-  NestedChild = `│   `,
+  NestedChild = `│   `,
   LastNestedChild = `    `,
 }
 
