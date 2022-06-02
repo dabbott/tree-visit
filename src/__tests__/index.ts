@@ -180,6 +180,15 @@ it('stops in onLeave', () => {
   expect(leaveNames).toEqual(['b1', 'b2', 'b'])
 })
 
+it('accepts explicitly undefined onLeave', () => {
+  // The following would throw in 0.1.2
+  visit(example, {
+    onEnter: () => {},
+    onLeave: undefined,
+    getChildren,
+  })
+})
+
 describe('access', () => {
   it('accesses node at index path', () => {
     visit(example, {

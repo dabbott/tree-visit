@@ -29,8 +29,8 @@ export type VisitOptions<T> = BaseOptions<T> & {
 export function visit<T>(node: T, options: VisitOptions<T>): void {
   const normalizedOptions: Required<VisitOptions<T>> = {
     onEnter: () => {},
-    onLeave: () => {},
     ...options,
+    onLeave: options.onLeave ?? (() => {}),
   }
 
   visitInternal(node, normalizedOptions)
