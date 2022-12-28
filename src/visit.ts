@@ -1,4 +1,3 @@
-import { access } from './access'
 import { IndexPath } from './indexPath'
 import { BaseOptions } from './options'
 
@@ -28,9 +27,9 @@ export type VisitOptions<T> = BaseOptions<T> & {
  */
 export function visit<T>(node: T, options: VisitOptions<T>): void {
   const normalizedOptions: Required<VisitOptions<T>> = {
-    onEnter: () => {},
-    onLeave: () => {},
     ...options,
+    onEnter: options.onEnter ?? (() => {}),
+    onLeave: options.onLeave ?? (() => {}),
   }
 
   visitInternal(node, normalizedOptions)
