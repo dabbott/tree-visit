@@ -1,9 +1,12 @@
-import { visit, IndexPath } from '../index'
 import { access, accessPath } from '../access'
-import { find, findIndexPath, findAll, findAllIndexPaths } from '../find'
-import { withOptions } from '../withOptions'
 import { diagram } from '../diagram'
+import { find, findAll, findAllIndexPaths, findIndexPath } from '../find'
 import { flat } from '../flat'
+import { flatMap } from '../flatMap'
+import { IndexPath, visit } from '../index'
+import { map } from '../map'
+import { reduce } from '../reduce'
+import { withOptions } from '../withOptions'
 
 type Node = {
   name: string
@@ -280,6 +283,77 @@ describe('flat', () => {
   })
 })
 
+describe('flatMap', () => {
+  it('flatMaps a tree', () => {
+    const items = flatMap(example, {
+      getChildren,
+      transform: (node) => [{ name: node.name, depth: node.indexPath.length }],
+    })
+
+    expect(items).toEqual([
+      { depth: 0, name: 'a' },
+      { depth: 1, name: 'b' },
+      { depth: 2, name: 'b1' },
+      { depth: 2, name: 'b2' },
+      { depth: 1, name: 'c' },
+      { depth: 2, name: 'c1' },
+      { depth: 2, name: 'c2' },
+    ])
+  })
+})
+
+describe('reduce', () => {
+  it('reduces a tree', () => {
+    const result = reduce(example, {
+      getChildren,
+      initialResult: 0,
+      nextResult: (result) => result + 1,
+    })
+
+    expect(result).toEqual(7)
+  })
+})
+
+describe('map', () => {
+  it('maps a tree', () => {
+    type ResultNode = { id: string; items: ResultNode[] }
+
+    const result: ResultNode = map(example, {
+      getChildren,
+      transform: (node, children) => ({
+        id: node.name,
+        items: children,
+      }),
+    })
+
+    expect(
+      flat(result, {
+        getChildren: (node) => node.items,
+      }).map((node) => node.id)
+    ).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
+  })
+
+  it('maps a tree and omits nodes', () => {
+    type ResultNode = { id: string; items: ResultNode[] }
+
+    const result: ResultNode = map(example, {
+      getChildren,
+      transform: (node, children) => ({
+        id: node.name,
+        items: children.filter(
+          (child) => child.id !== 'b1' && child.id !== 'c'
+        ),
+      }),
+    })
+
+    expect(
+      flat(result, {
+        getChildren: (node) => node.items,
+      }).map((node) => node.id)
+    ).toEqual(['a', 'b', 'b2'])
+  })
+})
+
 describe('diagram', () => {
   const getLabel = (node: Node): string => node.name
   const getMultilineLabel = (node: Node): string =>
@@ -466,7 +540,9 @@ describe('diagram', () => {
 
 describe('withOptions', () => {
   it('binds options', () => {
-    const { find, access, visit } = withOptions({ getChildren })
+    const { find, access, visit, reduce, flatMap, map } = withOptions({
+      getChildren,
+    })
 
     let enterNames: string[] = []
 
@@ -485,6 +561,34 @@ describe('withOptions', () => {
     ).toEqual('b1')
 
     expect(access(example, [0, 0]).name).toEqual('b1')
+
+    expect(
+      reduce(
+        example,
+        (result, node) => (result ? result + ' ' + node.name : node.name),
+        ''
+      )
+    ).toEqual('a b b1 b2 c c1 c2')
+
+    expect(flatMap(example, (node) => node.name.split(''))).toEqual([
+      'a',
+      'b',
+      'b',
+      '1',
+      'b',
+      '2',
+      'c',
+      'c',
+      '1',
+      'c',
+      '2',
+    ])
+
+    expect(
+      map<{ id: string }>(example, (node, transformedChildren) => ({
+        id: `${node.name}:${transformedChildren.length}`,
+      })).id
+    ).toEqual('a:2')
   })
 
   it('supports typed finding', () => {
