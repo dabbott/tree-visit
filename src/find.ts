@@ -1,6 +1,6 @@
 import { IndexPath } from './indexPath'
 import { BaseOptions } from './options'
-import { visit, STOP } from './visit'
+import { STOP, visit } from './visit'
 
 export type FindOptions<T> = BaseOptions<T> & {
   /**
@@ -28,13 +28,13 @@ export function find<T>(node: T, options: FindOptions<T>): T | undefined {
   let found: T | undefined
 
   visit(node, {
+    ...options,
     onEnter: (child, indexPath) => {
       if (options.predicate(child, indexPath)) {
         found = child
         return STOP
       }
     },
-    getChildren: options.getChildren,
   })
 
   return found

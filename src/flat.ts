@@ -1,5 +1,5 @@
 import { BaseOptions } from './options'
-import { visit } from './visit'
+import { reduce } from './reduce'
 
 /**
  * Returns an array containing the root node and all of its descendants.
@@ -7,14 +7,12 @@ import { visit } from './visit'
  * This is analogous to `Array.prototype.flat` for flattening arrays.
  */
 export function flat<T>(node: T, options: BaseOptions<T>): T[] {
-  let nodes: T[] = []
-
-  visit(node, {
-    onEnter: (child) => {
-      nodes.push(child)
+  return reduce<T, T[]>(node, {
+    ...options,
+    initialResult: [],
+    nextResult: (result, child) => {
+      result.push(child)
+      return result
     },
-    getChildren: options.getChildren,
   })
-
-  return nodes
 }

@@ -1,8 +1,5 @@
-import { BaseOptions } from './options'
-import { visit, VisitOptions } from './visit'
-import { IndexPath } from './indexPath'
 import { access, accessPath } from './access'
-import { flat } from './flat'
+import { diagram, DiagramOptions } from './diagram'
 import {
   find,
   findAll,
@@ -11,7 +8,13 @@ import {
   FindOptions,
   FindOptionsTyped,
 } from './find'
-import { DiagramOptions, diagram } from './diagram'
+import { flat } from './flat'
+import { flatMap, FlatMapOptions } from './flatMap'
+import { IndexPath } from './indexPath'
+import { map, MapOptions } from './map'
+import { BaseOptions } from './options'
+import { reduce, ReduceOptions } from './reduce'
+import { visit, VisitOptions } from './visit'
 
 // Omit any keys from the BaseOptions, since they're always applied
 // automatically as part of `withOptions`
@@ -95,6 +98,21 @@ export type WithOptions<T> = {
   flat(node: T): T[]
 
   /**
+   * Map each node into an array of values, which are then flattened into a single array.
+   *
+   * This is analogous to `Array.prototype.flatMap` for arrays.
+   */
+  flatMap<R>(node: T, transform: FlatMapOptions<T, R>['transform']): R[]
+
+  reduce<R>(
+    node: T,
+    nextResult: ReduceOptions<T, R>['nextResult'],
+    initialResult: R
+  ): R
+
+  map<R>(node: T, transform: MapOptions<T, R>['transform']): R
+
+  /**
    * Visit each node using preorder DFS traversal.
    */
   visit(node: T, onEnter: NonNullable<VisitOptions<T>>['onEnter']): void
@@ -151,6 +169,11 @@ export function withOptions<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
         ? findIndexPath(node, { ...baseOptions, predicate: predicateOrOptions })
         : findIndexPath(node, { ...baseOptions, ...predicateOrOptions }),
     flat: (node: T) => flat(node, baseOptions),
+    flatMap: (node: T, transform) =>
+      flatMap(node, { ...baseOptions, transform }),
+    reduce: (node: T, nextResult, initialResult) =>
+      reduce(node, { ...baseOptions, nextResult, initialResult }),
+    map: (node: T, transform) => map(node, { ...baseOptions, transform }),
     findAllIndexPaths: (
       node: T,
       predicateOrOptions:
