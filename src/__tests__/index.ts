@@ -18,6 +18,11 @@ function getChildren(node: Node): Node[] {
   return node.children ?? []
 }
 
+// Create a new child object for each node to test that we're not relying on object identity
+function getChildrenUnstable(node: Node): Node[] {
+  return getChildren(node).map((item) => ({ ...item }))
+}
+
 const example: Node = {
   name: 'a',
   children: [
@@ -351,6 +356,24 @@ describe('map', () => {
         getChildren: (node) => node.items,
       }).map((node) => node.id)
     ).toEqual(['a', 'b', 'b2'])
+  })
+
+  it('maps a tree with unstable object identity', () => {
+    type ResultNode = { id: string; items: ResultNode[] }
+
+    const result: ResultNode = map(example, {
+      getChildren: getChildrenUnstable,
+      transform: (node, children) => ({
+        id: node.name,
+        items: children,
+      }),
+    })
+
+    expect(
+      flat(result, {
+        getChildren: (node) => node.items,
+      }).map((node) => node.id)
+    ).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
   })
 })
 
