@@ -1,7 +1,5 @@
-import { accessPath } from './access'
 import { IndexPath } from './indexPath'
 import { map } from './map'
-import { memoizeGetChildrenByIndexPathLength } from './memoize'
 import { BaseOptions } from './options'
 import { sortIndexPaths } from './sort'
 
@@ -18,6 +16,22 @@ function splice<T>(
   ]
 }
 
+function isPathEqual(a: IndexPath, b: IndexPath) {
+  if (a.length !== b.length) {
+    return false
+  }
+
+  return a.every((segment, index) => segment === b[index])
+}
+
+function isPrefixPath(prefix: IndexPath, path: IndexPath) {
+  if (prefix.length > path.length) {
+    return false
+  }
+
+  return prefix.every((segment, index) => segment === path[index])
+}
+
 export type InsertOptions<T> = BaseOptions<T> & {
   nodes: T[]
   at: IndexPath
@@ -31,36 +45,42 @@ export type InsertOptions<T> = BaseOptions<T> & {
  * Insert nodes at a given `IndexPath`.
  */
 export function insert<T>(node: T, options: InsertOptions<T>) {
-  options = {
-    ...options,
-    getChildren: memoizeGetChildrenByIndexPathLength(options.getChildren),
-  }
-
-  const { nodes, at, getChildren, create } = options
+  const { nodes, at } = options
 
   if (at.length === 0) {
     throw new Error(`Can't insert nodes at the root`)
   }
 
-  const pathToParent = accessPath(node, at.slice(0, -1), options)
+  const parentIndexPath = at.slice(0, -1)
+  const index = at[at.length - 1]
 
-  for (let i = pathToParent.length - 1; i >= 0; i--) {
-    const original = pathToParent[i]
-    const indexPath = at.slice(0, i)
-    const index = at[i]
+  return map(node, {
+    ...options,
+    // Avoid calling `getChildren` for every node in the tree.
+    // Return [] if we're just going to return the original node anyway.
+    getChildren: (node, indexPath) => {
+      if (isPrefixPath(indexPath, parentIndexPath)) {
+        return options.getChildren(node, indexPath)
+      }
 
-    const children = getChildren(original, indexPath)
+      return []
+    },
+    transform: (node, children: T[], indexPath) => {
+      if (isPathEqual(indexPath, parentIndexPath)) {
+        return options.create(
+          node,
+          splice(children, index, 0, ...nodes),
+          indexPath
+        )
+      }
 
-    pathToParent[i] = create(
-      original,
-      i === pathToParent.length - 1
-        ? splice(children, index, 0, ...nodes)
-        : splice(children, index, 1, pathToParent[i + 1]),
-      indexPath
-    )
-  }
+      if (isPrefixPath(indexPath, parentIndexPath)) {
+        return options.create(node, children, indexPath)
+      }
 
-  return pathToParent[0]
+      return node
+    },
+  })
 }
 
 export type RemoveOptions<T> = BaseOptions<T> & {
@@ -72,6 +92,52 @@ export type RemoveOptions<T> = BaseOptions<T> & {
   create: (node: T, children: T[], indexPath: IndexPath) => T
 }
 
+enum RemovalState {
+  delete,
+  replace,
+}
+
+/**
+ * We sort the `IndexPath`s so that we can check if any parent nodes
+ * are also being deleted, and if so, we can skip deleting the descendant nodes.
+ */
+function getIndexesToRemove(indexPaths: IndexPath[]) {
+  const sortedIndexPaths = sortIndexPaths(indexPaths)
+
+  const indexesToRemove = new Map<string, number[]>()
+  const state = new Map<string, RemovalState>()
+
+  main: for (const indexPath of sortedIndexPaths) {
+    if (indexPath.length === 0) {
+      throw new Error(`Can't remove the root node`)
+    }
+
+    // Check if any of the parent nodes are also being deleted.
+    for (let i = indexPath.length - 1; i >= 0; i--) {
+      const parentKey = indexPath.slice(0, i).join()
+
+      if (state.get(parentKey) === RemovalState.delete) {
+        continue main
+      }
+
+      state.set(parentKey, RemovalState.replace)
+    }
+
+    state.set(indexPath.join(), RemovalState.delete)
+
+    // Add a 0 so we can always slice off the last element to get a unique parent key
+    const parentKey = indexPath.slice(0, -1).join()
+
+    const value = indexesToRemove.get(parentKey) ?? []
+
+    value.push(indexPath[indexPath.length - 1])
+
+    indexesToRemove.set(parentKey, value)
+  }
+
+  return { indexesToRemove, state }
+}
+
 /**
  * Insert nodes at a given `IndexPath`.
  */
@@ -80,46 +146,26 @@ export function remove<T>(node: T, options: RemoveOptions<T>) {
 
   if (indexPaths.length === 0) return node
 
-  const sortedIndexPaths = sortIndexPaths(indexPaths)
-
-  const isDeleted = new Set<string>()
-  const needsReplacement = new Set<string>()
-  const buckets = new Map<string, number[]>()
-
-  main: for (const indexPath of sortedIndexPaths) {
-    if (indexPath.length === 0) {
-      throw new Error(`Can't remove the root node`)
-    }
-
-    isDeleted.add(indexPath.join())
-
-    // Check if any of the parent nodes are also being deleted.
-    // We stop when `i` is 1 since we know that the root node can't be deleted.
-    for (let i = indexPath.length - 1; i >= 0; i--) {
-      const parentKey = indexPath.slice(0, i).join()
-
-      if (isDeleted.has(parentKey)) {
-        continue main
-      }
-
-      needsReplacement.add(parentKey)
-    }
-
-    // Add a 0 so we can always slice off the last element to get a unique parent key
-    const parentKey = indexPath.slice(0, -1).join()
-
-    const value = buckets.get(parentKey) ?? []
-
-    value.push(indexPath[indexPath.length - 1])
-
-    buckets.set(parentKey, value)
-  }
+  const { state, indexesToRemove } = getIndexesToRemove(indexPaths)
 
   return map(node, {
     ...options,
+    // Avoid calling `getChildren` for every node in the tree.
+    // Return [] if we're just going to return the original node anyway.
+    getChildren: (node, indexPath) => {
+      const key = indexPath.join()
+
+      switch (state.get(key)) {
+        case RemovalState.replace:
+          return options.getChildren(node, indexPath)
+        case RemovalState.delete:
+        default:
+          return []
+      }
+    },
     transform: (node, children: T[], indexPath) => {
       const key = indexPath.join()
-      const indexes = buckets.get(key)
+      const indexes = indexesToRemove.get(key)
 
       if (indexes) {
         return options.create(
@@ -127,7 +173,9 @@ export function remove<T>(node: T, options: RemoveOptions<T>) {
           children.filter((_, index) => !indexes.includes(index)),
           indexPath
         )
-      } else if (needsReplacement.has(key)) {
+      }
+
+      if (state.get(key) === RemovalState.replace) {
         return options.create(node, children, indexPath)
       }
 

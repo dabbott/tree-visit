@@ -67,7 +67,7 @@ describe('insert', () => {
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
-    expect(getCount()).toBe(2)
+    expect(getCount()).toEqual(2)
   })
 })
 
@@ -93,32 +93,41 @@ describe('remove', () => {
   })
 
   it('removes nested node', () => {
+    const { getChildrenWithCount, getCount } = createCountGetChildren()
+
     const result = remove(example, {
       indexPaths: [[1, 1]],
       create: (node, children) => ({ ...node, children }),
-      getChildren,
+      getChildren: getChildrenWithCount,
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+    expect(getCount()).toEqual(2)
   })
 
   it('removes multiple nodes', () => {
+    const { getChildrenWithCount, getCount } = createCountGetChildren()
+
     const result = remove(example, {
       indexPaths: [[1], [0, 1], [0, 0]],
       create: (node, children) => ({ ...node, children }),
-      getChildren,
+      getChildren: getChildrenWithCount,
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+    expect(getCount()).toEqual(2)
   })
 
   it('removes multiple nodes with common ancestor', () => {
+    const { getChildrenWithCount, getCount } = createCountGetChildren()
+
     const result = remove(example, {
       indexPaths: [[0, 1], [0]],
       create: (node, children) => ({ ...node, children }),
-      getChildren,
+      getChildren: getChildrenWithCount,
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+    expect(getCount()).toEqual(1)
   })
 })
