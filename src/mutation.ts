@@ -1,5 +1,6 @@
+import { accessPath } from './access'
 import { IndexPath } from './indexPath'
-import { map } from './map'
+import { memoizeGetChildrenByIndexPathLength } from './memoize'
 import { BaseOptions } from './options'
 
 export type InsertOptions<T> = BaseOptions<T> & {
@@ -11,45 +12,51 @@ export type InsertOptions<T> = BaseOptions<T> & {
   create: (node: T, children: T[], indexPath: IndexPath) => T
 }
 
-function isPathEqual(a: IndexPath, b: IndexPath) {
-  if (a.length !== b.length) {
-    return false
-  }
-
-  return a.every((segment, index) => segment === b[index])
+function splice<T>(
+  array: T[],
+  start: number,
+  deleteCount: number,
+  ...items: T[]
+) {
+  return [
+    ...array.slice(0, start),
+    ...items,
+    ...array.slice(start + deleteCount),
+  ]
 }
 
-function isPrefixPath(prefix: IndexPath, path: IndexPath) {
-  if (prefix.length > path.length) {
-    return false
-  }
-
-  return prefix.every((segment, index) => segment === path[index])
-}
-
+/**
+ * Insert nodes at a given `IndexPath`.
+ */
 export function insert<T>(node: T, options: InsertOptions<T>) {
-  const { nodes, at } = options
+  options = {
+    ...options,
+    getChildren: memoizeGetChildrenByIndexPathLength(options.getChildren),
+  }
+
+  const { nodes, at, getChildren, create } = options
 
   if (at.length === 0) {
     throw new Error(`Can't insert nodes at the root`)
   }
 
-  const parentIndexPath = at.slice(0, -1)
-  const index = at[at.length - 1]
+  const pathToParent = accessPath(node, at.slice(0, -1), options)
 
-  return map(node, {
-    ...options,
-    transform: (node, children: T[], indexPath) => {
-      if (isPathEqual(indexPath, parentIndexPath)) {
-        const before = children.slice(0, index)
-        const after = children.slice(index)
+  for (let i = pathToParent.length - 1; i >= 0; i--) {
+    const original = pathToParent[i]
+    const indexPath = at.slice(0, i)
+    const index = at[i]
 
-        return options.create(node, [...before, ...nodes, ...after], indexPath)
-      } else if (isPrefixPath(indexPath, parentIndexPath)) {
-        return options.create(node, children, indexPath)
-      }
+    const children = getChildren(original, indexPath)
 
-      return node
-    },
-  })
+    pathToParent[i] = create(
+      original,
+      i === pathToParent.length - 1
+        ? splice(children, index, 0, ...nodes)
+        : splice(children, index, 1, pathToParent[i + 1]),
+      indexPath
+    )
+  }
+
+  return pathToParent[0]
 }

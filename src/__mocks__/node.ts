@@ -19,6 +19,19 @@ export function getLabel(node: Node): string {
   return node.name
 }
 
+export function createCountGetChildren() {
+  let count = 0
+
+  const getChildrenWithCount = (node: Node) => {
+    count++
+    return getChildren(node)
+  }
+
+  const getCount = () => count
+
+  return { getChildrenWithCount, getCount }
+}
+
 export const example: Node = {
   name: 'a',
   children: [

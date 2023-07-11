@@ -1,4 +1,9 @@
-import { example, getChildren, getLabel } from '../__mocks__/node'
+import {
+  createCountGetChildren,
+  example,
+  getChildren,
+  getLabel,
+} from '../__mocks__/node'
 import { diagram } from '../diagram'
 import { insert } from '../mutation'
 
@@ -48,6 +53,8 @@ describe('insert', () => {
   })
 
   it('inserts multiple nodes', () => {
+    const { getChildrenWithCount, getCount } = createCountGetChildren()
+
     const result = insert(example, {
       at: [0, 1],
       nodes: [
@@ -56,9 +63,10 @@ describe('insert', () => {
         { name: 'z', indexPath: [] },
       ],
       create: (node, children) => ({ ...node, children }),
-      getChildren,
+      getChildren: getChildrenWithCount,
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+    expect(getCount()).toBe(2)
   })
 })
