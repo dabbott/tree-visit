@@ -5,7 +5,7 @@ import {
   getLabel,
 } from '../__mocks__/node'
 import { diagram } from '../diagram'
-import { insert } from '../mutation'
+import { insert, remove } from '../mutation'
 
 describe('insert', () => {
   it('inserts node at start', () => {
@@ -68,5 +68,57 @@ describe('insert', () => {
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
     expect(getCount()).toBe(2)
+  })
+})
+
+describe('remove', () => {
+  it('removes node at start', () => {
+    const result = remove(example, {
+      indexPaths: [[0]],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('removes node at end', () => {
+    const result = remove(example, {
+      indexPaths: [[1]],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('removes nested node', () => {
+    const result = remove(example, {
+      indexPaths: [[1, 1]],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('removes multiple nodes', () => {
+    const result = remove(example, {
+      indexPaths: [[1], [0, 1], [0, 0]],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('removes multiple nodes with common ancestor', () => {
+    const result = remove(example, {
+      indexPaths: [[0, 1], [0]],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
   })
 })

@@ -1,16 +1,9 @@
 import { accessPath } from './access'
 import { IndexPath } from './indexPath'
+import { map } from './map'
 import { memoizeGetChildrenByIndexPathLength } from './memoize'
 import { BaseOptions } from './options'
-
-export type InsertOptions<T> = BaseOptions<T> & {
-  nodes: T[]
-  at: IndexPath
-  /**
-   * Create a new node based on the original node and its new children
-   */
-  create: (node: T, children: T[], indexPath: IndexPath) => T
-}
+import { sortIndexPaths } from './sort'
 
 function splice<T>(
   array: T[],
@@ -23,6 +16,15 @@ function splice<T>(
     ...items,
     ...array.slice(start + deleteCount),
   ]
+}
+
+export type InsertOptions<T> = BaseOptions<T> & {
+  nodes: T[]
+  at: IndexPath
+  /**
+   * Create a new node based on the original node and its new children
+   */
+  create: (node: T, children: T[], indexPath: IndexPath) => T
 }
 
 /**
@@ -59,4 +61,77 @@ export function insert<T>(node: T, options: InsertOptions<T>) {
   }
 
   return pathToParent[0]
+}
+
+export type RemoveOptions<T> = BaseOptions<T> & {
+  indexPaths: IndexPath[]
+
+  /**
+   * Create a new node based on the original node and its new children
+   */
+  create: (node: T, children: T[], indexPath: IndexPath) => T
+}
+
+/**
+ * Insert nodes at a given `IndexPath`.
+ */
+export function remove<T>(node: T, options: RemoveOptions<T>) {
+  const { indexPaths } = options
+
+  if (indexPaths.length === 0) return node
+
+  const sortedIndexPaths = sortIndexPaths(indexPaths)
+
+  const isDeleted = new Set<string>()
+  const needsReplacement = new Set<string>()
+  const buckets = new Map<string, number[]>()
+
+  main: for (const indexPath of sortedIndexPaths) {
+    if (indexPath.length === 0) {
+      throw new Error(`Can't remove the root node`)
+    }
+
+    isDeleted.add(indexPath.join())
+
+    // Check if any of the parent nodes are also being deleted.
+    // We stop when `i` is 1 since we know that the root node can't be deleted.
+    for (let i = indexPath.length - 1; i >= 0; i--) {
+      const parentKey = indexPath.slice(0, i).join()
+
+      if (isDeleted.has(parentKey)) {
+        continue main
+      }
+
+      needsReplacement.add(parentKey)
+    }
+
+    // Add a 0 so we can always slice off the last element to get a unique parent key
+    const parentKey = indexPath.slice(0, -1).join()
+
+    const value = buckets.get(parentKey) ?? []
+
+    value.push(indexPath[indexPath.length - 1])
+
+    buckets.set(parentKey, value)
+  }
+
+  return map(node, {
+    ...options,
+    transform: (node, children: T[], indexPath) => {
+      const key = indexPath.join()
+      const indexes = buckets.get(key)
+
+      if (indexes) {
+        return options.create(
+          node,
+          children.filter((_, index) => !indexes.includes(index)),
+          indexPath
+        )
+      } else if (needsReplacement.has(key)) {
+        return options.create(node, children, indexPath)
+      }
+
+      return node
+    },
+  })
 }

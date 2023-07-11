@@ -56,3 +56,38 @@ exports[`insert inserts node in middle 1`] = `
     ├── c1
     └── c2"
 `;
+
+exports[`remove removes multiple nodes 1`] = `
+"a
+└── b"
+`;
+
+exports[`remove removes multiple nodes with common ancestor 1`] = `
+"a
+└── c
+    ├── c1
+    └── c2"
+`;
+
+exports[`remove removes nested node 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+└── c
+    └── c1"
+`;
+
+exports[`remove removes node at end 1`] = `
+"a
+└── b
+    ├── b1
+    └── b2"
+`;
+
+exports[`remove removes node at start 1`] = `
+"a
+└── c
+    ├── c1
+    └── c2"
+`;
