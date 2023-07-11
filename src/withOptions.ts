@@ -1,20 +1,23 @@
 import { access, accessPath } from './access'
-import { diagram, DiagramOptions } from './diagram'
+import { DiagramOptions, diagram } from './diagram'
 import {
+  FindOptions,
+  FindOptionsTyped,
   find,
   findAll,
   findAllIndexPaths,
   findIndexPath,
-  FindOptions,
-  FindOptionsTyped,
 } from './find'
 import { flat } from './flat'
-import { flatMap, FlatMapOptions } from './flatMap'
+import { FlatMapOptions, flatMap } from './flatMap'
 import { IndexPath } from './indexPath'
-import { map, MapOptions } from './map'
+import { InsertOptions, insert } from './insert'
+import { MapOptions, map } from './map'
+import { MoveOptions, move } from './move'
 import { BaseOptions } from './options'
-import { reduce, ReduceOptions } from './reduce'
-import { visit, VisitOptions } from './visit'
+import { ReduceOptions, reduce } from './reduce'
+import { RemoveOptions, remove } from './remove'
+import { VisitOptions, visit } from './visit'
 
 // Omit any keys from the BaseOptions, since they're always applied
 // automatically as part of `withOptions`
@@ -121,6 +124,21 @@ export type WithOptions<T> = {
    * Visit each node using DFS traversal.
    */
   visit(node: T, options: WithoutBase<VisitOptions<T>>): void
+
+  /**
+   * Insert nodes at a given `IndexPath`.
+   */
+  insert(node: T, options: WithoutBase<InsertOptions<T>>): T
+
+  /**
+   * Remove nodes at the given `IndexPath`s.
+   */
+  remove(node: T, options: WithoutBase<RemoveOptions<T>>): T
+
+  /**
+   * Move nodes from one `IndexPath` to another.
+   */
+  move(node: T, options: WithoutBase<MoveOptions<T>>): T
 }
 
 /**
@@ -195,5 +213,8 @@ export function withOptions<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
       typeof onEnterOrOptions === 'function'
         ? visit(node, { ...baseOptions, onEnter: onEnterOrOptions })
         : visit(node, { ...baseOptions, ...onEnterOrOptions }),
+    insert: (node: T, options) => insert(node, { ...baseOptions, ...options }),
+    remove: (node: T, options) => remove(node, { ...baseOptions, ...options }),
+    move: (node: T, options) => move(node, { ...baseOptions, ...options }),
   }
 }
