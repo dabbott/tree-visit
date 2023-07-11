@@ -6,7 +6,9 @@ import {
   getLabel,
 } from '../__mocks__/node'
 import { diagram } from '../diagram'
-import { insert, move, remove } from '../mutation'
+import { insert } from '../insert'
+import { move } from '../move'
+import { remove } from '../remove'
 
 describe('insert', () => {
   it('inserts node at start', () => {
