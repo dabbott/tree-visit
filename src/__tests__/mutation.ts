@@ -1,6 +1,7 @@
 import {
   Node,
   createCountGetChildren,
+  createNode,
   example,
   getChildren,
   getLabel,
@@ -15,7 +16,7 @@ describe('insert', () => {
     const result = insert(example, {
       at: [0],
       nodes: [{ name: 'x', indexPath: [] }],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -26,7 +27,7 @@ describe('insert', () => {
     const result = insert(example, {
       at: [1],
       nodes: [{ name: 'x', indexPath: [] }],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -37,7 +38,7 @@ describe('insert', () => {
     const result = insert(example, {
       at: [2],
       nodes: [{ name: 'x', indexPath: [] }],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -48,7 +49,7 @@ describe('insert', () => {
     const result = insert(example, {
       at: [1, 1],
       nodes: [{ name: 'x', indexPath: [] }],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -65,7 +66,7 @@ describe('insert', () => {
         { name: 'y', indexPath: [] },
         { name: 'z', indexPath: [] },
       ],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren: getChildrenWithCount,
     })
 
@@ -78,7 +79,7 @@ describe('remove', () => {
   it('removes node at start', () => {
     const result = remove(example, {
       indexPaths: [[0]],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -88,7 +89,7 @@ describe('remove', () => {
   it('removes node at end', () => {
     const result = remove(example, {
       indexPaths: [[1]],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -100,7 +101,7 @@ describe('remove', () => {
 
     const result = remove(example, {
       indexPaths: [[1, 1]],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren: getChildrenWithCount,
     })
 
@@ -113,7 +114,7 @@ describe('remove', () => {
 
     const result = remove(example, {
       indexPaths: [[1], [0, 1], [0, 0]],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren: getChildrenWithCount,
     })
 
@@ -126,7 +127,7 @@ describe('remove', () => {
 
     const result = remove(example, {
       indexPaths: [[0, 1], [0]],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren: getChildrenWithCount,
     })
 
@@ -140,7 +141,7 @@ describe('move', () => {
     const result1 = move(example, {
       indexPaths: [[0]],
       to: [0],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -149,7 +150,7 @@ describe('move', () => {
     const result2 = move(example, {
       indexPaths: [[1]],
       to: [1],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -160,7 +161,7 @@ describe('move', () => {
     const result = move(example, {
       indexPaths: [[1]],
       to: [0],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -171,7 +172,7 @@ describe('move', () => {
     const result = move(example, {
       indexPaths: [[0]],
       to: [1],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -182,7 +183,7 @@ describe('move', () => {
     const result = move(example, {
       indexPaths: [[0, 0]],
       to: [1],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -193,7 +194,7 @@ describe('move', () => {
     const result = move(example, {
       indexPaths: [[0, 0]],
       to: [1, 0],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 
@@ -231,7 +232,7 @@ describe('move', () => {
     const result = move(example, {
       indexPaths: [[0], [1]],
       to: [3],
-      create: (node, children) => ({ ...node, children }),
+      create: createNode,
       getChildren,
     })
 

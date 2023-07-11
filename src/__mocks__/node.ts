@@ -32,6 +32,10 @@ export function createCountGetChildren() {
   return { getChildrenWithCount, getCount }
 }
 
+export function createNode(node: Node, children: Node[]): Node {
+  return { ...node, children }
+}
+
 export const example: Node = {
   name: 'a',
   children: [
