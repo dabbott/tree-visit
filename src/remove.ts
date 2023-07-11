@@ -1,15 +1,10 @@
 import { ancestorIndexPaths } from './ancestors'
 import { IndexPath } from './indexPath'
 import { map } from './map'
-import { BaseOptions } from './options'
+import { MutationBaseOptions } from './options'
 
-export type RemoveOptions<T> = BaseOptions<T> & {
+export type RemoveOptions<T> = MutationBaseOptions<T> & {
   indexPaths: IndexPath[]
-
-  /**
-   * Create a new node based on the original node and its new children
-   */
-  create: (node: T, children: T[], indexPath: IndexPath) => T
 }
 
 enum RemovalState {

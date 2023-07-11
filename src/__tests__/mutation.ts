@@ -10,6 +10,7 @@ import { diagram } from '../diagram'
 import { insert } from '../insert'
 import { move } from '../move'
 import { remove } from '../remove'
+import { withOptions } from '../withOptions'
 
 describe('insert', () => {
   it('inserts node at start', () => {
@@ -234,6 +235,39 @@ describe('move', () => {
       to: [3],
       create: createNode,
       getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+})
+
+describe('partially applied', () => {
+  const Tree = withOptions({
+    getChildren,
+    create: createNode,
+  })
+
+  it('inserts node', () => {
+    const result = Tree.insert(example, {
+      at: [1],
+      nodes: [{ name: 'x', indexPath: [] }],
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('removes node', () => {
+    const result = Tree.remove(example, {
+      indexPaths: [[1]],
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('moves node', () => {
+    const result = Tree.move(example, {
+      indexPaths: [[1, 1]],
+      to: [0],
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()

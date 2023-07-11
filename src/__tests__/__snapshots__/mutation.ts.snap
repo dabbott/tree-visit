@@ -106,6 +106,34 @@ exports[`move moves node using old index 1`] = `
 └── f"
 `;
 
+exports[`partially applied inserts node 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+├── x
+└── c
+    ├── c1
+    └── c2"
+`;
+
+exports[`partially applied moves node 1`] = `
+"a
+├── c2
+├── b
+│   ├── b1
+│   └── b2
+└── c
+    └── c1"
+`;
+
+exports[`partially applied removes node 1`] = `
+"a
+└── b
+    ├── b1
+    └── b2"
+`;
+
 exports[`remove removes multiple nodes 1`] = `
 "a
 └── b"

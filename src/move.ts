@@ -2,17 +2,12 @@ import { access } from './access'
 import { ancestorIndexPaths } from './ancestors'
 import { IndexPath } from './indexPath'
 import { insert } from './insert'
-import { BaseOptions } from './options'
+import { MutationBaseOptions } from './options'
 import { getIndexesToRemove, removeInternal } from './remove'
 
-export type MoveOptions<T> = BaseOptions<T> & {
+export type MoveOptions<T> = MutationBaseOptions<T> & {
   indexPaths: IndexPath[]
   to: IndexPath
-
-  /**
-   * Create a new node based on the original node and its new children
-   */
-  create: (node: T, children: T[], indexPath: IndexPath) => T
 }
 
 function adjustIndex(

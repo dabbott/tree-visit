@@ -1,15 +1,10 @@
 import { IndexPath } from './indexPath'
 import { map } from './map'
-import { BaseOptions } from './options'
+import { MutationBaseOptions } from './options'
 
-export type InsertOptions<T> = BaseOptions<T> & {
+export type InsertOptions<T> = MutationBaseOptions<T> & {
   nodes: T[]
   at: IndexPath
-
-  /**
-   * Create a new node based on the original node and its new children
-   */
-  create: (node: T, children: T[], indexPath: IndexPath) => T
 }
 
 /**

@@ -14,7 +14,7 @@ import { IndexPath } from './indexPath'
 import { InsertOptions, insert } from './insert'
 import { MapOptions, map } from './map'
 import { MoveOptions, move } from './move'
-import { BaseOptions } from './options'
+import { BaseOptions, MutationBaseOptions } from './options'
 import { ReduceOptions, reduce } from './reduce'
 import { RemoveOptions, remove } from './remove'
 import { VisitOptions, visit } from './visit'
@@ -141,12 +141,7 @@ export type WithOptions<T> = {
   move(node: T, options: WithoutBase<MoveOptions<T>>): T
 }
 
-/**
- * Return every tree utility function with options partially applied.
- *
- * @param baseOptions
- */
-export function withOptions<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
+function withOptionsBase<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
   return {
     access: (node, indexPath) => access(node, indexPath, baseOptions),
     accessPath: (node, indexPath) => accessPath(node, indexPath, baseOptions),
@@ -217,4 +212,47 @@ export function withOptions<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
     remove: (node: T, options) => remove(node, { ...baseOptions, ...options }),
     move: (node: T, options) => move(node, { ...baseOptions, ...options }),
   }
+}
+
+type WithoutMutationBase<O> = Omit<O, keyof MutationBaseOptions<unknown>>
+
+export type WithMutationOptions<T> = Omit<
+  WithOptions<T>,
+  'insert' | 'remove' | 'move'
+> & {
+  insert: (node: T, options: WithoutMutationBase<InsertOptions<T>>) => T
+  remove: (node: T, options: WithoutMutationBase<RemoveOptions<T>>) => T
+  move: (node: T, options: WithoutMutationBase<MoveOptions<T>>) => T
+}
+
+function withMutationOptions<T>(
+  baseOptions: MutationBaseOptions<T>
+): WithMutationOptions<T> {
+  const tree = withOptionsBase(baseOptions)
+
+  return {
+    ...tree,
+    insert: (node, options) => insert(node, { ...baseOptions, ...options }),
+    remove: (node, options) => remove(node, { ...baseOptions, ...options }),
+    move: (node, options) => move(node, { ...baseOptions, ...options }),
+  }
+}
+
+/**
+ * Return every tree utility function with options partially applied.
+ *
+ * @param baseOptions
+ */
+export function withOptions<T>(baseOptions: BaseOptions<T>): WithOptions<T>
+export function withOptions<T>(
+  baseOptions: MutationBaseOptions<T>
+): WithMutationOptions<T>
+export function withOptions<T>(
+  baseOptions: BaseOptions<T> | MutationBaseOptions<T>
+): WithOptions<T> {
+  if ('create' in baseOptions) {
+    return withMutationOptions(baseOptions)
+  }
+
+  return withOptionsBase(baseOptions)
 }
