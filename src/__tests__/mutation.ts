@@ -136,6 +136,26 @@ describe('remove', () => {
 })
 
 describe('move', () => {
+  it('moves node to the same place', () => {
+    const result1 = move(example, {
+      indexPaths: [[0]],
+      to: [0],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(result1).toEqual(example)
+
+    const result2 = move(example, {
+      indexPaths: [[1]],
+      to: [1],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(result2).toEqual(example)
+  })
+
   it('moves node from 1 to 0', () => {
     const result = move(example, {
       indexPaths: [[1]],
