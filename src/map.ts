@@ -21,9 +21,10 @@ export function map<T, U>(node: T, options: MapOptions<T, U>): U {
   visit(node, {
     ...options,
     onLeave: (child, indexPath) => {
-      indexPath = [0, ...indexPath]
+      // Add a 0 so we can always slice off the last element to get a unique parent key
+      const keyIndexPath = [0, ...indexPath]
 
-      const key = indexPath.join()
+      const key = keyIndexPath.join()
 
       const transformed = options.transform(
         child,
@@ -31,7 +32,7 @@ export function map<T, U>(node: T, options: MapOptions<T, U>): U {
         indexPath
       )
 
-      const parentKey = indexPath.slice(0, -1).join()
+      const parentKey = keyIndexPath.slice(0, -1).join()
 
       const parentChildren = childrenMap[parentKey] ?? []
 

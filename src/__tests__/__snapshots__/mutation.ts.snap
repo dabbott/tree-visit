@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`insert inserts multiple nodes 1`] = `
+"a
+├── b
+│   ├── b1
+│   ├── x
+│   ├── y
+│   ├── z
+│   └── b2
+└── c
+    ├── c1
+    └── c2"
+`;
+
+exports[`insert inserts nested node 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+└── c
+    ├── c1
+    ├── x
+    └── c2"
+`;
+
+exports[`insert inserts node at end 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+├── c
+│   ├── c1
+│   └── c2
+└── x"
+`;
+
+exports[`insert inserts node at start 1`] = `
+"a
+├── x
+├── b
+│   ├── b1
+│   └── b2
+└── c
+    ├── c1
+    └── c2"
+`;
+
+exports[`insert inserts node in middle 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+├── x
+└── c
+    ├── c1
+    └── c2"
+`;
