@@ -1,3 +1,4 @@
+import { access } from './access'
 import { IndexPath } from './indexPath'
 import { map } from './map'
 import { BaseOptions } from './options'
@@ -35,6 +36,7 @@ function isPrefixPath(prefix: IndexPath, path: IndexPath) {
 export type InsertOptions<T> = BaseOptions<T> & {
   nodes: T[]
   at: IndexPath
+
   /**
    * Create a new node based on the original node and its new children
    */
@@ -92,40 +94,61 @@ export type RemoveOptions<T> = BaseOptions<T> & {
   create: (node: T, children: T[], indexPath: IndexPath) => T
 }
 
+/**
+ * Filter out index paths that are descendents of other index paths.
+ */
+function filterAncestorIndexPaths(indexPaths: IndexPath[]): IndexPath[] {
+  const paths = new Map<string, IndexPath>()
+
+  const sortedIndexPaths = sortIndexPaths(indexPaths)
+
+  for (const indexPath of sortedIndexPaths) {
+    const foundParent = indexPath.some((_, index) => {
+      const parentKey = indexPath.slice(0, index).join()
+
+      return paths.has(parentKey)
+    })
+
+    if (foundParent) continue
+
+    paths.set(indexPath.join(), indexPath)
+  }
+
+  return Array.from(paths.values())
+}
+
 enum RemovalState {
   delete,
   replace,
 }
 
-/**
- * We sort the `IndexPath`s so that we can check if any parent nodes
- * are also being deleted, and if so, we can skip deleting the descendant nodes.
- */
-function getIndexesToRemove(indexPaths: IndexPath[]) {
-  const sortedIndexPaths = sortIndexPaths(indexPaths)
-
-  const indexesToRemove = new Map<string, number[]>()
+function getRemovalState(indexPaths: IndexPath[]) {
   const state = new Map<string, RemovalState>()
 
-  main: for (const indexPath of sortedIndexPaths) {
-    if (indexPath.length === 0) {
-      throw new Error(`Can't remove the root node`)
-    }
-
-    // Check if any of the parent nodes are also being deleted.
+  // Mark all parents for replacing
+  for (const indexPath of indexPaths) {
     for (let i = indexPath.length - 1; i >= 0; i--) {
       const parentKey = indexPath.slice(0, i).join()
 
-      if (state.get(parentKey) === RemovalState.delete) {
-        continue main
-      }
-
       state.set(parentKey, RemovalState.replace)
     }
+  }
 
+  // Mark all nodes for deleting
+  for (const indexPath of indexPaths) {
     state.set(indexPath.join(), RemovalState.delete)
+  }
 
-    // Add a 0 so we can always slice off the last element to get a unique parent key
+  return state
+}
+
+/**
+ * Group indexes to remove by their parent index path.
+ */
+function getIndexesToRemove(ancestorIndexPaths: IndexPath[]) {
+  const indexesToRemove = new Map<string, number[]>()
+
+  for (const indexPath of ancestorIndexPaths) {
     const parentKey = indexPath.slice(0, -1).join()
 
     const value = indexesToRemove.get(parentKey) ?? []
@@ -135,18 +158,29 @@ function getIndexesToRemove(indexPaths: IndexPath[]) {
     indexesToRemove.set(parentKey, value)
   }
 
-  return { indexesToRemove, state }
+  return indexesToRemove
 }
 
 /**
- * Insert nodes at a given `IndexPath`.
+ * Remove nodes at the given `IndexPath`s.
  */
-export function remove<T>(node: T, options: RemoveOptions<T>) {
+function removeInternal<T>(
+  node: T,
+  options: RemoveOptions<T>,
+  ancestorIndexPaths: IndexPath[],
+  indexesToRemove: Map<string, number[]>
+) {
   const { indexPaths } = options
 
   if (indexPaths.length === 0) return node
 
-  const { state, indexesToRemove } = getIndexesToRemove(indexPaths)
+  for (const indexPath of indexPaths) {
+    if (indexPath.length === 0) {
+      throw new Error(`Can't remove the root node`)
+    }
+  }
+
+  const state = getRemovalState(ancestorIndexPaths)
 
   return map(node, {
     ...options,
@@ -182,4 +216,63 @@ export function remove<T>(node: T, options: RemoveOptions<T>) {
       return node
     },
   })
+}
+
+/**
+ * Remove nodes at the given `IndexPath`s.
+ */
+export function remove<T>(node: T, options: RemoveOptions<T>) {
+  const ancestorIndexPaths = filterAncestorIndexPaths(options.indexPaths)
+  const indexesToRemove = getIndexesToRemove(ancestorIndexPaths)
+
+  return removeInternal(node, options, ancestorIndexPaths, indexesToRemove)
+}
+
+export type MoveOptions<T> = BaseOptions<T> & {
+  indexPaths: IndexPath[]
+  to: IndexPath
+
+  /**
+   * Create a new node based on the original node and its new children
+   */
+  create: (node: T, children: T[], indexPath: IndexPath) => T
+}
+
+function adjustIndex(
+  indexPath: IndexPath,
+  indexesToRemove: Map<string, number[]>
+) {
+  const parentIndexPath = indexPath.slice(0, -1)
+  const index = indexPath[indexPath.length - 1]
+  const removedIndexes = indexesToRemove.get(parentIndexPath.join()) ?? []
+  const adjustedIndex = removedIndexes.reduce(
+    (index, removedIndex) => (removedIndex < index ? index - 1 : index),
+    index
+  )
+
+  return [...parentIndexPath, adjustedIndex]
+}
+
+export function move<T>(node: T, options: MoveOptions<T>) {
+  if (options.indexPaths.length === 0) return node
+
+  if (options.to.length === 0) {
+    throw new Error(`Can't move nodes to the root`)
+  }
+
+  const ancestorIndexPaths = filterAncestorIndexPaths(options.indexPaths)
+  const indexesToRemove = getIndexesToRemove(ancestorIndexPaths)
+  const nodesToInsert = ancestorIndexPaths.map((indexPath) =>
+    access(node, indexPath, options)
+  )
+
+  node = removeInternal(node, options, ancestorIndexPaths, indexesToRemove)
+
+  node = insert(node, {
+    ...options,
+    at: adjustIndex(options.to, indexesToRemove),
+    nodes: nodesToInsert,
+  })
+
+  return node
 }

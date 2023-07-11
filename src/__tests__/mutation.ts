@@ -1,11 +1,12 @@
 import {
+  Node,
   createCountGetChildren,
   example,
   getChildren,
   getLabel,
 } from '../__mocks__/node'
 import { diagram } from '../diagram'
-import { insert, remove } from '../mutation'
+import { insert, move, remove } from '../mutation'
 
 describe('insert', () => {
   it('inserts node at start', () => {
@@ -129,5 +130,89 @@ describe('remove', () => {
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
     expect(getCount()).toEqual(1)
+  })
+})
+
+describe('move', () => {
+  it('moves node from 1 to 0', () => {
+    const result = move(example, {
+      indexPaths: [[1]],
+      to: [0],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('moves node from 0 to 1', () => {
+    const result = move(example, {
+      indexPaths: [[0]],
+      to: [1],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('moves node from 0.0 to 1', () => {
+    const result = move(example, {
+      indexPaths: [[0, 0]],
+      to: [1],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('moves node from 0.0 to 1.0', () => {
+    const result = move(example, {
+      indexPaths: [[0, 0]],
+      to: [1, 0],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('moves node using old index', () => {
+    const example: Node = {
+      name: 'a',
+      children: [
+        {
+          name: 'b',
+          indexPath: [0],
+        },
+        {
+          name: 'c',
+          indexPath: [1],
+        },
+        {
+          name: 'd',
+          indexPath: [2],
+        },
+        {
+          name: 'e',
+          indexPath: [3],
+        },
+        {
+          name: 'f',
+          indexPath: [4],
+        },
+      ],
+      indexPath: [],
+    }
+
+    const result = move(example, {
+      indexPaths: [[0], [1]],
+      to: [3],
+      create: (node, children) => ({ ...node, children }),
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
   })
 })

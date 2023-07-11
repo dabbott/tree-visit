@@ -57,6 +57,55 @@ exports[`insert inserts node in middle 1`] = `
     └── c2"
 `;
 
+exports[`move moves node from 0 to 1 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+└── c
+    ├── c1
+    └── c2"
+`;
+
+exports[`move moves node from 0.0 to 1 1`] = `
+"a
+├── b
+│   └── b2
+├── b1
+└── c
+    ├── c1
+    └── c2"
+`;
+
+exports[`move moves node from 0.0 to 1.0 1`] = `
+"a
+├── b
+│   └── b2
+└── c
+    ├── b1
+    ├── c1
+    └── c2"
+`;
+
+exports[`move moves node from 1 to 0 1`] = `
+"a
+├── c
+│   ├── c1
+│   └── c2
+└── b
+    ├── b1
+    └── b2"
+`;
+
+exports[`move moves node using old index 1`] = `
+"a
+├── d
+├── b
+├── c
+├── e
+└── f"
+`;
+
 exports[`remove removes multiple nodes 1`] = `
 "a
 └── b"
