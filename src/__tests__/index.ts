@@ -563,9 +563,18 @@ describe('diagram', () => {
 
 describe('withOptions', () => {
   it('binds options', () => {
-    const { find, access, visit, reduce, flatMap, map } = withOptions({
+    const { find, access, visit, reduce, flatMap, map, ...Tree } = withOptions({
       getChildren,
     })
+
+    expect(Tree.getChildren(example, []).map((node) => node.name)).toEqual([
+      'b',
+      'c',
+    ])
+
+    expect(
+      Tree.getChildren(example.children![0], []).map((node) => node.name)
+    ).toEqual(['b1', 'b2'])
 
     let enterNames: string[] = []
 

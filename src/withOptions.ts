@@ -25,6 +25,13 @@ type WithoutBase<O> = Omit<O, keyof BaseOptions<unknown>>
 
 export type WithOptions<T> = {
   /**
+   * Returns the node's children.
+   *
+   * This is the same as the `getChildren` option passed to `withOptions`, included here for convenience.
+   */
+  getChildren: BaseOptions<T>['getChildren']
+
+  /**
    * Returns a node by its `IndexPath`.
    *
    * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
@@ -143,6 +150,7 @@ export type WithOptions<T> = {
 
 function withOptionsBase<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
   return {
+    getChildren: baseOptions.getChildren,
     access: (node, indexPath) => access(node, indexPath, baseOptions),
     accessPath: (node, indexPath) => accessPath(node, indexPath, baseOptions),
     diagram: (
