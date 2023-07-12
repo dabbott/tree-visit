@@ -8,7 +8,6 @@ import { sortIndexPaths } from './sort'
  * 2. removing any `indexPaths` that are descendants of other `indexPaths`
  * 3. removing any `indexPaths` that are duplicates
  */
-
 export function ancestorIndexPaths(indexPaths: IndexPath[]): IndexPath[] {
   const paths = new Map<string, IndexPath>()
 

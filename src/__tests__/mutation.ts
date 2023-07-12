@@ -272,4 +272,29 @@ describe('partially applied', () => {
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
   })
+
+  it('mutate in place', () => {
+    // Clone the example mock so we can mutate it
+    const clone = Tree.map<Node>(example, (node, children) => {
+      return { ...node, ...(children.length > 0 && { children }) }
+    })
+
+    expect(clone).toEqual(example)
+
+    const result = insert(clone, {
+      at: [1],
+      nodes: [{ name: 'x', indexPath: [] }],
+      getChildren,
+      create: (node: Node, children: Node[]) => {
+        node.children = children
+        return node
+      },
+    })
+
+    expect(result).toBe(clone)
+    expect(Tree.access(result, [1])).toEqual({
+      name: 'x',
+      indexPath: [],
+    })
+  })
 })
