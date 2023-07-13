@@ -7,6 +7,27 @@ export type InsertOptions<T> = MutationBaseOptions<T> & {
   at: IndexPath
 }
 
+export enum InsertionState {
+  insert,
+  replace,
+}
+
+export function getInsertionState(indexPath: IndexPath) {
+  const state = new Map<string, InsertionState>()
+
+  // Mark all parents for replacing
+  for (let i = indexPath.length - 1; i >= 0; i--) {
+    const parentKey = indexPath.slice(0, i).join()
+
+    state.set(parentKey, InsertionState.replace)
+  }
+
+  // Mark insertion node
+  state.set(indexPath.join(), InsertionState.insert)
+
+  return state
+}
+
 /**
  * Insert nodes at a given `IndexPath`.
  */
@@ -20,36 +41,43 @@ export function insert<T>(node: T, options: InsertOptions<T>) {
   const parentIndexPath = at.slice(0, -1)
   const index = at[at.length - 1]
 
+  const state = getInsertionState(parentIndexPath)
+
   return map(node, {
     ...options,
     // Avoid calling `getChildren` for every node in the tree.
     // Return [] if we're just going to return the original node anyway.
     getChildren: (node, indexPath) => {
-      if (isPrefixPath(indexPath, parentIndexPath)) {
-        return options.getChildren(node, indexPath)
-      }
+      const key = indexPath.join()
 
-      return []
+      switch (state.get(key)) {
+        case InsertionState.replace:
+        case InsertionState.insert:
+          return options.getChildren(node, indexPath)
+        default:
+          return []
+      }
     },
     transform: (node, children: T[], indexPath) => {
-      if (isPathEqual(indexPath, parentIndexPath)) {
-        return options.create(
-          node,
-          splice(children, index, 0, ...nodes),
-          indexPath
-        )
-      }
+      const key = indexPath.join()
 
-      if (isPrefixPath(indexPath, parentIndexPath)) {
-        return options.create(node, children, indexPath)
+      switch (state.get(key)) {
+        case InsertionState.insert:
+          return options.create(
+            node,
+            splice(children, index, 0, ...nodes),
+            indexPath
+          )
+        case InsertionState.replace:
+          return options.create(node, children, indexPath)
+        default:
+          return node
       }
-
-      return node
     },
   })
 }
 
-function splice<T>(
+export function splice<T>(
   array: T[],
   start: number,
   deleteCount: number,
@@ -60,20 +88,4 @@ function splice<T>(
     ...items,
     ...array.slice(start + deleteCount),
   ]
-}
-
-function isPathEqual(a: IndexPath, b: IndexPath) {
-  if (a.length !== b.length) {
-    return false
-  }
-
-  return a.every((segment, index) => segment === b[index])
-}
-
-function isPrefixPath(prefix: IndexPath, path: IndexPath) {
-  if (prefix.length > path.length) {
-    return false
-  }
-
-  return prefix.every((segment, index) => segment === path[index])
 }

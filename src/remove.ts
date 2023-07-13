@@ -7,12 +7,12 @@ export type RemoveOptions<T> = MutationBaseOptions<T> & {
   indexPaths: IndexPath[]
 }
 
-enum RemovalState {
+export enum RemovalState {
   remove,
   replace,
 }
 
-function getRemovalState(indexPaths: IndexPath[]) {
+export function getRemovalState(indexPaths: IndexPath[]) {
   const state = new Map<string, RemovalState>()
 
   // Mark all parents for replacing

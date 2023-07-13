@@ -1,16 +1,17 @@
 import { access } from './access'
 import { ancestorIndexPaths } from './ancestors'
 import { IndexPath } from './indexPath'
-import { insert } from './insert'
+import { InsertionState, getInsertionState, splice } from './insert'
+import { map } from './map'
 import { MutationBaseOptions } from './options'
-import { getIndexesToRemove, removeInternal } from './remove'
+import { RemovalState, getIndexesToRemove, getRemovalState } from './remove'
 
 export type MoveOptions<T> = MutationBaseOptions<T> & {
   indexPaths: IndexPath[]
   to: IndexPath
 }
 
-function adjustIndex(
+function adjustIndexPath(
   indexPath: IndexPath,
   indexesToRemove: Map<string, number[]>
 ) {
@@ -38,13 +39,77 @@ export function move<T>(node: T, options: MoveOptions<T>) {
     access(node, indexPath, options)
   )
 
-  node = removeInternal(node, options, _ancestorIndexPaths, indexesToRemove)
+  const removalState = getRemovalState(_ancestorIndexPaths)
 
-  node = insert(node, {
+  const adjustedIndexPath = adjustIndexPath(options.to, indexesToRemove)
+  const parentIndexPath = adjustedIndexPath.slice(0, -1)
+  const index = adjustedIndexPath[adjustedIndexPath.length - 1]
+  const insertionState = getInsertionState(parentIndexPath)
+
+  return map(node, {
     ...options,
-    at: adjustIndex(options.to, indexesToRemove),
-    nodes: nodesToInsert,
-  })
+    // Avoid calling `getChildren` for every node in the tree.
+    // Return [] if we're just going to return the original node anyway.
+    getChildren: (node, indexPath) => {
+      const key = indexPath.join()
 
-  return node
+      switch (insertionState.get(key)) {
+        case InsertionState.replace:
+        case InsertionState.insert:
+          return options.getChildren(node, indexPath)
+      }
+
+      switch (removalState.get(key)) {
+        case RemovalState.replace:
+          return options.getChildren(node, indexPath)
+        case RemovalState.remove:
+        default:
+          return []
+      }
+    },
+    transform: (node, children: T[], indexPath) => {
+      const key = indexPath.join()
+      const indexes = indexesToRemove.get(key)
+      const insertion = insertionState.get(key)
+
+      if (indexes && insertion === InsertionState.insert) {
+        const updatedChildren = children.filter(
+          (_, index) => !(indexes ?? []).includes(index)
+        )
+
+        return options.create(
+          node,
+          splice(updatedChildren, index, 0, ...nodesToInsert),
+          indexPath
+        )
+      }
+
+      if (insertion === InsertionState.insert) {
+        return options.create(
+          node,
+          splice(children, index, 0, ...nodesToInsert),
+          indexPath
+        )
+      }
+
+      if (indexes) {
+        return options.create(
+          node,
+          children.filter((_, index) => !indexes.includes(index)),
+          indexPath
+        )
+      }
+
+      const removal = removalState.get(key)
+
+      if (
+        removal === RemovalState.replace ||
+        insertion === InsertionState.replace
+      ) {
+        return options.create(node, children, indexPath)
+      }
+
+      return node
+    },
+  })
 }

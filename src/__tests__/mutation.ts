@@ -159,14 +159,17 @@ describe('move', () => {
   })
 
   it('moves node from 1 to 0', () => {
+    const { getChildrenWithCount, getCount } = createCountGetChildren()
+
     const result = move(example, {
       indexPaths: [[1]],
       to: [0],
       create: createNode,
-      getChildren,
+      getChildren: getChildrenWithCount,
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+    expect(getCount()).toEqual(2)
   })
 
   it('moves node from 0 to 1', () => {
