@@ -144,6 +144,14 @@ exports[`partially applied removes node 1`] = `
     └── b2"
 `;
 
+exports[`partially applied replaces node 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+└── x"
+`;
+
 exports[`remove removes multiple nodes 1`] = `
 "a
 └── b"
@@ -178,3 +186,23 @@ exports[`remove removes node at start 1`] = `
     ├── c1
     └── c2"
 `;
+
+exports[`replace replaces child 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+└── x"
+`;
+
+exports[`replace replaces nested 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── x
+└── c
+    ├── c1
+    └── c2"
+`;
+
+exports[`replace replaces root 1`] = `"x"`;

@@ -10,6 +10,7 @@ import { diagram } from '../diagram'
 import { insert } from '../insert'
 import { move } from '../move'
 import { remove } from '../remove'
+import { replace } from '../replace'
 import { withOptions } from '../withOptions'
 
 describe('insert', () => {
@@ -134,6 +135,41 @@ describe('remove', () => {
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
     expect(getCount()).toEqual(1)
+  })
+})
+
+describe('replace', () => {
+  it('replaces root', () => {
+    const result = replace(example, {
+      at: [],
+      node: { name: 'x', indexPath: [] },
+      create: createNode,
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('replaces child', () => {
+    const result = replace(example, {
+      at: [1],
+      node: { name: 'x', indexPath: [] },
+      create: createNode,
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('replaces nested', () => {
+    const result = replace(example, {
+      at: [0, 1],
+      node: { name: 'x', indexPath: [] },
+      create: createNode,
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
   })
 })
 
@@ -282,6 +318,15 @@ describe('partially applied', () => {
     const result = Tree.move(example, {
       indexPaths: [[1, 1]],
       to: [0],
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('replaces node', () => {
+    const result = Tree.replace(example, {
+      at: [1],
+      node: { name: 'x', indexPath: [] },
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()

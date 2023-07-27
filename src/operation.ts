@@ -49,13 +49,16 @@ export function replaceOperation<T>(): NodeOperation<T> {
 
 type OperationMap<T> = Map<string, NodeOperation<T>>
 
+function splitIndexPath(indexPath: IndexPath): [IndexPath, number] {
+  return [indexPath.slice(0, -1), indexPath[indexPath.length - 1]]
+}
+
 export function getInsertionOperations<T>(
   indexPath: IndexPath,
   nodes: T[],
   operations: OperationMap<T> = new Map()
 ) {
-  const parentIndexPath = indexPath.slice(0, -1)
-  const index = indexPath.at(-1)!
+  const [parentIndexPath, index] = splitIndexPath(indexPath)
 
   // Mark all parents for replacing
   for (let i = parentIndexPath.length - 1; i >= 0; i--) {
@@ -123,6 +126,27 @@ export function getRemovalOperations<T>(indexPaths: IndexPath[]) {
       removeOperation(indexesToRemove.get(parentKey) ?? [])
     )
   }
+
+  return operations
+}
+
+export function getReplaceOperations<T>(indexPath: IndexPath, node: T) {
+  const operations: OperationMap<T> = new Map()
+  const [parentIndexPath, index] = splitIndexPath(indexPath)
+
+  // Mark all parents for replacing
+  for (let i = parentIndexPath.length - 1; i >= 0; i--) {
+    const parentKey = parentIndexPath.slice(0, i).join()
+
+    operations.set(parentKey, replaceOperation())
+  }
+
+  operations.set(parentIndexPath.join(), {
+    type: 'removeThenInsert',
+    removeIndexes: [index],
+    insertIndex: index,
+    insertNodes: [node],
+  })
 
   return operations
 }

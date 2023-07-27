@@ -17,6 +17,7 @@ import { MoveOptions, move } from './move'
 import { BaseOptions, MutationBaseOptions } from './options'
 import { ReduceOptions, reduce } from './reduce'
 import { RemoveOptions, remove } from './remove'
+import { ReplaceOptions, replace } from './replace'
 import { VisitOptions, visit } from './visit'
 
 // Omit any keys from the BaseOptions, since they're always applied
@@ -146,6 +147,11 @@ export type WithOptions<T> = {
    * Move nodes from one `IndexPath` to another.
    */
   move(node: T, options: WithoutBase<MoveOptions<T>>): T
+
+  /**
+   * Replace the node at the given `IndexPath` with another
+   */
+  replace(node: T, options: WithoutBase<ReplaceOptions<T>>): T
 }
 
 function withOptionsBase<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
@@ -219,6 +225,8 @@ function withOptionsBase<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
     insert: (node: T, options) => insert(node, { ...baseOptions, ...options }),
     remove: (node: T, options) => remove(node, { ...baseOptions, ...options }),
     move: (node: T, options) => move(node, { ...baseOptions, ...options }),
+    replace: (node: T, options) =>
+      replace(node, { ...baseOptions, ...options }),
   }
 }
 
@@ -226,11 +234,12 @@ type WithoutMutationBase<O> = Omit<O, keyof MutationBaseOptions<unknown>>
 
 export type WithMutationOptions<T> = Omit<
   WithOptions<T>,
-  'insert' | 'remove' | 'move'
+  'insert' | 'remove' | 'move' | 'replace'
 > & {
   insert: (node: T, options: WithoutMutationBase<InsertOptions<T>>) => T
   remove: (node: T, options: WithoutMutationBase<RemoveOptions<T>>) => T
   move: (node: T, options: WithoutMutationBase<MoveOptions<T>>) => T
+  replace: (node: T, options: WithoutMutationBase<ReplaceOptions<T>>) => T
 }
 
 function withMutationOptions<T>(
@@ -243,6 +252,7 @@ function withMutationOptions<T>(
     insert: (node, options) => insert(node, { ...baseOptions, ...options }),
     remove: (node, options) => remove(node, { ...baseOptions, ...options }),
     move: (node, options) => move(node, { ...baseOptions, ...options }),
+    replace: (node, options) => replace(node, { ...baseOptions, ...options }),
   }
 }
 
