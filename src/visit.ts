@@ -11,30 +11,6 @@ export type VisitOptions<T> = BaseOptions<T> & {
   onLeave?(node: T, indexPath: IndexPath): LeaveReturnValue
 }
 
-/**
- * Visit each node in the tree, calling an optional `onEnter` and `onLeave` for each.
- *
- * From `onEnter`:
- *
- * - return nothing or `undefined` to continue
- * - return `"skip"` to skip the children of that node and the subsequent `onLeave`
- * - return `"stop"` to end traversal
- *
- * From `onLeave`:
- *
- * - return nothing or `undefined` to continue
- * - return `"stop"` to end traversal
- */
-export function visit<T>(node: T, options: VisitOptions<T>): void {
-  const normalizedOptions: Required<VisitOptions<T>> = {
-    ...options,
-    onEnter: options.onEnter ?? (() => {}),
-    onLeave: options.onLeave ?? (() => {}),
-  }
-
-  visitInternal(node, normalizedOptions)
-}
-
 type NodeWrapper<T> = {
   node: T
 
@@ -53,28 +29,44 @@ type NodeWrapper<T> = {
   children?: T[]
 }
 
-function visitInternal<T>(
-  root: T,
-  options: Required<VisitOptions<T>>
-): void | 'stop' {
+/**
+ * Visit each node in the tree, calling an optional `onEnter` and `onLeave` for each.
+ *
+ * From `onEnter`:
+ *
+ * - return nothing or `undefined` to continue
+ * - return `"skip"` to skip the children of that node and the subsequent `onLeave`
+ * - return `"stop"` to end traversal
+ *
+ * From `onLeave`:
+ *
+ * - return nothing or `undefined` to continue
+ * - return `"stop"` to end traversal
+ */
+export function visit<T>(node: T, options: VisitOptions<T>): void {
   const { onEnter, onLeave, getChildren } = options
 
   let indexPath: IndexPath = []
-  let stack: NodeWrapper<T>[] = [{ node: root }]
+  let stack: NodeWrapper<T>[] = [{ node }]
+
+  const getIndexPath = options.reuseIndexPath
+    ? () => indexPath
+    : () => indexPath.slice()
 
   while (stack.length > 0) {
     let wrapper = stack[stack.length - 1]
 
     // Visit the wrapped node
     if (wrapper.state === undefined) {
-      const enterResult = onEnter(wrapper.node, indexPath)
+      const enterResult = onEnter?.(wrapper.node, getIndexPath())
 
-      if (enterResult === STOP) return enterResult
+      if (enterResult === STOP) return
 
       wrapper.state = enterResult === SKIP ? -1 : 0
     }
 
-    const children = wrapper.children || getChildren(wrapper.node, indexPath)
+    const children =
+      wrapper.children || getChildren(wrapper.node, getIndexPath())
 
     if (!wrapper.children) {
       wrapper.children = children
@@ -94,9 +86,9 @@ function visitInternal<T>(
         continue
       }
 
-      const leaveResult = onLeave(wrapper.node, indexPath)
+      const leaveResult = onLeave?.(wrapper.node, getIndexPath())
 
-      if (leaveResult === STOP) return leaveResult
+      if (leaveResult === STOP) return
     }
 
     indexPath.pop()

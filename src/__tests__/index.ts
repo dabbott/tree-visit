@@ -116,6 +116,35 @@ it('traverses normally', () => {
   expect(leaveNames).toEqual(['b1', 'b2', 'b', 'c1', 'c2', 'c', 'a'])
 })
 
+describe('reuseIndexPath option', () => {
+  it('allocates new index paths', () => {
+    let indexPaths: IndexPath[] = []
+
+    visit(example, {
+      onEnter: (_child, indexPath) => {
+        indexPaths.push(indexPath)
+      },
+      getChildren,
+    })
+
+    expect(indexPaths).toEqual([[], [0], [0, 0], [0, 1], [1], [1, 0], [1, 1]])
+  })
+
+  it('reuses index paths', () => {
+    let indexPaths: IndexPath[] = []
+
+    visit(example, {
+      onEnter: (_child, indexPath) => {
+        indexPaths.push(indexPath)
+      },
+      getChildren,
+      reuseIndexPath: true,
+    })
+
+    expect(indexPaths).toEqual([[], [], [], [], [], [], []])
+  })
+})
+
 it('traverses deeply nested nodes', () => {
   let enterNames: string[] = []
 
