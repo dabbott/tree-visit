@@ -12,7 +12,8 @@
     "build:watch": "rm -rf ./lib && tsc --declaration --watch",
     "test": "jest",
     "test:watch": "jest --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf ./lib"
   },
   "repository": "https://github.com/dabbott/tree-visit",
   "license": "MIT",

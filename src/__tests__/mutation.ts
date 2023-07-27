@@ -242,6 +242,17 @@ describe('move', () => {
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
   })
+
+  it('moves node to non-existent index', () => {
+    const result = move(example, {
+      indexPaths: [[0, 1]],
+      to: [1, 7],
+      create: createNode,
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
 })
 
 describe('partially applied', () => {

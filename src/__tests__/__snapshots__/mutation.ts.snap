@@ -97,6 +97,16 @@ exports[`move moves node from 1 to 0 1`] = `
     └── b2"
 `;
 
+exports[`move moves node to non-existent index 1`] = `
+"a
+├── b
+│   └── b1
+└── c
+    ├── c1
+    ├── c2
+    └── b2"
+`;
+
 exports[`move moves node using old index 1`] = `
 "a
 ├── d
