@@ -2,6 +2,7 @@ import { access, accessPath } from './access'
 import { DiagramOptions, diagram } from './diagram'
 import {
   FindOptions,
+  FindOptionsTyped,
   find,
   findAll,
   findAllIndexPaths,
@@ -42,6 +43,46 @@ type ReplaceOptionsWB<T> = WithoutBase<ReplaceOptions<T>>
 
 type ApplyableOptions<T> = DiagramRequiredOptions<T> & MutationOptions<T>
 
+function bindAllMethods(instance: any): void {
+  const prototype = Object.getPrototypeOf(instance)
+
+  Object.getOwnPropertyNames(prototype).forEach((propertyName) => {
+    const propertyDescriptor = Object.getOwnPropertyDescriptor(
+      prototype,
+      propertyName
+    )
+
+    if (propertyDescriptor) {
+      // For methods
+      if (
+        typeof propertyDescriptor.value === 'function' &&
+        propertyName !== 'constructor'
+      ) {
+        instance[propertyName] = propertyDescriptor.value.bind(instance)
+      }
+
+      // For getters and setters
+      if (propertyDescriptor.get || propertyDescriptor.set) {
+        const { get, set } = propertyDescriptor
+        const boundDescriptor: PropertyDescriptor = {
+          configurable: true,
+          enumerable: true,
+        }
+
+        if (get) {
+          boundDescriptor.get = get.bind(instance)
+        }
+
+        if (set) {
+          boundDescriptor.set = set.bind(instance)
+        }
+
+        Object.defineProperty(instance, propertyName, boundDescriptor)
+      }
+    }
+  })
+}
+
 class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
   constructor(
     getChildrenOrBaseOptions: BaseOptions<T> | ((node: T) => T[]),
@@ -51,6 +92,8 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
       typeof getChildrenOrBaseOptions === 'function'
         ? { getChildren: getChildrenOrBaseOptions }
         : getChildrenOrBaseOptions
+
+    bindAllMethods(this)
   }
 
   public baseOptions: BaseOptions<T>
@@ -88,17 +131,112 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
       ? diagram(node, { ...this.baseOptions, getLabel: options })
       : diagram(node, this.mergeOptions(options))
 
-  find = (node: T, options: FindOptionsWB<T>) =>
-    find(node, this.mergeOptions(options))
+  /**
+   * Find a node matching a predicate function.
+   */
+  find(node: T, predicate: FindOptions<T>['predicate']): T | undefined
 
-  findAll = (node: T, options: FindOptionsWB<T>) =>
-    findAll(node, this.mergeOptions(options))
+  find(node: T, options: WithoutBase<FindOptions<T>>): T | undefined
 
-  findIndexPath = (node: T, options: FindOptionsWB<T>) =>
-    findIndexPath(node, this.mergeOptions(options))
+  find<S extends T>(
+    node: T,
+    predicate: FindOptionsTyped<T, S>['predicate']
+  ): S | undefined
 
-  findAllIndexPaths = (node: T, options: FindOptionsWB<T>) =>
-    findAllIndexPaths(node, this.mergeOptions(options))
+  find<S extends T>(
+    node: T,
+    options: WithoutBase<FindOptionsTyped<T, S>>
+  ): S | undefined
+
+  find(
+    node: T,
+    predicateOrOptions:
+      | FindOptions<T>['predicate']
+      | WithoutBase<FindOptions<T>>
+  ) {
+    return typeof predicateOrOptions === 'function'
+      ? find(node, this.mergeOptions({ predicate: predicateOrOptions }))
+      : find(node, this.mergeOptions({ ...predicateOrOptions }))
+  }
+
+  /**
+   * Find all nodes matching a predicate function.
+   */
+  findAll(node: T, predicate: FindOptions<T>['predicate']): T[]
+
+  findAll(node: T, options: WithoutBase<FindOptions<T>>): T[]
+
+  findAll<S extends T>(
+    node: T,
+    predicate: FindOptionsTyped<T, S>['predicate']
+  ): S[]
+
+  findAll<S extends T>(
+    node: T,
+    options: WithoutBase<FindOptionsTyped<T, S>>
+  ): S[]
+
+  findAll(
+    node: T,
+    predicateOrOptions:
+      | FindOptions<T>['predicate']
+      | WithoutBase<FindOptions<T>>
+  ) {
+    return typeof predicateOrOptions === 'function'
+      ? findAll(node, this.mergeOptions({ predicate: predicateOrOptions }))
+      : findAll(node, this.mergeOptions({ ...predicateOrOptions }))
+  }
+
+  /**
+   * Find the `IndexPath` of a node matching a predicate function.
+   */
+  findIndexPath(
+    node: T,
+    predicate: FindOptions<T>['predicate']
+  ): IndexPath | undefined
+
+  findIndexPath(
+    node: T,
+    options: WithoutBase<FindOptions<T>>
+  ): IndexPath | undefined
+
+  findIndexPath(
+    node: T,
+    predicateOrOptions:
+      | FindOptions<T>['predicate']
+      | WithoutBase<FindOptions<T>>
+  ) {
+    return typeof predicateOrOptions === 'function'
+      ? findIndexPath(
+          node,
+          this.mergeOptions({ predicate: predicateOrOptions })
+        )
+      : findIndexPath(node, this.mergeOptions({ ...predicateOrOptions }))
+  }
+
+  /**
+   * Find the `IndexPath` of all nodes matching a predicate function.
+   */
+  findAllIndexPaths(
+    node: T,
+    predicate: FindOptions<T>['predicate']
+  ): IndexPath[]
+
+  findAllIndexPaths(node: T, options: WithoutBase<FindOptions<T>>): IndexPath[]
+
+  findAllIndexPaths(
+    node: T,
+    predicateOrOptions:
+      | FindOptions<T>['predicate']
+      | WithoutBase<FindOptions<T>>
+  ) {
+    return typeof predicateOrOptions === 'function'
+      ? findAllIndexPaths(
+          node,
+          this.mergeOptions({ predicate: predicateOrOptions })
+        )
+      : findAllIndexPaths(node, this.mergeOptions({ ...predicateOrOptions }))
+  }
 
   flat = (node: T) => flat(node, this.mergeOptions({}))
 
@@ -113,8 +251,6 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
 
   map = <R>(node: T, transform: MapOptions<T, R>['transform']): R =>
     map(node, this.mergeOptions({ transform }))
-
-  // --- Mutations ---
 
   /**
    * Visit each node using preorder DFS traversal.
@@ -132,12 +268,12 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
       | NonNullable<VisitOptions<T>>['onEnter']
       | VisitOptionsWB<T>
   ) {
-    if (typeof onEnterOrOptions === 'function') {
-      visit(node, this.mergeOptions({ onEnter: onEnterOrOptions }))
-    } else {
-      visit(node, this.mergeOptions({ ...onEnterOrOptions }))
-    }
+    return typeof onEnterOrOptions === 'function'
+      ? visit(node, this.mergeOptions({ onEnter: onEnterOrOptions }))
+      : visit(node, this.mergeOptions({ ...onEnterOrOptions }))
   }
+
+  // --- Mutations ---
 
   insert = (
     node: T,
@@ -170,28 +306,28 @@ export function defineTree<T>(
   return new Tree(getChildren, {})
 }
 
-type TestNode = {
-  label: string
-  children: TestNode[]
-}
-const a = { label: 'a', children: [] }
+// type TestNode = {
+//   label: string
+//   children: TestNode[]
+// }
+// const a = { label: 'a', children: [] }
 
-const TestTree1 = defineTree((node: TestNode) => node.children)
-TestTree1.diagram(a, { getLabel: (node) => node.label })
-// TestTree1.diagram(a, {}) // Fails
-TestTree1.diagram(a, (node) => node.label)
+// const TestTree1 = defineTree((node: TestNode) => node.children)
+// TestTree1.diagram(a, { getLabel: (node) => node.label })
+// // TestTree1.diagram(a, {}) // Fails
+// TestTree1.diagram(a, (node) => node.label)
 
-const TestTree2 = TestTree1.withOptions({ getLabel: (node) => node.label })
-// TestTree2.diagram(a)
+// const TestTree2 = TestTree1.withOptions({ getLabel: (node) => node.label })
+// // TestTree2.diagram(a)
 
-const TestTree3 = TestTree1.withOptions({
-  getLabel: (node) => node.label,
-  funcA: () => {},
-})
-TestTree3.diagram(a, {})
-TestTree3.diagram(a)
+// const TestTree3 = TestTree1.withOptions({
+//   getLabel: (node) => node.label,
+//   funcA: () => {},
+// })
+// TestTree3.diagram(a, {})
+// TestTree3.diagram(a)
 
-const InsertTree1 = defineTree((node: TestNode) => node.children)
-InsertTree1.insert(a, { at: [], nodes: [], create: (node) => node })
-const InsertTree2 = InsertTree1.withOptions({ create: (node) => node })
-InsertTree2.insert(a, { at: [], nodes: [] })
+// const InsertTree1 = defineTree((node: TestNode) => node.children)
+// InsertTree1.insert(a, { at: [], nodes: [], create: (node) => node })
+// const InsertTree2 = InsertTree1.withOptions({ create: (node) => node })
+// InsertTree2.insert(a, { at: [], nodes: [] })

@@ -1,4 +1,5 @@
 import { access, accessPath } from './access'
+import { defineTree } from './defineTree'
 import { DiagramOptions, diagram } from './diagram'
 import {
   FindOptions,
@@ -269,8 +270,8 @@ export function withOptions<T>(
   baseOptions: BaseOptions<T> | MutationBaseOptions<T>
 ): WithOptions<T> {
   if ('create' in baseOptions) {
-    return withMutationOptions(baseOptions)
+    return defineTree(baseOptions).withOptions({ create: baseOptions.create })
   }
 
-  return withOptionsBase(baseOptions)
+  return defineTree(baseOptions)
 }
