@@ -206,3 +206,14 @@ exports[`replace replaces nested 1`] = `
 `;
 
 exports[`replace replaces root 1`] = `"x"`;
+
+exports[`tree with no options inserts node 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+├── x
+└── c
+    ├── c1
+    └── c2"
+`;

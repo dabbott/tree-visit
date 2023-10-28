@@ -1,4 +1,5 @@
 import { access, accessPath } from '../access'
+import { defineTree } from '../defineTree'
 import { diagram } from '../diagram'
 import { find, findAll, findAllIndexPaths, findIndexPath } from '../find'
 import { flat } from '../flat'
@@ -6,7 +7,6 @@ import { flatMap } from '../flatMap'
 import { IndexPath, visit } from '../index'
 import { map } from '../map'
 import { reduce } from '../reduce'
-import { withOptions } from '../withOptions'
 
 type Node = {
   name: string
@@ -592,9 +592,8 @@ describe('diagram', () => {
 
 describe('withOptions', () => {
   it('binds options', () => {
-    const { find, access, visit, reduce, flatMap, map, ...Tree } = withOptions({
-      getChildren,
-    })
+    const { find, access, visit, reduce, flatMap, map, ...Tree } =
+      defineTree(getChildren)
 
     expect(Tree.getChildren(example, []).map((node) => node.name)).toEqual([
       'b',
@@ -653,7 +652,7 @@ describe('withOptions', () => {
   })
 
   it('supports typed finding', () => {
-    const { find, findAll } = withOptions({ getChildren: getTypedChildren })
+    const { find, findAll } = defineTree(getTypedChildren)
 
     expect(
       find<TypeA>(typedExample, {
@@ -669,9 +668,8 @@ describe('withOptions', () => {
   })
 
   it('supports overloaded calls', () => {
-    const { find, findAllIndexPaths, visit, diagram, flat } = withOptions({
-      getChildren,
-    })
+    const { find, findAllIndexPaths, visit, diagram, flat } =
+      defineTree(getChildren)
 
     let enterNames: string[] = []
 

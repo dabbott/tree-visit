@@ -6,12 +6,12 @@ import {
   getChildren,
   getLabel,
 } from '../__mocks__/node'
+import { defineTree } from '../defineTree'
 import { diagram } from '../diagram'
 import { insert } from '../insert'
 import { move } from '../move'
 import { remove } from '../remove'
 import { replace } from '../replace'
-import { withOptions } from '../withOptions'
 
 describe('insert', () => {
   it('inserts node at start', () => {
@@ -291,9 +291,22 @@ describe('move', () => {
   })
 })
 
+describe('tree with no options', () => {
+  const Tree = defineTree(getChildren)
+
+  it('inserts node', () => {
+    const result = Tree.insert(example, {
+      at: [1],
+      nodes: [{ name: 'x', indexPath: [] }],
+      create: createNode,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+})
+
 describe('partially applied', () => {
-  const Tree = withOptions({
-    getChildren,
+  const Tree = defineTree(getChildren).withOptions({
     create: createNode,
   })
 
