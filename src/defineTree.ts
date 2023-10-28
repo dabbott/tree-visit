@@ -122,6 +122,11 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
     this.getChildren = this.baseOptions.getChildren
   }
 
+  /**
+   * Returns the node's children.
+   *
+   * This is the same as the `getChildren` option passed to `defineTree`, included here for convenience.
+   */
   getChildren: BaseOptions<T>['getChildren']
 
   private baseOptions: BaseOptions<T>
@@ -136,12 +141,25 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
     newOptions: NewOptions
   ) => new Tree(this.baseOptions, { ...this.appliedOptions, ...newOptions })
 
+  /**
+   * Returns a node by its `IndexPath`.
+   *
+   * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
+   */
   access = (node: T, indexPath: IndexPath) =>
     access(node, indexPath, this.mergeOptions({}))
 
+  /**
+   * Returns an array of each node in an `IndexPath`.
+   *
+   * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
+   */
   accessPath = (node: T, indexPath: IndexPath) =>
     accessPath(node, indexPath, this.mergeOptions({}))
 
+  /**
+   * Generate a diagram of the tree, as a string.
+   */
   diagram = (
     node: T,
     options:
@@ -193,8 +211,18 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
         )
       : findAllIndexPaths(node, this.mergeOptions({ ...predicateOrOptions }))
 
+  /**
+   * Returns an array containing the root node and all of its descendants.
+   *
+   * This is analogous to `Array.prototype.flat` for flattening arrays.
+   */
   flat = (node: T) => flat(node, this.mergeOptions({}))
 
+  /**
+   * Map each node into an array of values, which are then flattened into a single array.
+   *
+   * This is analogous to `Array.prototype.flatMap` for arrays.
+   */
   flatMap = <R>(node: T, transform: FlatMapOptions<T, R>['transform']) =>
     flatMap(node, this.mergeOptions({ transform }))
 
@@ -219,24 +247,36 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
 
   // --- Mutations ---
 
+  /**
+   * Insert nodes at a given `IndexPath`.
+   */
   insert = (
     node: T,
     options: OptionCheck<AppliedOptions, 'create', InsertOptionsWB<T>> &
       Omit<InsertOptionsWB<T>, 'create'>
   ) => insert(node, this.mergeOptions(options))
 
+  /**
+   * Remove nodes at the given `IndexPath`s.
+   */
   remove = (
     node: T,
     options: OptionCheck<AppliedOptions, 'create', RemoveOptionsWB<T>> &
       Omit<RemoveOptionsWB<T>, 'create'>
   ) => remove(node, this.mergeOptions(options))
 
+  /**
+   * Move nodes from one `IndexPath` to another.
+   */
   move = (
     node: T,
     options: OptionCheck<AppliedOptions, 'create', MoveOptionsWB<T>> &
       Omit<MoveOptionsWB<T>, 'create'>
   ) => move(node, this.mergeOptions(options))
 
+  /**
+   * Replace the node at the given `IndexPath` with another
+   */
   replace = (
     node: T,
     options: OptionCheck<AppliedOptions, 'create', ReplaceOptionsWB<T>> &

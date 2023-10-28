@@ -1,25 +1,16 @@
-import { access, accessPath } from './access'
 import { defineTree } from './defineTree'
-import { DiagramOptions, diagram } from './diagram'
-import {
-  FindOptions,
-  FindOptionsTyped,
-  find,
-  findAll,
-  findAllIndexPaths,
-  findIndexPath,
-} from './find'
-import { flat } from './flat'
-import { FlatMapOptions, flatMap } from './flatMap'
+import { DiagramOptions } from './diagram'
+import { FindOptions, FindOptionsTyped } from './find'
+import { FlatMapOptions } from './flatMap'
 import { IndexPath } from './indexPath'
-import { InsertOptions, insert } from './insert'
-import { MapOptions, map } from './map'
-import { MoveOptions, move } from './move'
+import { InsertOptions } from './insert'
+import { MapOptions } from './map'
+import { MoveOptions } from './move'
 import { BaseOptions, MutationBaseOptions } from './options'
-import { ReduceOptions, reduce } from './reduce'
-import { RemoveOptions, remove } from './remove'
-import { ReplaceOptions, replace } from './replace'
-import { VisitOptions, visit } from './visit'
+import { ReduceOptions } from './reduce'
+import { RemoveOptions } from './remove'
+import { ReplaceOptions } from './replace'
+import { VisitOptions } from './visit'
 
 // Omit any keys from the BaseOptions, since they're always applied
 // automatically as part of `withOptions`
@@ -155,82 +146,6 @@ export type WithOptions<T> = {
   replace(node: T, options: WithoutBase<ReplaceOptions<T>>): T
 }
 
-function withOptionsBase<T>(baseOptions: BaseOptions<T>): WithOptions<T> {
-  return {
-    getChildren: baseOptions.getChildren,
-    access: (node, indexPath) => access(node, indexPath, baseOptions),
-    accessPath: (node, indexPath) => accessPath(node, indexPath, baseOptions),
-    diagram: (
-      node: T,
-      getLabelOrOptions:
-        | DiagramOptions<T>['getLabel']
-        | WithoutBase<DiagramOptions<T>>
-    ) =>
-      typeof getLabelOrOptions === 'function'
-        ? diagram(node, { ...baseOptions, getLabel: getLabelOrOptions })
-        : diagram(node, { ...baseOptions, ...getLabelOrOptions }),
-    find: (
-      node: T,
-      predicateOrOptions:
-        | FindOptions<T>['predicate']
-        | WithoutBase<FindOptions<T>>
-    ) =>
-      typeof predicateOrOptions === 'function'
-        ? find(node, { ...baseOptions, predicate: predicateOrOptions })
-        : find(node, { ...baseOptions, ...predicateOrOptions }),
-    findAll: (
-      node: T,
-      predicateOrOptions:
-        | FindOptions<T>['predicate']
-        | WithoutBase<FindOptions<T>>
-    ) =>
-      typeof predicateOrOptions === 'function'
-        ? findAll(node, { ...baseOptions, predicate: predicateOrOptions })
-        : findAll(node, { ...baseOptions, ...predicateOrOptions }),
-    findIndexPath: (
-      node: T,
-      predicateOrOptions:
-        | FindOptions<T>['predicate']
-        | WithoutBase<FindOptions<T>>
-    ) =>
-      typeof predicateOrOptions === 'function'
-        ? findIndexPath(node, { ...baseOptions, predicate: predicateOrOptions })
-        : findIndexPath(node, { ...baseOptions, ...predicateOrOptions }),
-    flat: (node: T) => flat(node, baseOptions),
-    flatMap: (node: T, transform) =>
-      flatMap(node, { ...baseOptions, transform }),
-    reduce: (node: T, nextResult, initialResult) =>
-      reduce(node, { ...baseOptions, nextResult, initialResult }),
-    map: (node: T, transform) => map(node, { ...baseOptions, transform }),
-    findAllIndexPaths: (
-      node: T,
-      predicateOrOptions:
-        | FindOptions<T>['predicate']
-        | WithoutBase<FindOptions<T>>
-    ) =>
-      typeof predicateOrOptions === 'function'
-        ? findAllIndexPaths(node, {
-            ...baseOptions,
-            predicate: predicateOrOptions,
-          })
-        : findAllIndexPaths(node, { ...baseOptions, ...predicateOrOptions }),
-    visit: (
-      node: T,
-      onEnterOrOptions:
-        | NonNullable<VisitOptions<T>>['onEnter']
-        | WithoutBase<VisitOptions<T>>
-    ) =>
-      typeof onEnterOrOptions === 'function'
-        ? visit(node, { ...baseOptions, onEnter: onEnterOrOptions })
-        : visit(node, { ...baseOptions, ...onEnterOrOptions }),
-    insert: (node: T, options) => insert(node, { ...baseOptions, ...options }),
-    remove: (node: T, options) => remove(node, { ...baseOptions, ...options }),
-    move: (node: T, options) => move(node, { ...baseOptions, ...options }),
-    replace: (node: T, options) =>
-      replace(node, { ...baseOptions, ...options }),
-  }
-}
-
 type WithoutMutationBase<O> = Omit<O, keyof MutationBaseOptions<unknown>>
 
 export type WithMutationOptions<T> = Omit<
@@ -241,20 +156,6 @@ export type WithMutationOptions<T> = Omit<
   remove: (node: T, options: WithoutMutationBase<RemoveOptions<T>>) => T
   move: (node: T, options: WithoutMutationBase<MoveOptions<T>>) => T
   replace: (node: T, options: WithoutMutationBase<ReplaceOptions<T>>) => T
-}
-
-function withMutationOptions<T>(
-  baseOptions: MutationBaseOptions<T>
-): WithMutationOptions<T> {
-  const tree = withOptionsBase(baseOptions)
-
-  return {
-    ...tree,
-    insert: (node, options) => insert(node, { ...baseOptions, ...options }),
-    remove: (node, options) => remove(node, { ...baseOptions, ...options }),
-    move: (node, options) => move(node, { ...baseOptions, ...options }),
-    replace: (node, options) => replace(node, { ...baseOptions, ...options }),
-  }
 }
 
 /**

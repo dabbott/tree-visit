@@ -1,5 +1,6 @@
 export * from './access'
 export * from './ancestors'
+export * from './defineTree'
 export * from './diagram'
 export * from './find'
 export * from './flat'
