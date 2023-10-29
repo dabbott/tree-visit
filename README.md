@@ -14,19 +14,21 @@ yarn add tree-visit
 
 ## API
 
-All functions take an `options` parameter that must contain _at least_ a `getChildren` function which specifies how to find a node's children. The `withOptions` API returns a version of every function with the `getChildren` option already set. Using `withOptions` instead of the bare functions is recommended for convenience.
+The recommended way to use `tree-visit` is by calling `defineTree(getChildren)`, where `getChildren` is a function which returns a node's children as an array. The `defineTree` API returns an object containing every library function with the `getChildren` option already set.
 
-Most functions, such as `getChildren`, `predicate`, `onEnter`, and `onLeave`, are passed an `IndexPath` as the second argument, containing an array of integer indexes that identify that node. The root node is implicitly included in the `IndexPath` (i.e. there's no `0` first in every `IndexPath`).
+You may alternately import individual functions, e.g. `visit`, and pass the `{ getChildren }` option when calling them. Importing individual functions can reduce your bundle size to the bear minimum (though the entire library is small and has 0 dependencies, so this may not be necessary).
+
+Most callback functions, such as `getChildren`, `predicate`, `onEnter`, and `onLeave`, are passed an `IndexPath` as the second argument, containing an array of integer indexes that identify that node. The root node is implicitly included in the `IndexPath` (i.e. there's no `0` first in every `IndexPath`).
 
 - [access](#access)
 - [accessPath](#accessPath)
+- [defineTree](#defineTree)
 - [diagram](#diagram)
 - [find](#find)
 - [findAll](#findAll)
 - [findIndexPath](#findIndexPath)
 - [flat](#flat)
 - [visit](#visit)
-- [withOptions](#withOptions)
 
 ---
 
@@ -86,6 +88,45 @@ const rootNode = {
 
 access(rootNode, [1, 0], { getChildren })
 // #=> [{ name: 'a', children: [...] }, { name: 'c', children: [...] }, { name: 'd' }]
+```
+
+---
+
+### `defineTree`
+
+Returns a version of every library function with the `getChildren` option already set.
+
+This also allows for more concise calls to most functions.
+
+**Type**: `function defineTree<T>(baseOptions: BaseOptions<T>): Tree<T>`
+
+#### Example
+
+```js
+import { defineTree } from 'tree-visit'
+
+const getChildren = (node) => node.children || []
+
+const { visit, find } = defineTree({ getChildren })
+
+const rootNode = {
+  name: 'a',
+  children: [
+    { name: 'b' },
+    {
+      name: 'c',
+      children: [{ name: 'd' }],
+    },
+  ],
+}
+
+visit(rootNode, (node) => {
+  console.log(node)
+})
+// #=> a, b, c, d
+
+find(rootNode, (node) => node.name === 'd')
+// #=> { name: 'd' }
 ```
 
 ---
@@ -320,43 +361,4 @@ visit(rootNode, {
   },
 })
 // #=> a, b, c, d
-```
-
----
-
-### `withOptions`
-
-Returns a version of every function with the `getChildren` option already set.
-
-This allows for more concise calls to most functions.
-
-**Type**: `function withOptions<T>(baseOptions: BaseOptions<T>): WithOptions<T>`
-
-#### Example
-
-```js
-import { withOptions } from 'tree-visit'
-
-const getChildren = (node) => node.children || []
-
-const { visit, find } = withOptions({ getChildren })
-
-const rootNode = {
-  name: 'a',
-  children: [
-    { name: 'b' },
-    {
-      name: 'c',
-      children: [{ name: 'd' }],
-    },
-  ],
-}
-
-visit(rootNode, (node) => {
-  console.log(node)
-})
-// #=> a, b, c, d
-
-find(rootNode, (node) => node.name === 'd')
-// #=> { name: 'd' }
 ```
