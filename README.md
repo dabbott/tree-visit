@@ -36,7 +36,7 @@ Most callback functions, such as `getChildren`, `predicate`, `onEnter`, and `onL
 
 Returns a node by its `IndexPath`.
 
-**Type**: `function access<T>(node: T, indexPath: IndexPath, options: BaseOptions<T>): T`
+**Type**: `function access<T>(node: T, options: AccessOptions<T>): T`
 
 #### Example
 
@@ -56,7 +56,7 @@ const rootNode = {
   ],
 }
 
-access(rootNode, [1, 0], { getChildren })
+access(rootNode, { indexPath: [1, 0], getChildren })
 // #=> { name: 'd' }
 ```
 
@@ -66,7 +66,7 @@ access(rootNode, [1, 0], { getChildren })
 
 Returns an array of each node in an `IndexPath`.
 
-**Type**: `function accessPath<T>(node: T, indexPath: IndexPath, options: BaseOptions<T>): T`
+**Type**: `function accessPath<T>(node: T, options: AccessOptions<T>): T`
 
 #### Example
 
@@ -86,7 +86,7 @@ const rootNode = {
   ],
 }
 
-access(rootNode, [1, 0], { getChildren })
+access(rootNode, { indexPath: [1, 0], getChildren })
 // #=> [{ name: 'a', children: [...] }, { name: 'c', children: [...] }, { name: 'd' }]
 ```
 
@@ -94,7 +94,7 @@ access(rootNode, [1, 0], { getChildren })
 
 ### `defineTree`
 
-Returns a version of every library function with the `getChildren` option already set.
+Returns an object containing every library function with the `getChildren` option already set.
 
 This also allows for more concise calls to most functions.
 

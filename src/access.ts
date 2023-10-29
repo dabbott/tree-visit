@@ -1,17 +1,17 @@
 import { IndexPath } from './indexPath'
 import { BaseOptions } from './options'
 
+export type AccessOptions<T> = BaseOptions<T> & {
+  indexPath: IndexPath
+}
+
 /**
  * Returns a node by its `IndexPath`.
  *
  * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
  */
-export function access<T>(
-  node: T,
-  indexPath: IndexPath,
-  options: BaseOptions<T>
-): T {
-  let path = indexPath.slice()
+export function access<T>(node: T, options: AccessOptions<T>): T {
+  let path = options.indexPath.slice()
 
   while (path.length > 0) {
     let index = path.shift()!
@@ -26,12 +26,8 @@ export function access<T>(
  *
  * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
  */
-export function accessPath<T>(
-  node: T,
-  indexPath: IndexPath,
-  options: BaseOptions<T>
-): T[] {
-  let path = indexPath.slice()
+export function accessPath<T>(node: T, options: AccessOptions<T>): T[] {
+  let path = options.indexPath.slice()
   let result: T[] = [node]
 
   while (path.length > 0) {

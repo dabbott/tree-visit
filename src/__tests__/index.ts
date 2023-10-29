@@ -221,7 +221,7 @@ describe('access', () => {
   it('accesses node at index path', () => {
     visit(example, {
       onEnter: (child, indexPath) => {
-        const found = access(example, indexPath, { getChildren })
+        const found = access(example, { getChildren, indexPath })
         expect(found.name).toEqual(child.name)
       },
       getChildren,
@@ -230,7 +230,9 @@ describe('access', () => {
 
   it('accesses node path', () => {
     expect(
-      accessPath(example, [0, 1], { getChildren }).map((node) => node.name)
+      accessPath(example, { getChildren, indexPath: [0, 1] }).map(
+        (node) => node.name
+      )
     ).toEqual(['a', 'b', 'b2'])
   })
 })
@@ -292,7 +294,7 @@ describe('find', () => {
     expect(indexPaths).toEqual([[0], [0, 0], [0, 1]])
 
     const nodes = indexPaths.map((indexPath) =>
-      access(example, indexPath, { getChildren })
+      access(example, { getChildren, indexPath })
     )
 
     expect(nodes.map((node) => node.name)).toEqual(['b', 'b1', 'b2'])

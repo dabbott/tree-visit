@@ -147,7 +147,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
    * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
    */
   access = (node: T, indexPath: IndexPath) =>
-    access(node, indexPath, this.mergeOptions({}))
+    access(node, this.mergeOptions({ indexPath }))
 
   /**
    * Returns an array of each node in an `IndexPath`.
@@ -155,7 +155,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
    * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
    */
   accessPath = (node: T, indexPath: IndexPath) =>
-    accessPath(node, indexPath, this.mergeOptions({}))
+    accessPath(node, this.mergeOptions({ indexPath }))
 
   /**
    * Generate a diagram of the tree, as a string.

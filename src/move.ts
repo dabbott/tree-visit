@@ -29,7 +29,7 @@ export function move<T>(node: T, options: MoveOptions<T>) {
   const _ancestorIndexPaths = ancestorIndexPaths(options.indexPaths)
 
   const nodesToInsert = _ancestorIndexPaths.map((indexPath) =>
-    access(node, indexPath, options)
+    access(node, { ...options, indexPath })
   )
 
   const operations = getInsertionOperations(
