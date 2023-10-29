@@ -713,7 +713,13 @@ describe('withOptions', () => {
       Tree.diagram(example)
     }).toThrowError()
 
+    expect(() => {
+      // @ts-expect-error
+      Tree.diagram(example, {})
+    }).toThrowError()
+
     TreeWithOptions.diagram(example)
+    TreeWithOptions.diagram(example, {})
     TreeWithOptions.diagram(example, (node) => node.name)
   })
 })

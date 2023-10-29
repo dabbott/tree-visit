@@ -303,29 +303,3 @@ export function defineTree<T>(
 ) {
   return new Tree(getChildren, {})
 }
-
-// type TestNode = {
-//   label: string
-//   children: TestNode[]
-// }
-// const a = { label: 'a', children: [] }
-
-// const TestTree1 = defineTree((node: TestNode) => node.children)
-// TestTree1.diagram(a, { getLabel: (node) => node.label })
-// // TestTree1.diagram(a, {}) // Fails
-// TestTree1.diagram(a, (node) => node.label)
-
-// const TestTree2 = TestTree1.withOptions({ getLabel: (node) => node.label })
-// TestTree2.diagram(a)
-
-// const TestTree3 = TestTree1.withOptions({
-//   getLabel: (node) => node.label,
-// })
-// TestTree3.diagram(a, {})
-// TestTree3.diagram(a)
-
-// const InsertTree1 = defineTree((node: TestNode) => node.children)
-// InsertTree1.insert(a, { at: [], nodes: [], create: (node) => node })
-// // InsertTree1.insert(a, { at: [], nodes: [] }) // Fails
-// const InsertTree2 = InsertTree1.withOptions({ create: (node) => node })
-// InsertTree2.insert(a, { at: [], nodes: [] })
