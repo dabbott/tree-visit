@@ -18,7 +18,7 @@ import { BaseOptions, MutationBaseOptions } from './options'
 import { ReduceOptions, reduce } from './reduce'
 import { RemoveOptions, remove } from './remove'
 import { ReplaceOptions, replace } from './replace'
-import { ExtractRequiredKeys, OptionCheck } from './types'
+import { ExtractRequiredKeys, OptionCheck, Prettify } from './types'
 import { VisitOptions, visit } from './visit'
 
 type WithoutBase<T> = Omit<T, keyof BaseOptions<T>>
@@ -164,10 +164,16 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
     node: T,
     options:
       | DiagramRequiredOptions<T>['getLabel']
-      | (AppliedOptions extends DiagramRequiredOptions<T>
-          ? DiagramOptionalOptions<T> | void
-          : OptionCheck<AppliedOptions, 'getLabel', DiagramRequiredOptions<T>> &
-              DiagramOptionalOptions<T>)
+      | Prettify<
+          AppliedOptions extends DiagramRequiredOptions<T>
+            ? DiagramOptionalOptions<T> | void
+            : OptionCheck<
+                AppliedOptions,
+                'getLabel',
+                DiagramRequiredOptions<T>
+              > &
+                DiagramOptionalOptions<T>
+        >
   ) =>
     typeof options === 'function'
       ? diagram(node, this.mergeOptions({ getLabel: options }))
@@ -252,8 +258,10 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
    */
   insert = (
     node: T,
-    options: OptionCheck<AppliedOptions, 'create', InsertOptionsWB<T>> &
-      Omit<InsertOptionsWB<T>, 'create'>
+    options: Prettify<
+      OptionCheck<AppliedOptions, 'create', InsertOptionsWB<T>> &
+        Omit<InsertOptionsWB<T>, 'create'>
+    >
   ) => insert(node, this.mergeOptions(options))
 
   /**
@@ -261,8 +269,10 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
    */
   remove = (
     node: T,
-    options: OptionCheck<AppliedOptions, 'create', RemoveOptionsWB<T>> &
-      Omit<RemoveOptionsWB<T>, 'create'>
+    options: Prettify<
+      OptionCheck<AppliedOptions, 'create', RemoveOptionsWB<T>> &
+        Omit<RemoveOptionsWB<T>, 'create'>
+    >
   ) => remove(node, this.mergeOptions(options))
 
   /**
@@ -270,8 +280,10 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
    */
   move = (
     node: T,
-    options: OptionCheck<AppliedOptions, 'create', MoveOptionsWB<T>> &
-      Omit<MoveOptionsWB<T>, 'create'>
+    options: Prettify<
+      OptionCheck<AppliedOptions, 'create', MoveOptionsWB<T>> &
+        Omit<MoveOptionsWB<T>, 'create'>
+    >
   ) => move(node, this.mergeOptions(options))
 
   /**
@@ -279,8 +291,10 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
    */
   replace = (
     node: T,
-    options: OptionCheck<AppliedOptions, 'create', ReplaceOptionsWB<T>> &
-      Omit<ReplaceOptionsWB<T>, 'create'>
+    options: Prettify<
+      OptionCheck<AppliedOptions, 'create', ReplaceOptionsWB<T>> &
+        Omit<ReplaceOptionsWB<T>, 'create'>
+    >
   ) => replace(node, this.mergeOptions(options))
 }
 

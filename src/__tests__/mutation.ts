@@ -303,6 +303,16 @@ describe('tree with no options', () => {
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
   })
+
+  it('type checks', () => {
+    expect(() => {
+      // @ts-expect-error
+      Tree.insert(example, {
+        at: [1],
+        nodes: [{ name: 'x', indexPath: [] }],
+      })
+    }).toThrowError()
+  })
 })
 
 describe('partially applied', () => {

@@ -9,3 +9,8 @@ export type OptionCheck<
 > = AppliedOptions extends Record<OptionKey, any>
   ? { [K in OptionKey]?: R[K] }
   : { [K in OptionKey]: R[K] }
+
+/**
+ * Improve the type displayed in tooltips by flattening utility types.
+ */
+export type Prettify<T> = { [K in keyof T]: T[K] } & {}

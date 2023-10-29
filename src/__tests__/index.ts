@@ -703,4 +703,17 @@ describe('withOptions', () => {
       })
     ).toMatchSnapshot()
   })
+
+  it('type checks', () => {
+    const Tree = defineTree(getChildren)
+    const TreeWithOptions = Tree.withOptions({ getLabel: (node) => node.name })
+
+    expect(() => {
+      // @ts-expect-error
+      Tree.diagram(example)
+    }).toThrowError()
+
+    TreeWithOptions.diagram(example)
+    TreeWithOptions.diagram(example, (node) => node.name)
+  })
 })
