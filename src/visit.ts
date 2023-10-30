@@ -16,49 +16,7 @@ export type VisitEntriesOptions<T> = BaseEntriesOptions<T> & {
   onLeave?(node: T, keyPath: KeyPath): LeaveReturnValue
 }
 
-/**
- * Visit each node in the tree, calling an optional `onEnter` and `onLeave` for each.
- *
- * From `onEnter`:
- *
- * - return nothing or `undefined` to continue
- * - return `"skip"` to skip the children of that node and the subsequent `onLeave`
- * - return `"stop"` to end traversal
- *
- * From `onLeave`:
- *
- * - return nothing or `undefined` to continue
- * - return `"stop"` to end traversal
- */
-export function visit<T>(node: T, options: VisitOptions<T>): void
-export function visit<T>(node: T, options: VisitEntriesOptions<T>): void
-export function visit<T>(
-  node: T,
-  options: VisitOptions<T> | VisitEntriesOptions<T>
-): void {
-  const opts: VisitEntriesOptions<T> =
-    'getChildren' in options
-      ? {
-          ...convertChildrenToEntries<T>(options),
-          onEnter: (node: T, keyPath: KeyPath) => {
-            return options.onEnter?.(
-              node,
-              keyPath.map((pk) => pk as number)
-            )
-          },
-          onLeave: (node: T, keyPath: KeyPath) => {
-            return options.onLeave?.(
-              node,
-              keyPath.map((pk) => pk as number)
-            )
-          },
-        }
-      : options
-
-  return visitKeyed(node, opts)
-}
-
-type NodeEntriesWrapper<T> = {
+type NodeWrapper<T> = {
   node: T
 
   /**
@@ -90,11 +48,17 @@ type NodeEntriesWrapper<T> = {
  * - return nothing or `undefined` to continue
  * - return `"stop"` to end traversal
  */
-export function visitKeyed<T>(node: T, options: VisitEntriesOptions<T>): void {
+export function visit<T>(node: T, options: VisitOptions<T>): void
+export function visit<T>(node: T, options: VisitEntriesOptions<T>): void
+export function visit<T>(
+  node: T,
+  _options: VisitOptions<T> | VisitEntriesOptions<T>
+): void {
+  const options = visitOptionsInterop(_options)
   const { onEnter, onLeave, getEntries } = options
 
   let keyPath: KeyPath = []
-  let stack: NodeEntriesWrapper<T>[] = [{ node }]
+  let stack: NodeWrapper<T>[] = [{ node }]
 
   const getKeyPath = options.reuseIndexPath
     ? () => keyPath
@@ -139,5 +103,31 @@ export function visitKeyed<T>(node: T, options: VisitEntriesOptions<T>): void {
 
     keyPath.pop()
     stack.pop()
+  }
+}
+
+function visitOptionsInterop<T>(
+  options: VisitOptions<T> | VisitEntriesOptions<T>
+): VisitEntriesOptions<T> {
+  if ('getEntries' in options) return options
+
+  return {
+    ...convertChildrenToEntries<T>(options),
+    ...(options.onEnter && {
+      onEnter: (node: T, keyPath: KeyPath) => {
+        return options.onEnter?.(
+          node,
+          keyPath.map((pk) => pk as number)
+        )
+      },
+    }),
+    ...(options.onLeave && {
+      onLeave: (node: T, keyPath: KeyPath) => {
+        return options.onLeave?.(
+          node,
+          keyPath.map((pk) => pk as number)
+        )
+      },
+    }),
   }
 }

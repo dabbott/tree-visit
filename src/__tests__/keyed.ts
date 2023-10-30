@@ -1,6 +1,6 @@
 import { Node, example } from '../__mocks__/node'
 import { access } from '../access'
-import { visitKeyed } from '../visit'
+import { visit } from '../visit'
 
 const getEntries = (node: Node) =>
   (node.children || []).map((n): [string, Node] => [n.name, n])
@@ -18,7 +18,7 @@ describe('keyed access', () => {
   it('visits by key', () => {
     const result: string[] = []
 
-    visitKeyed(example, {
+    visit(example, {
       getEntries,
       onEnter(node) {
         result.push(node.name)
