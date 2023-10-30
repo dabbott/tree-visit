@@ -23,7 +23,7 @@ export function access<T>(node: T, options: AccessOptions<T>): T {
   if ('getEntries' in options) {
     let path = options.keyPath.slice()
 
-    while (path.length > 1) {
+    while (path.length > 0) {
       let key = path.shift()!
 
       node = getChild(node, {
