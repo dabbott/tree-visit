@@ -10,7 +10,7 @@ describe('keyed access', () => {
     expect(
       access(example, {
         getEntries,
-        keyPath: ['b', 'b2'],
+        path: ['b', 'b2'],
       }).name
     ).toEqual('b2')
   })

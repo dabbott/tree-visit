@@ -3,11 +3,11 @@ import { IndexPath, KeyPath } from './indexPath'
 import { BaseEntriesOptions, BaseOptions } from './options'
 
 type AccessChildrenOptions<T> = BaseOptions<T> & {
-  indexPath: IndexPath
+  path: IndexPath
 }
 
 type AccessEntriesOptions<T> = BaseEntriesOptions<T> & {
-  keyPath: KeyPath
+  path: KeyPath
 }
 
 export type AccessOptions<T> =
@@ -24,7 +24,7 @@ export function access<T>(node: T, options: AccessEntriesOptions<T>): T
 export function access<T>(node: T, _options: AccessOptions<T>): T {
   const options = accessOptionsInterop(_options)
 
-  let path = options.keyPath.slice()
+  let path = options.path.slice()
 
   while (path.length > 0) {
     let key = path.shift()!
@@ -46,7 +46,7 @@ export function accessPath<T>(node: T, _options: AccessOptions<T>): T[] {
   const options = accessOptionsInterop(_options)
 
   let result: T[] = [node]
-  let path = options.keyPath.slice()
+  let path = options.path.slice()
 
   while (path.length > 0) {
     let key = path.shift()!
@@ -66,6 +66,6 @@ function accessOptionsInterop<T>(
 
   return {
     ...convertChildrenToEntries<T>(options),
-    keyPath: options.indexPath,
+    path: options.path,
   }
 }

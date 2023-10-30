@@ -111,25 +111,9 @@ interface Overloads<T> {
 
 class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
   constructor(
-    getChildrenOrBaseOptions: BaseOptions<T> | ((node: T) => T[]),
+    private baseOptions: BaseOptions<T>,
     private appliedOptions: AppliedOptions
-  ) {
-    this.baseOptions =
-      typeof getChildrenOrBaseOptions === 'function'
-        ? { getChildren: getChildrenOrBaseOptions }
-        : getChildrenOrBaseOptions
-
-    this.getChildren = this.baseOptions.getChildren
-  }
-
-  /**
-   * Returns the node's children.
-   *
-   * This is the same as the `getChildren` option passed to `defineTree`, included here for convenience.
-   */
-  getChildren: BaseOptions<T>['getChildren']
-
-  private baseOptions: BaseOptions<T>
+  ) {}
 
   private mergeOptions = <T extends Record<string, any>>(options: T) => ({
     ...this.baseOptions,
@@ -146,16 +130,16 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
    *
    * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
    */
-  access = (node: T, indexPath: IndexPath) =>
-    access(node, this.mergeOptions({ indexPath }))
+  access = (node: T, path: IndexPath) =>
+    access(node, this.mergeOptions({ path }))
 
   /**
    * Returns an array of each node in an `IndexPath`.
    *
    * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
    */
-  accessPath = (node: T, indexPath: IndexPath) =>
-    accessPath(node, this.mergeOptions({ indexPath }))
+  accessPath = (node: T, path: IndexPath) =>
+    accessPath(node, this.mergeOptions({ path }))
 
   /**
    * Generate a diagram of the tree, as a string.
@@ -301,5 +285,8 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
 export function defineTree<T>(
   getChildren: BaseOptions<T> | ((node: T) => T[])
 ) {
-  return new Tree(getChildren, {})
+  return new Tree(
+    typeof getChildren === 'function' ? { getChildren } : getChildren,
+    {}
+  )
 }
