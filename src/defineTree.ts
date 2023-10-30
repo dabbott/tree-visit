@@ -15,7 +15,7 @@ import { InsertOptions, insert } from './insert'
 import { MapOptions, map } from './map'
 import { MoveOptions, move } from './move'
 import { BaseOptions, MutationBaseOptions } from './options'
-import { ReduceOptions, reduce } from './reduce'
+import { ReduceChildrenOptions, reduce } from './reduce'
 import { RemoveOptions, remove } from './remove'
 import { ReplaceOptions, replace } from './replace'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from './types'
@@ -234,7 +234,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
 
   reduce = <R>(
     node: T,
-    nextResult: ReduceOptions<T, R>['nextResult'],
+    nextResult: ReduceChildrenOptions<T, R>['nextResult'],
     initialResult: R
   ): R => reduce(node, this.mergeOptions({ nextResult, initialResult }))
 
