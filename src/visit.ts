@@ -113,15 +113,7 @@ function visitOptionsInterop<T>(
 
   return {
     ...convertChildrenToEntries<T>(options),
-    ...(options.onEnter && {
-      onEnter: (node: T, keyPath: KeyPath) => {
-        return options.onEnter?.(node, keyPath as IndexPath)
-      },
-    }),
-    ...(options.onLeave && {
-      onLeave: (node: T, keyPath: KeyPath) => {
-        return options.onLeave?.(node, keyPath as IndexPath)
-      },
-    }),
+    ...(options.onEnter && { onEnter: options.onEnter }),
+    ...(options.onLeave && { onLeave: options.onLeave }),
   }
 }

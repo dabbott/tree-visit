@@ -56,8 +56,7 @@ function reduceOptionsInterop<T, R>(
   return {
     ...convertChildrenToEntries<T>(options),
     initialResult: options.initialResult,
-    nextResult: (result: R, node: T, keyPath: KeyPath) => {
-      return options.nextResult(result, node, keyPath as IndexPath)
-    },
+    nextResult: (result: R, node: T, keyPath: KeyPath) =>
+      options.nextResult(result, node, keyPath as IndexPath),
   }
 }
