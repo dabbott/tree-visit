@@ -1,4 +1,4 @@
-import { getChild } from './getChild'
+import { convertChildrenToEntries, getEntriesChild } from './getChild'
 import { IndexPath, KeyPath } from './indexPath'
 import { BaseEntriesOptions, BaseOptions } from './options'
 
@@ -19,36 +19,34 @@ export type AccessOptions<T> =
  *
  * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
  */
+export function access<T>(node: T, options: AccessChildrenOptions<T>): T
+export function access<T>(node: T, options: AccessEntriesOptions<T>): T
 export function access<T>(node: T, options: AccessOptions<T>): T {
-  if ('getEntries' in options) {
-    let path = options.keyPath.slice()
+  const opts =
+    'getChildren' in options
+      ? { ...convertChildrenToEntries<T>(options), keyPath: options.indexPath }
+      : options
 
-    while (path.length > 0) {
-      let key = path.shift()!
+  return accessInternal(node, opts)
+}
 
-      node = getChild(node, {
-        ...options,
-        keyPath: path,
-        key,
-      })
-    }
+export function accessInternal<T>(
+  node: T,
+  options: AccessEntriesOptions<T>
+): T {
+  let path = options.keyPath.slice()
 
-    return node
-  } else {
-    let path = options.indexPath.slice()
+  while (path.length > 0) {
+    let key = path.shift()!
 
-    while (path.length > 0) {
-      let index = path.shift()!
-
-      node = getChild(node, {
-        ...options,
-        indexPath: path,
-        index,
-      })
-    }
-
-    return node
+    node = getEntriesChild(node, {
+      ...options,
+      keyPath: path,
+      key,
+    })
   }
+
+  return node
 }
 
 /**
@@ -56,37 +54,34 @@ export function access<T>(node: T, options: AccessOptions<T>): T {
  *
  * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
  */
+export function accessPath<T>(node: T, options: AccessChildrenOptions<T>): T[]
+export function accessPath<T>(node: T, options: AccessEntriesOptions<T>): T[]
 export function accessPath<T>(node: T, options: AccessOptions<T>): T[] {
+  const opts =
+    'getChildren' in options
+      ? { ...convertChildrenToEntries<T>(options), keyPath: options.indexPath }
+      : options
+
+  return accessPathInternal(node, opts)
+}
+
+export function accessPathInternal<T>(
+  node: T,
+  options: AccessEntriesOptions<T>
+): T[] {
   let result: T[] = [node]
+  let path = options.keyPath.slice()
 
-  if ('getEntries' in options) {
-    let path = options.keyPath.slice()
+  while (path.length > 0) {
+    let key = path.shift()!
 
-    while (path.length > 1) {
-      let key = path.shift()!
+    node = getEntriesChild(node, {
+      ...options,
+      keyPath: path,
+      key,
+    })
 
-      node = getChild(node, {
-        ...options,
-        keyPath: path,
-        key,
-      })
-
-      result.push(node)
-    }
-  } else {
-    let path = options.indexPath.slice()
-
-    while (path.length > 0) {
-      let index = path.shift()!
-
-      node = getChild(node, {
-        ...options,
-        indexPath: path,
-        index,
-      })
-
-      result.push(node)
-    }
+    result.push(node)
   }
 
   return result

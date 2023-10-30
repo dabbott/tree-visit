@@ -24,8 +24,8 @@ export type BaseOptions<T> = {
 //     })
 
 export type BaseEntriesOptions<T> = {
-  getEntries: (node: T, keyPath: KeyPath) => [string, T][]
-  getChild?: (parent: T, parentKeyPath: KeyPath, childKey: string) => T
+  getEntries: (node: T, keyPath: KeyPath) => [PropertyKey, T][]
+  getChild?: (parent: T, parentKeyPath: KeyPath, childKey: PropertyKey) => T
   reuseIndexPath?: boolean
 }
 

@@ -1,3 +1,4 @@
+import { convertChildrenToEntries } from './getChild'
 import { IndexPath, KeyPath } from './indexPath'
 import { BaseEntriesOptions, BaseOptions } from './options'
 
@@ -9,24 +10,6 @@ export type LeaveReturnValue = void | 'stop'
 export type VisitOptions<T> = BaseOptions<T> & {
   onEnter?(node: T, indexPath: IndexPath): EnterReturnValue
   onLeave?(node: T, indexPath: IndexPath): LeaveReturnValue
-}
-
-type NodeWrapper<T> = {
-  node: T
-
-  /**
-   * The current traversal state of the node.
-   *
-   * undefined => not visited
-   * -1        => skipped
-   * n         => nth child
-   */
-  state?: number
-
-  /**
-   * Cached children, so we only call getChildren once per node
-   */
-  children?: T[]
 }
 
 /**
@@ -43,57 +26,32 @@ type NodeWrapper<T> = {
  * - return nothing or `undefined` to continue
  * - return `"stop"` to end traversal
  */
-export function visit<T>(node: T, options: VisitOptions<T>): void {
-  const { onEnter, onLeave, getChildren } = options
+export function visit<T>(node: T, options: VisitOptions<T>): void
+export function visit<T>(node: T, options: VisitEntriesOptions<T>): void
+export function visit<T>(
+  node: T,
+  options: VisitOptions<T> | VisitEntriesOptions<T>
+): void {
+  const opts =
+    'getChildren' in options
+      ? {
+          ...convertChildrenToEntries<T>(options),
+          onEnter: (node: T, keyPath: KeyPath) => {
+            return options.onEnter?.(
+              node,
+              keyPath.map((pk) => pk as number)
+            )
+          },
+          onLeave: (node: T, keyPath: KeyPath) => {
+            return options.onLeave?.(
+              node,
+              keyPath.map((pk) => pk as number)
+            )
+          },
+        }
+      : options
 
-  let indexPath: IndexPath = []
-  let stack: NodeWrapper<T>[] = [{ node }]
-
-  const getIndexPath = options.reuseIndexPath
-    ? () => indexPath
-    : () => indexPath.slice()
-
-  while (stack.length > 0) {
-    let wrapper = stack[stack.length - 1]
-
-    // Visit the wrapped node
-    if (wrapper.state === undefined) {
-      const enterResult = onEnter?.(wrapper.node, getIndexPath())
-
-      if (enterResult === STOP) return
-
-      wrapper.state = enterResult === SKIP ? -1 : 0
-    }
-
-    const children =
-      wrapper.children || getChildren(wrapper.node, getIndexPath())
-
-    if (!wrapper.children) {
-      wrapper.children = children
-    }
-
-    // If the node wasn't skipped
-    if (wrapper.state !== -1) {
-      // Visit the next child
-      if (wrapper.state < children.length) {
-        let currentIndex = wrapper.state
-
-        indexPath.push(currentIndex)
-        stack.push({ node: children[currentIndex] })
-
-        wrapper.state = currentIndex + 1
-
-        continue
-      }
-
-      const leaveResult = onLeave?.(wrapper.node, getIndexPath())
-
-      if (leaveResult === STOP) return
-    }
-
-    indexPath.pop()
-    stack.pop()
-  }
+  return visitKeyed(node, opts)
 }
 
 type VisitEntriesOptions<T> = BaseEntriesOptions<T> & {
@@ -116,7 +74,7 @@ type NodeEntriesWrapper<T> = {
   /**
    * Cached children, so we only call getChildren once per node
    */
-  entries?: [string, T][]
+  entries?: [PropertyKey, T][]
 }
 
 /**
