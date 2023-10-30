@@ -1,9 +1,18 @@
-import { IndexPath } from './indexPath'
-import { BaseOptions } from './options'
+import { getChild } from './getChild'
+import { IndexPath, KeyPath } from './indexPath'
+import { BaseEntriesOptions, BaseOptions } from './options'
 
-export type AccessOptions<T> = BaseOptions<T> & {
+type AccessChildrenOptions<T> = BaseOptions<T> & {
   indexPath: IndexPath
 }
+
+type AccessEntriesOptions<T> = BaseEntriesOptions<T> & {
+  keyPath: KeyPath
+}
+
+export type AccessOptions<T> =
+  | AccessChildrenOptions<T>
+  | AccessEntriesOptions<T>
 
 /**
  * Returns a node by its `IndexPath`.
@@ -11,14 +20,35 @@ export type AccessOptions<T> = BaseOptions<T> & {
  * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
  */
 export function access<T>(node: T, options: AccessOptions<T>): T {
-  let path = options.indexPath.slice()
+  if ('getEntries' in options) {
+    let path = options.keyPath.slice()
 
-  while (path.length > 0) {
-    let index = path.shift()!
-    node = options.getChildren(node, path)[index]
+    while (path.length > 1) {
+      let key = path.shift()!
+
+      node = getChild(node, {
+        ...options,
+        keyPath: path,
+        key,
+      })
+    }
+
+    return node
+  } else {
+    let path = options.indexPath.slice()
+
+    while (path.length > 0) {
+      let index = path.shift()!
+
+      node = getChild(node, {
+        ...options,
+        indexPath: path,
+        index,
+      })
+    }
+
+    return node
   }
-
-  return node
 }
 
 /**
@@ -27,13 +57,36 @@ export function access<T>(node: T, options: AccessOptions<T>): T {
  * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
  */
 export function accessPath<T>(node: T, options: AccessOptions<T>): T[] {
-  let path = options.indexPath.slice()
   let result: T[] = [node]
 
-  while (path.length > 0) {
-    let index = path.shift()!
-    node = options.getChildren(node, path)[index]
-    result.push(node)
+  if ('getEntries' in options) {
+    let path = options.keyPath.slice()
+
+    while (path.length > 1) {
+      let key = path.shift()!
+
+      node = getChild(node, {
+        ...options,
+        keyPath: path,
+        key,
+      })
+
+      result.push(node)
+    }
+  } else {
+    let path = options.indexPath.slice()
+
+    while (path.length > 0) {
+      let index = path.shift()!
+
+      node = getChild(node, {
+        ...options,
+        indexPath: path,
+        index,
+      })
+
+      result.push(node)
+    }
   }
 
   return result
