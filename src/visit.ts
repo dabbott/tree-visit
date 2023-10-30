@@ -11,6 +11,10 @@ export type VisitOptions<T> = BaseOptions<T> & {
   onEnter?(node: T, indexPath: IndexPath): EnterReturnValue
   onLeave?(node: T, indexPath: IndexPath): LeaveReturnValue
 }
+export type VisitEntriesOptions<T> = BaseEntriesOptions<T> & {
+  onEnter?(node: T, keyPath: KeyPath): EnterReturnValue
+  onLeave?(node: T, keyPath: KeyPath): LeaveReturnValue
+}
 
 /**
  * Visit each node in the tree, calling an optional `onEnter` and `onLeave` for each.
@@ -32,7 +36,7 @@ export function visit<T>(
   node: T,
   options: VisitOptions<T> | VisitEntriesOptions<T>
 ): void {
-  const opts =
+  const opts: VisitEntriesOptions<T> =
     'getChildren' in options
       ? {
           ...convertChildrenToEntries<T>(options),
@@ -52,11 +56,6 @@ export function visit<T>(
       : options
 
   return visitKeyed(node, opts)
-}
-
-type VisitEntriesOptions<T> = BaseEntriesOptions<T> & {
-  onEnter?(node: T, keyPath: KeyPath): EnterReturnValue
-  onLeave?(node: T, keyPath: KeyPath): LeaveReturnValue
 }
 
 type NodeEntriesWrapper<T> = {
