@@ -130,19 +130,19 @@ describe('reuseIndexPath option', () => {
     expect(indexPaths).toEqual([[], [0], [0, 0], [0, 1], [1], [1, 0], [1, 1]])
   })
 
-  // it('reuses index paths', () => {
-  //   let indexPaths: IndexPath[] = []
+  it('reuses index paths', () => {
+    let indexPaths: IndexPath[] = []
 
-  //   visit(example, {
-  //     onEnter: (_child, indexPath) => {
-  //       indexPaths.push(indexPath)
-  //     },
-  //     getChildren,
-  //     reuseIndexPath: true,
-  //   })
+    visit(example, {
+      onEnter: (_child, indexPath) => {
+        indexPaths.push(indexPath)
+      },
+      getChildren,
+      reuseIndexPath: true,
+    })
 
-  //   expect(indexPaths).toEqual([[], [], [], [], [], [], []])
-  // })
+    expect(indexPaths).toEqual([[], [], [], [], [], [], []])
+  })
 })
 
 it('traverses deeply nested nodes', () => {
