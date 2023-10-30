@@ -19,6 +19,8 @@ export type AccessOptions<T> =
  *
  * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
  */
+export function access<T>(node: T, options: AccessChildrenOptions<T>): T
+export function access<T>(node: T, options: AccessEntriesOptions<T>): T
 export function access<T>(node: T, options: AccessOptions<T>): T {
   if ('getEntries' in options) {
     let path = options.keyPath.slice()

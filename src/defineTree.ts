@@ -19,7 +19,7 @@ import { ReduceOptions, reduce } from './reduce'
 import { RemoveOptions, remove } from './remove'
 import { ReplaceOptions, replace } from './replace'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from './types'
-import { VisitOptions, visit } from './visit'
+import { VisitChildrenOptions, visit } from './visit'
 
 type WithoutBase<T> = Omit<T, keyof BaseOptions<T>>
 
@@ -35,7 +35,7 @@ type DiagramOptionalOptions<T> = Omit<
   ExtractRequiredKeys<DiagramOptionsWB<T>>
 >
 type FindOptionsWB<T> = WithoutBase<FindOptions<T>>
-type VisitOptionsWB<T> = WithoutBase<VisitOptions<T>>
+type VisitOptionsWB<T> = WithoutBase<VisitChildrenOptions<T>>
 type InsertOptionsWB<T> = WithoutBase<InsertOptions<T>>
 type RemoveOptionsWB<T> = WithoutBase<RemoveOptions<T>>
 type MoveOptionsWB<T> = WithoutBase<MoveOptions<T>>
@@ -101,7 +101,7 @@ interface Overloads<T> {
   /**
    * Visit each node using preorder DFS traversal.
    */
-  visit(node: T, onEnter: NonNullable<VisitOptions<T>>['onEnter']): void
+  visit(node: T, onEnter: NonNullable<VisitChildrenOptions<T>>['onEnter']): void
 
   /**
    * Visit each node using DFS traversal.
@@ -244,7 +244,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
   visit: Overloads<T>['visit'] = (
     node: T,
     onEnterOrOptions:
-      | NonNullable<VisitOptions<T>>['onEnter']
+      | NonNullable<VisitChildrenOptions<T>>['onEnter']
       | VisitOptionsWB<T>
   ) =>
     typeof onEnterOrOptions === 'function'
