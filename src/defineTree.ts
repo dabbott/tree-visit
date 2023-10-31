@@ -1,11 +1,26 @@
-import { BaseChildrenOptions } from './options'
+import { BaseChildrenOptions, BaseEntriesOptions } from './options'
 import { ChildrenTree } from './tree/childrenTree'
+import { EntriesTree } from './tree/entriesTree'
 
 export function defineTree<T>(
   getChildren: ((node: T) => T[]) | BaseChildrenOptions<T>
+): ChildrenTree<T, {}>
+
+export function defineTree<T, PK extends PropertyKey>(
+  getChildren: BaseEntriesOptions<T, PK>
+): EntriesTree<T, PK, {}>
+
+export function defineTree<T, PK extends PropertyKey>(
+  getChildren:
+    | ((node: T) => T[])
+    | BaseChildrenOptions<T>
+    | BaseEntriesOptions<T, PK>
 ) {
-  return new ChildrenTree(
-    typeof getChildren === 'function' ? { getChildren } : getChildren,
-    {}
-  )
+  if (typeof getChildren === 'function') {
+    return new ChildrenTree({ getChildren }, {})
+  } else if ('getEntries' in getChildren) {
+    return new EntriesTree(getChildren, {})
+  } else {
+    return new ChildrenTree(getChildren, {})
+  }
 }

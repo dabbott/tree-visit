@@ -10,7 +10,7 @@ export const STOP = 'stop'
 
 export type EnterReturnValue = void | 'skip' | 'stop'
 export type LeaveReturnValue = void | 'stop'
-export type VisitOptions<T> = BaseChildrenOptions<T> & {
+export type VisitChildrenOptions<T> = BaseChildrenOptions<T> & {
   onEnter?(node: T, indexPath: IndexPath): EnterReturnValue
   onLeave?(node: T, indexPath: IndexPath): LeaveReturnValue
 }
@@ -54,14 +54,14 @@ type NodeWrapper<T, PK extends PropertyKey> = {
  * - return nothing or `undefined` to continue
  * - return `"stop"` to end traversal
  */
-export function visit<T>(node: T, options: VisitOptions<T>): void
+export function visit<T>(node: T, options: VisitChildrenOptions<T>): void
 export function visit<T, PK extends PropertyKey>(
   node: T,
   options: VisitEntriesOptions<T, PK>
 ): void
 export function visit<T, PK extends PropertyKey>(
   node: T,
-  _options: VisitOptions<T> | VisitEntriesOptions<T, PK>
+  _options: VisitChildrenOptions<T> | VisitEntriesOptions<T, PK>
 ): void {
   const options = visitOptionsInterop(_options)
   const { onEnter, onLeave, getEntries } = options
@@ -116,7 +116,7 @@ export function visit<T, PK extends PropertyKey>(
 }
 
 function visitOptionsInterop<T, PK extends PropertyKey>(
-  options: VisitOptions<T> | VisitEntriesOptions<T, PK>
+  options: VisitChildrenOptions<T> | VisitEntriesOptions<T, PK>
 ): VisitEntriesOptions<T, PK> {
   if ('getEntries' in options) return options
 

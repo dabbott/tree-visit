@@ -1,5 +1,6 @@
 import { Node, example } from '../__mocks__/node'
 import { access } from '../access'
+import { defineTree } from '../defineTree'
 import { visit } from '../visit'
 
 const getEntries = (node: Node) =>
@@ -26,5 +27,16 @@ describe('keyed access', () => {
     })
 
     expect(result).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
+  })
+})
+
+describe('keyed partially applied', () => {
+  const Tree = defineTree({ getEntries }).withOptions({
+    getLabel: (node, keyPath) =>
+      [example.name, ...keyPath].join('/') + ': ' + node.name,
+  })
+
+  it('renders diagram', () => {
+    expect(Tree.diagram(example)).toMatchSnapshot()
   })
 })
