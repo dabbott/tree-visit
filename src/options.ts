@@ -1,8 +1,6 @@
 import { IndexPath } from './indexPath'
 
-export type BaseChildrenOptions<T> = {
-  getChildren: (node: T, indexPath: IndexPath) => T[]
-
+type CommonOptions = {
   /**
    * By default, a new IndexPath array is allocated on every callback.
    *
@@ -13,10 +11,13 @@ export type BaseChildrenOptions<T> = {
   reuseIndexPath?: boolean
 }
 
-export type BaseEntriesOptions<T, PK extends PropertyKey> = {
+export type BaseChildrenOptions<T> = CommonOptions & {
+  getChildren: (node: T, indexPath: IndexPath) => T[]
+}
+
+export type BaseEntriesOptions<T, PK extends PropertyKey> = CommonOptions & {
   getEntries: (node: T, keyPath: PK[]) => [PK, T][]
   getChild?: (parent: T, parentKeyPath: PK[], childKey: PK) => T
-  reuseIndexPath?: boolean
 }
 
 export type MutationBaseOptions<T> = BaseChildrenOptions<T> & {

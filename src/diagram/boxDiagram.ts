@@ -1,5 +1,4 @@
-import { IndexPath } from '../indexPath'
-import { DiagramOptions } from '../diagram'
+import { DiagramEntriesOptions } from '../diagram'
 
 enum BoxDrawing {
   TopLeft = '┌',
@@ -103,20 +102,20 @@ function mergeBoxesVertical(boxes: Box[]): Box {
   }, boxes[0])
 }
 
-function nodeDiagram<T>(
+function nodeDiagram<T, PK extends PropertyKey>(
   node: T,
-  indexPath: IndexPath,
-  options: DiagramOptions<T>
+  keyPath: PK[],
+  options: DiagramEntriesOptions<T, PK>
 ): Box {
-  const label = options.getLabel(node, indexPath)
+  const label = options.getLabel(node, keyPath)
   const box = wrapLabelInBox(label)
 
-  const children = options.getChildren(node, indexPath)
+  const entries = options.getEntries(node, keyPath)
 
-  if (children.length === 0) return box
+  if (entries.length === 0) return box
 
-  const childBoxes = children.map((child, index) => {
-    const childBox = nodeDiagram(child, [...indexPath, index], options)
+  const childBoxes = entries.map(([key, child]) => {
+    const childBox = nodeDiagram(child, [...keyPath, key], options)
 
     // Draw top connector for each child
     childBox.contents[0] = insertSubstring(
@@ -169,7 +168,10 @@ function nodeDiagram<T>(
   return result
 }
 
-export function boxDiagram<T>(node: T, options: DiagramOptions<T>): string {
+export function boxDiagram<T, PK extends PropertyKey>(
+  node: T,
+  options: DiagramEntriesOptions<T, PK>
+): string {
   return nodeDiagram(node, [], options).contents.join('\n')
 }
 

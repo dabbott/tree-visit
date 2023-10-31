@@ -1,5 +1,4 @@
-import { DiagramOptions } from '../diagram'
-import { IndexPath } from '../indexPath'
+import { DiagramEntriesOptions } from '../diagram'
 
 enum LinePrefix {
   Child = `├── `,
@@ -15,37 +14,38 @@ type Line = {
   multilinePrefix: string
 }
 
-function nodeDiagram<T>(
+function nodeDiagram<T, PK extends PropertyKey>(
   node: T,
-  indexPath: IndexPath,
-  options: DiagramOptions<T>
+  keyPath: PK[],
+  options: DiagramEntriesOptions<T, PK>
 ): Line[] {
-  const label = options.getLabel(node, indexPath)
-  const depth = indexPath.length
+  const label = options.getLabel(node, keyPath)
+  const depth = keyPath.length
 
   let rootLine = { label, depth, prefix: '', multilinePrefix: '' }
 
-  const children = options.getChildren(node, indexPath)
+  const entries = options.getEntries(node, keyPath)
 
-  if (children.length === 0) return [rootLine]
+  if (entries.length === 0) return [rootLine]
 
   // Special-case nodes with a single child, collapsing their labels to a single line
   if (
     options.flattenSingleChildNodes &&
-    children.length === 1 &&
+    entries.length === 1 &&
     !isMultiline(label)
   ) {
-    const [line] = nodeDiagram(children[0], [...indexPath, 0], options)
-    const hideRoot = indexPath.length === 0 && label === ''
+    const [key, entry] = entries[0]
+    const [line] = nodeDiagram(entry, [...keyPath, key], options)
+    const hideRoot = keyPath.length === 0 && label === ''
     rootLine.label = hideRoot
       ? `/ ${line.label}`
       : `${rootLine.label} / ${line.label}`
     return [rootLine]
   }
 
-  const nestedLines: Line[] = children.flatMap((file, index, array) => {
+  const nestedLines: Line[] = entries.flatMap(([key, entry], index, array) => {
     const childIsLast = index === array.length - 1
-    const childLines = nodeDiagram(file, [...indexPath, index], options)
+    const childLines = nodeDiagram(entry, [...keyPath, key], options)
     const childPrefix = childIsLast ? LinePrefix.LastChild : LinePrefix.Child
     const childMultilinePrefix = childIsLast
       ? LinePrefix.LastNestedChild
@@ -70,9 +70,9 @@ function nodeDiagram<T>(
   return [rootLine, ...nestedLines]
 }
 
-export function directoryDiagram<T>(
+export function directoryDiagram<T, PK extends PropertyKey>(
   node: T,
-  options: DiagramOptions<T>
+  options: DiagramEntriesOptions<T, PK>
 ): string {
   const lines = nodeDiagram(node, [], options)
   const strings = lines.map((line) =>

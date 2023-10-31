@@ -1,5 +1,5 @@
 import { access, accessPath } from '../access'
-import { DiagramOptions, diagram } from '../diagram'
+import { DiagramChildrenOptions, diagram } from '../diagram'
 import {
   FindOptions,
   FindOptionsTyped,
@@ -25,7 +25,7 @@ type WithoutBase<T> = Omit<T, keyof BaseChildrenOptions<T>>
 
 type MutationOptions<T> = WithoutBase<MutationBaseOptions<T>>
 
-type DiagramOptionsWB<T> = WithoutBase<DiagramOptions<T>>
+type DiagramOptionsWB<T> = WithoutBase<DiagramChildrenOptions<T>>
 type DiagramRequiredOptions<T> = Pick<
   DiagramOptionsWB<T>,
   ExtractRequiredKeys<DiagramOptionsWB<T>>
