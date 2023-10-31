@@ -1,13 +1,13 @@
 import { convertChildrenToEntries } from './getChild'
 import { IndexPath, KeyPath } from './indexPath'
-import { BaseEntriesOptions, BaseOptions } from './options'
+import { BaseChildrenOptions, BaseEntriesOptions } from './options'
 
 export const SKIP = 'skip'
 export const STOP = 'stop'
 
 export type EnterReturnValue = void | 'skip' | 'stop'
 export type LeaveReturnValue = void | 'stop'
-export type VisitOptions<T> = BaseOptions<T> & {
+export type VisitOptions<T> = BaseChildrenOptions<T> & {
   onEnter?(node: T, indexPath: IndexPath): EnterReturnValue
   onLeave?(node: T, indexPath: IndexPath): LeaveReturnValue
 }

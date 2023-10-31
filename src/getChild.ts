@@ -1,5 +1,5 @@
 import { IndexPath, KeyPath } from './indexPath'
-import { BaseEntriesOptions, BaseOptions } from './options'
+import { BaseChildrenOptions, BaseEntriesOptions } from './options'
 
 export function getChild<T>(
   node: T,
@@ -17,7 +17,7 @@ export function getChild<T>(
 }
 
 export function convertChildrenToEntries<T>(
-  options: BaseOptions<T>
+  options: BaseChildrenOptions<T>
 ): BaseEntriesOptions<T> {
   const { getChildren, ...rest } = options
 

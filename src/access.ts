@@ -1,12 +1,12 @@
 import { convertChildrenToEntries, getChild } from './getChild'
 import { IndexPath, KeyPath } from './indexPath'
-import { BaseEntriesOptions, BaseOptions } from './options'
+import { BaseChildrenOptions, BaseEntriesOptions } from './options'
 
-type AccessChildrenOptions<T> = BaseOptions<T> & {
+export type AccessChildrenOptions<T> = BaseChildrenOptions<T> & {
   path: IndexPath
 }
 
-type AccessEntriesOptions<T> = BaseEntriesOptions<T> & {
+export type AccessEntriesOptions<T> = BaseEntriesOptions<T> & {
   path: KeyPath
 }
 
@@ -22,8 +22,12 @@ export type AccessOptions<T> =
 export function access<T>(node: T, options: AccessChildrenOptions<T>): T
 export function access<T>(node: T, options: AccessEntriesOptions<T>): T
 export function access<T>(node: T, _options: AccessOptions<T>): T {
-  const options = accessOptionsInterop(_options)
-
+  return accessInternal(node, accessOptionsInterop(_options))
+}
+export function accessInternal<T>(
+  node: T,
+  options: AccessEntriesOptions<T>
+): T {
   let path = options.path.slice()
 
   while (path.length > 0) {
@@ -59,7 +63,7 @@ export function accessPath<T>(node: T, _options: AccessOptions<T>): T[] {
   return result
 }
 
-function accessOptionsInterop<T>(
+export function accessOptionsInterop<T>(
   options: AccessOptions<T>
 ): AccessEntriesOptions<T> {
   if ('getEntries' in options) return options

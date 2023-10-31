@@ -1,4 +1,4 @@
-import { BaseOptions } from './options'
+import { BaseChildrenOptions } from './options'
 import { reduce } from './reduce'
 
 /**
@@ -6,7 +6,7 @@ import { reduce } from './reduce'
  *
  * This is analogous to `Array.prototype.flat` for flattening arrays.
  */
-export function flat<T>(node: T, options: BaseOptions<T>): T[] {
+export function flat<T>(node: T, options: BaseChildrenOptions<T>): T[] {
   return reduce<T, T[]>(node, {
     ...options,
     initialResult: [],

@@ -1,8 +1,8 @@
 import { IndexPath } from './indexPath'
-import { BaseOptions } from './options'
+import { BaseChildrenOptions } from './options'
 import { visit } from './visit'
 
-export type MapOptions<T, U> = BaseOptions<T> & {
+export type MapOptions<T, U> = BaseChildrenOptions<T> & {
   /**
    * Transform the node into a different value.
    */

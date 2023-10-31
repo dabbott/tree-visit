@@ -1,8 +1,8 @@
 import { IndexPath } from './indexPath'
-import { BaseOptions } from './options'
+import { BaseChildrenOptions } from './options'
 import { reduce } from './reduce'
 
-export type FlatMapOptions<T, R> = BaseOptions<T> & {
+export type FlatMapOptions<T, R> = BaseChildrenOptions<T> & {
   /**
    * Transform the node into an array of values.
    */

@@ -1,11 +1,11 @@
-import { IndexPath } from './indexPath'
-import { BaseOptions } from './options'
 import { boxDiagram } from './diagram/boxDiagram'
 import { directoryDiagram } from './diagram/directoryDiagram'
+import { IndexPath } from './indexPath'
+import { BaseChildrenOptions } from './options'
 
 export type DiagramType = 'directory' | 'box'
 
-export type DiagramOptions<T> = BaseOptions<T> & {
+export type DiagramOptions<T> = BaseChildrenOptions<T> & {
   getLabel: (node: T, indexPath: IndexPath) => string
   type?: DiagramType
   flattenSingleChildNodes?: boolean

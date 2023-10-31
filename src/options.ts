@@ -1,6 +1,6 @@
 import { IndexPath, KeyPath } from './indexPath'
 
-export type BaseOptions<T> = {
+export type BaseChildrenOptions<T> = {
   getChildren: (node: T, indexPath: IndexPath) => T[]
 
   /**
@@ -13,21 +13,13 @@ export type BaseOptions<T> = {
   reuseIndexPath?: boolean
 }
 
-// export type AdvancedBaseOptions<T, PK extends PathKey> = {
-//   reuseIndexPath?: boolean
-// } & (PK extends string
-//   ? {
-//       getEntries: (node: T, indexPath: KeyPath) => T[]
-//     }
-//   : {
-//       getChildren: (node: T, indexPath: IndexPath) => T[]
-//     })
-
 export type BaseEntriesOptions<T> = {
   getEntries: (node: T, keyPath: KeyPath) => [PropertyKey, T][]
   getChild?: (parent: T, parentKeyPath: KeyPath, childKey: PropertyKey) => T
   reuseIndexPath?: boolean
 }
+
+export type BaseOptions<T> = BaseChildrenOptions<T> | BaseEntriesOptions<T>
 
 // export type ConditionalBaseOptions<
 //   T,
@@ -44,7 +36,7 @@ export type BaseEntriesOptions<T> = {
 //   ? KeyPath
 //   : IndexPath
 
-export type MutationBaseOptions<T> = BaseOptions<T> & {
+export type MutationBaseOptions<T> = BaseChildrenOptions<T> & {
   /**
    * Create a new node based on the original node and its new children
    */

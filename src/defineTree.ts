@@ -14,14 +14,14 @@ import { IndexPath } from './indexPath'
 import { InsertOptions, insert } from './insert'
 import { MapOptions, map } from './map'
 import { MoveOptions, move } from './move'
-import { BaseOptions, MutationBaseOptions } from './options'
+import { BaseChildrenOptions, MutationBaseOptions } from './options'
 import { ReduceChildrenOptions, reduce } from './reduce'
 import { RemoveOptions, remove } from './remove'
 import { ReplaceOptions, replace } from './replace'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from './types'
 import { VisitOptions, visit } from './visit'
 
-type WithoutBase<T> = Omit<T, keyof BaseOptions<T>>
+type WithoutBase<T> = Omit<T, keyof BaseChildrenOptions<T>>
 
 type MutationOptions<T> = WithoutBase<MutationBaseOptions<T>>
 
@@ -111,7 +111,7 @@ interface Overloads<T> {
 
 class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
   constructor(
-    private baseOptions: BaseOptions<T>,
+    private baseOptions: BaseChildrenOptions<T>,
     private appliedOptions: AppliedOptions
   ) {}
 
@@ -283,7 +283,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
 }
 
 export function defineTree<T>(
-  getChildren: BaseOptions<T> | ((node: T) => T[])
+  getChildren: ((node: T) => T[]) | BaseChildrenOptions<T>
 ) {
   return new Tree(
     typeof getChildren === 'function' ? { getChildren } : getChildren,

@@ -1,15 +1,15 @@
 import { IndexPath } from './indexPath'
-import { BaseOptions } from './options'
+import { BaseChildrenOptions } from './options'
 import { STOP, visit } from './visit'
 
-export type FindOptions<T> = BaseOptions<T> & {
+export type FindOptions<T> = BaseChildrenOptions<T> & {
   /**
    * Return `true` to include this node in the results.
    */
   predicate: (node: T, indexPath: IndexPath) => boolean
 }
 
-export type FindOptionsTyped<T, S extends T> = BaseOptions<T> & {
+export type FindOptionsTyped<T, S extends T> = BaseChildrenOptions<T> & {
   /**
    * Return `true` to include this node in the results.
    */
