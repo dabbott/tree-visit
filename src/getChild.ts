@@ -1,4 +1,3 @@
-import { IndexPath } from './indexPath'
 import { BaseChildrenOptions, BaseEntriesOptions } from './options'
 
 export function getChild<T, PK extends PropertyKey>(
@@ -21,14 +20,13 @@ export function convertChildrenToEntries<T, PK extends PropertyKey>(
 ): BaseEntriesOptions<T, PK> {
   const { getChildren, ...rest } = options
 
-  return {
+  const result: BaseEntriesOptions<T, number> = {
     ...rest,
-    getChild: (parent, parentKeyPath, childKey) =>
-      getChildren(parent, parentKeyPath as IndexPath)[childKey as number],
     getEntries: (node, keyPath) =>
-      getChildren(node, keyPath as IndexPath).map((child, index) => [
-        index as PK,
-        child,
-      ]),
+      getChildren(node, keyPath).map((child, index) => [index, child]),
+    getChild: (parent, parentKeyPath, childKey) =>
+      getChildren(parent, parentKeyPath)[childKey],
   }
+
+  return result as BaseEntriesOptions<T, any> as BaseEntriesOptions<T, PK>
 }

@@ -31,7 +31,7 @@ export function access<T, PK extends PropertyKey>(
   node: T,
   _options: AccessOptions<T, PK>
 ): T {
-  return accessInternal(node, accessOptionsInterop(_options))
+  return accessInternal(node, accessOptionsInterop<T, PK>(_options))
 }
 export function accessInternal<T, PK extends PropertyKey>(
   node: T,
@@ -58,9 +58,9 @@ export function accessPath<T, PK extends PropertyKey>(
   node: T,
   options: AccessEntriesOptions<T, PK>
 ): T[]
-export function accessPath<T, PK extends PropertyKey>(
+export function accessPath<T>(
   node: T,
-  _options: AccessOptions<T, PK>
+  _options: AccessOptions<T, PropertyKey>
 ): T[] {
   const options = accessOptionsInterop(_options)
 
@@ -78,7 +78,7 @@ export function accessPath<T, PK extends PropertyKey>(
   return result
 }
 
-export function accessOptionsInterop<T, PK extends PropertyKey>(
+function accessOptionsInterop<T, PK extends PropertyKey>(
   options: AccessOptions<T, PK>
 ): AccessEntriesOptions<T, PK> {
   if ('getEntries' in options) return options
