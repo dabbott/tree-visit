@@ -1,4 +1,4 @@
-import { IndexPath, KeyPath } from './indexPath'
+import { IndexPath } from './indexPath'
 
 export type BaseChildrenOptions<T> = {
   getChildren: (node: T, indexPath: IndexPath) => T[]
@@ -13,13 +13,11 @@ export type BaseChildrenOptions<T> = {
   reuseIndexPath?: boolean
 }
 
-export type BaseEntriesOptions<T> = {
-  getEntries: (node: T, keyPath: KeyPath) => [PropertyKey, T][]
-  getChild?: (parent: T, parentKeyPath: KeyPath, childKey: PropertyKey) => T
+export type BaseEntriesOptions<T, PK extends PropertyKey> = {
+  getEntries: (node: T, keyPath: PK[]) => [PK, T][]
+  getChild?: (parent: T, parentKeyPath: PK[], childKey: PK) => T
   reuseIndexPath?: boolean
 }
-
-export type BaseOptions<T> = BaseChildrenOptions<T> | BaseEntriesOptions<T>
 
 // export type ConditionalBaseOptions<
 //   T,

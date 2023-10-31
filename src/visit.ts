@@ -1,5 +1,5 @@
 import { convertChildrenToEntries } from './getChild'
-import { IndexPath, KeyPath } from './indexPath'
+import { IndexPath } from './indexPath'
 import { BaseChildrenOptions, BaseEntriesOptions } from './options'
 
 export const SKIP = 'skip'
@@ -11,12 +11,15 @@ export type VisitOptions<T> = BaseChildrenOptions<T> & {
   onEnter?(node: T, indexPath: IndexPath): EnterReturnValue
   onLeave?(node: T, indexPath: IndexPath): LeaveReturnValue
 }
-export type VisitEntriesOptions<T> = BaseEntriesOptions<T> & {
-  onEnter?(node: T, keyPath: KeyPath): EnterReturnValue
-  onLeave?(node: T, keyPath: KeyPath): LeaveReturnValue
+export type VisitEntriesOptions<T, PK extends PropertyKey> = BaseEntriesOptions<
+  T,
+  PK
+> & {
+  onEnter?(node: T, keyPath: PK[]): EnterReturnValue
+  onLeave?(node: T, keyPath: PK[]): LeaveReturnValue
 }
 
-type NodeWrapper<T> = {
+type NodeWrapper<T, PK extends PropertyKey> = {
   node: T
 
   /**
@@ -31,7 +34,7 @@ type NodeWrapper<T> = {
   /**
    * Cached children, so we only call getChildren once per node
    */
-  entries?: [PropertyKey, T][]
+  entries?: [PK, T][]
 }
 
 /**
@@ -49,16 +52,19 @@ type NodeWrapper<T> = {
  * - return `"stop"` to end traversal
  */
 export function visit<T>(node: T, options: VisitOptions<T>): void
-export function visit<T>(node: T, options: VisitEntriesOptions<T>): void
-export function visit<T>(
+export function visit<T, PK extends PropertyKey>(
   node: T,
-  _options: VisitOptions<T> | VisitEntriesOptions<T>
+  options: VisitEntriesOptions<T, PK>
+): void
+export function visit<T, PK extends PropertyKey>(
+  node: T,
+  _options: VisitOptions<T> | VisitEntriesOptions<T, PK>
 ): void {
   const options = visitOptionsInterop(_options)
   const { onEnter, onLeave, getEntries } = options
 
-  let keyPath: KeyPath = []
-  let stack: NodeWrapper<T>[] = [{ node }]
+  let keyPath: PK[] = []
+  let stack: NodeWrapper<T, PK>[] = [{ node }]
 
   const getKeyPath = options.reuseIndexPath
     ? () => keyPath
@@ -106,14 +112,18 @@ export function visit<T>(
   }
 }
 
-function visitOptionsInterop<T>(
-  options: VisitOptions<T> | VisitEntriesOptions<T>
-): VisitEntriesOptions<T> {
+function visitOptionsInterop<T, PK extends PropertyKey>(
+  options: VisitOptions<T> | VisitEntriesOptions<T, PK>
+): VisitEntriesOptions<T, PK> {
   if ('getEntries' in options) return options
 
   return {
-    ...convertChildrenToEntries<T>(options),
-    ...(options.onEnter && { onEnter: options.onEnter }),
-    ...(options.onLeave && { onLeave: options.onLeave }),
+    ...convertChildrenToEntries<T, PK>(options),
+    ...(options.onEnter && {
+      onEnter: options.onEnter as VisitEntriesOptions<T, PK>['onEnter'],
+    }),
+    ...(options.onLeave && {
+      onLeave: options.onLeave as VisitEntriesOptions<T, PK>['onLeave'],
+    }),
   }
 }

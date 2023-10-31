@@ -15,7 +15,11 @@ export type ReduceChildrenOptions<T, R> = BaseChildrenOptions<T> & {
   nextResult: (result: R, node: T, indexPath: IndexPath) => R
 }
 
-export type ReduceEntriesOptions<T, R> = BaseEntriesOptions<T> & {
+export type ReduceEntriesOptions<
+  T,
+  PK extends PropertyKey,
+  R
+> = BaseEntriesOptions<T, PK> & {
   /**
    * The initial result value.
    */
@@ -27,13 +31,19 @@ export type ReduceEntriesOptions<T, R> = BaseEntriesOptions<T> & {
   nextResult: (result: R, node: T, keyPath: KeyPath) => R
 }
 
-export type ReduceOptions<T, R> =
+export type ReduceOptions<T, PK extends PropertyKey, R> =
   | ReduceChildrenOptions<T, R>
-  | ReduceEntriesOptions<T, R>
+  | ReduceEntriesOptions<T, PK, R>
 
 export function reduce<T, R>(node: T, options: ReduceChildrenOptions<T, R>): R
-export function reduce<T, R>(node: T, options: ReduceEntriesOptions<T, R>): R
-export function reduce<T, R>(node: T, _options: ReduceOptions<T, R>): R {
+export function reduce<T, PK extends PropertyKey, R>(
+  node: T,
+  options: ReduceEntriesOptions<T, PK, R>
+): R
+export function reduce<T, PK extends PropertyKey, R>(
+  node: T,
+  _options: ReduceOptions<T, PK, R>
+): R {
   const options = reduceOptionsInterop(_options)
 
   let result = options.initialResult
@@ -48,15 +58,18 @@ export function reduce<T, R>(node: T, _options: ReduceOptions<T, R>): R {
   return result
 }
 
-function reduceOptionsInterop<T, R>(
-  options: ReduceOptions<T, R>
-): ReduceEntriesOptions<T, R> {
+function reduceOptionsInterop<T, PK extends PropertyKey, R>(
+  options: ReduceOptions<T, PK, R>
+): ReduceEntriesOptions<T, PK, R> {
   if ('getEntries' in options) return options
 
   return {
-    ...convertChildrenToEntries<T>(options),
+    ...convertChildrenToEntries<T, PK>(options),
     initialResult: options.initialResult,
-    nextResult: (result: R, node: T, keyPath: KeyPath) =>
-      options.nextResult(result, node, keyPath as IndexPath),
+    nextResult: options.nextResult as ReduceEntriesOptions<
+      T,
+      PK,
+      R
+    >['nextResult'],
   }
 }
