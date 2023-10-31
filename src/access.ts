@@ -35,12 +35,8 @@ export function access<T, PK extends PropertyKey>(
   node: T,
   _options: AccessOptions<T, PK>
 ): T {
-  return accessInternal(node, accessOptionsInterop<T, PK>(_options))
-}
-export function accessInternal<T, PK extends PropertyKey>(
-  node: T,
-  options: AccessEntriesOptions<T, PK>
-): T {
+  const options = accessOptionsInterop<T, PK>(_options)
+
   let path = options.path.slice()
 
   while (path.length > 0) {
