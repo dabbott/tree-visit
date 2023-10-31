@@ -1,6 +1,9 @@
-import { convertChildrenToEntries } from './getChild'
 import { IndexPath, KeyPath } from './indexPath'
-import { BaseChildrenOptions, BaseEntriesOptions } from './options'
+import {
+  BaseChildrenOptions,
+  BaseEntriesOptions,
+  convertChildrenToEntries,
+} from './options'
 import { visit } from './visit'
 
 export type ReduceChildrenOptions<T, R> = BaseChildrenOptions<T> & {

@@ -19,24 +19,40 @@ export type BaseEntriesOptions<T, PK extends PropertyKey> = {
   reuseIndexPath?: boolean
 }
 
-// export type ConditionalBaseOptions<
-//   T,
-//   PK extends PathKey,
-//   KeyedOptions,
-//   IndexedOptions
-// > = AdvancedBaseOptions<T, PK> extends { getEntries: any }
-//   ? AdvancedBaseOptions<T, PK> & KeyedOptions
-//   : AdvancedBaseOptions<T, PK> & IndexedOptions
-
-// export type ExtractPathType<T, O extends AdvancedBaseOptions<T>> = O extends {
-//   getEntries: any
-// }
-//   ? KeyPath
-//   : IndexPath
-
 export type MutationBaseOptions<T> = BaseChildrenOptions<T> & {
   /**
    * Create a new node based on the original node and its new children
    */
   create: (node: T, children: T[], indexPath: IndexPath) => T
+}
+
+export function getChild<T, PK extends PropertyKey>(
+  node: T,
+  options: BaseEntriesOptions<T, PK>,
+  keyPath: PK[],
+  key: PK
+): T {
+  if (options.getChild) {
+    return options.getChild(node, keyPath, key)
+  } else {
+    const entries = options.getEntries(node, keyPath)
+    const entry = entries.find(([k]) => k === key)
+    return entry![1]
+  }
+}
+
+export function convertChildrenToEntries<T, PK extends PropertyKey>(
+  options: BaseChildrenOptions<T>
+): BaseEntriesOptions<T, PK> {
+  const { getChildren, ...rest } = options
+
+  const result: BaseEntriesOptions<T, number> = {
+    ...rest,
+    getEntries: (node, keyPath) =>
+      getChildren(node, keyPath).map((child, index) => [index, child]),
+    getChild: (parent, parentKeyPath, childKey) =>
+      getChildren(parent, parentKeyPath)[childKey],
+  }
+
+  return result as BaseEntriesOptions<T, any> as BaseEntriesOptions<T, PK>
 }

@@ -1,6 +1,10 @@
-import { convertChildrenToEntries, getChild } from './getChild'
 import { IndexPath } from './indexPath'
-import { BaseChildrenOptions, BaseEntriesOptions } from './options'
+import {
+  BaseChildrenOptions,
+  BaseEntriesOptions,
+  convertChildrenToEntries,
+  getChild,
+} from './options'
 
 export type AccessChildrenOptions<T> = BaseChildrenOptions<T> & {
   path: IndexPath

@@ -1,6 +1,9 @@
-import { convertChildrenToEntries } from './getChild'
 import { IndexPath } from './indexPath'
-import { BaseChildrenOptions, BaseEntriesOptions } from './options'
+import {
+  BaseChildrenOptions,
+  BaseEntriesOptions,
+  convertChildrenToEntries,
+} from './options'
 
 export const SKIP = 'skip'
 export const STOP = 'stop'
