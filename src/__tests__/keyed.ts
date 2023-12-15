@@ -4,6 +4,7 @@ import { defineTree } from '../defineTree'
 import { find, findAll, findAllIndexPaths, findIndexPath } from '../find'
 import { flat } from '../flat'
 import { flatMap } from '../flatMap'
+import { reduce } from '../reduce'
 import { visit } from '../visit'
 
 const getEntries = (node: Node) =>
@@ -97,6 +98,16 @@ describe('keyed access', () => {
       })
     ).toEqual(['b', 'b1', 'b2'])
   })
+
+  it('reduces', () => {
+    expect(
+      reduce(example, {
+        getEntries,
+        nextResult: (result, node) => result + node.name + '|',
+        initialResult: '|',
+      })
+    ).toEqual('|a|b|b1|b2|c|c1|c2|')
+  })
 })
 
 describe('keyed partially applied', () => {
@@ -109,6 +120,7 @@ describe('keyed partially applied', () => {
     findAllIndexPaths,
     flat,
     flatMap,
+    reduce,
   } = defineTree({
     getEntries,
   }).withOptions({
@@ -187,5 +199,11 @@ describe('keyed partially applied', () => {
     expect(
       flatMap(example, (node) => (node.name.startsWith('b') ? [node.name] : []))
     ).toEqual(['b', 'b1', 'b2'])
+  })
+
+  it('reduces', () => {
+    expect(
+      reduce(example, (result, node) => result + node.name + '|', '|')
+    ).toEqual('|a|b|b1|b2|c|c1|c2|')
   })
 })

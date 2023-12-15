@@ -11,6 +11,7 @@ import {
 import { flat } from '../flat'
 import { FlatMapEntriesOptions, flatMap } from '../flatMap'
 import { BaseEntriesOptions } from '../options'
+import { ReduceEntriesOptions, reduce } from '../reduce'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from '../types'
 import { VisitEntriesOptions, visit } from '../visit'
 
@@ -244,11 +245,11 @@ export class EntriesTree<
     transform: FlatMapEntriesOptions<T, PK, R>['transform']
   ) => flatMap(node, this.mergeOptions({ transform }))
 
-  // reduce = <R>(
-  //   node: T,
-  //   nextResult: ReduceChildrenOptions<T, R>['nextResult'],
-  //   initialResult: R
-  // ): R => reduce(node, this.mergeOptions({ nextResult, initialResult }))
+  reduce = <R>(
+    node: T,
+    nextResult: ReduceEntriesOptions<T, PK, R>['nextResult'],
+    initialResult: R
+  ): R => reduce(node, this.mergeOptions({ nextResult, initialResult }))
 
   // map = <R>(node: T, transform: MapOptions<T, R>['transform']): R =>
   //   map(node, this.mergeOptions({ transform }))
