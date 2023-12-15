@@ -8,6 +8,7 @@ import {
   findAllIndexPaths,
   findIndexPath,
 } from '../find'
+import { flat } from '../flat'
 import { BaseEntriesOptions } from '../options'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from '../types'
 import { VisitEntriesOptions, visit } from '../visit'
@@ -225,12 +226,12 @@ export class EntriesTree<
         )
       : findAllIndexPaths(node, this.mergeOptions({ ...predicateOrOptions }))
 
-  // /**
-  //  * Returns an array containing the root node and all of its descendants.
-  //  *
-  //  * This is analogous to `Array.prototype.flat` for flattening arrays.
-  //  */
-  // flat = (node: T) => flat(node, this.mergeOptions({}))
+  /**
+   * Returns an array containing the root node and all of its descendants.
+   *
+   * This is analogous to `Array.prototype.flat` for flattening arrays.
+   */
+  flat = (node: T) => flat(node, this.mergeOptions({}))
 
   // /**
   //  * Map each node into an array of values, which are then flattened into a single array.
