@@ -1,6 +1,11 @@
 import { access, accessPath } from '../access'
 import { DiagramEntriesOptions, diagram } from '../diagram'
-import { FindEntriesOptions, FindEntriesOptionsTyped, find } from '../find'
+import {
+  FindEntriesOptions,
+  FindEntriesOptionsTyped,
+  find,
+  findAll,
+} from '../find'
 import { BaseEntriesOptions } from '../options'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from '../types'
 import { VisitEntriesOptions, visit } from '../visit'
@@ -60,22 +65,22 @@ interface Overloads<T, PK extends PropertyKey> {
     options: WithoutBase<FindEntriesOptionsTyped<T, PK, S>, PK>
   ): S | undefined
 
-  // /**
-  //  * Find all nodes matching a predicate function.
-  //  */
-  // findAll(node: T, predicate: FindOptions<T>['predicate']): T[]
+  /**
+   * Find all nodes matching a predicate function.
+   */
+  findAll(node: T, predicate: FindEntriesOptions<T, PK>['predicate']): T[]
 
-  // findAll(node: T, options: FindOptionsWB<T>): T[]
+  findAll(node: T, options: FindOptionsWB<T, PK>): T[]
 
-  // findAll<S extends T>(
-  //   node: T,
-  //   predicate: FindOptionsTyped<T, S>['predicate']
-  // ): S[]
+  findAll<S extends T>(
+    node: T,
+    predicate: FindEntriesOptionsTyped<T, PK, S>['predicate']
+  ): S[]
 
-  // findAll<S extends T>(
-  //   node: T,
-  //   options: WithoutBase<FindOptionsTyped<T, S>>
-  // ): S[]
+  findAll<S extends T>(
+    node: T,
+    options: WithoutBase<FindEntriesOptionsTyped<T, PK, S>, PK>
+  ): S[]
 
   // /**
   //  * Find the `IndexPath` of a node matching a predicate function.
@@ -182,13 +187,15 @@ export class EntriesTree<
       ? find(node, this.mergeOptions({ predicate: predicateOrOptions }))
       : find(node, this.mergeOptions({ ...predicateOrOptions }))
 
-  // findAll: Overloads<T>['findAll'] = (
-  //   node: T,
-  //   predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
-  // ) =>
-  //   typeof predicateOrOptions === 'function'
-  //     ? findAll(node, this.mergeOptions({ predicate: predicateOrOptions }))
-  //     : findAll(node, this.mergeOptions({ ...predicateOrOptions }))
+  findAll: Overloads<T, PK>['findAll'] = (
+    node: T,
+    predicateOrOptions:
+      | FindEntriesOptions<T, PK>['predicate']
+      | FindOptionsWB<T, PK>
+  ) =>
+    typeof predicateOrOptions === 'function'
+      ? findAll(node, this.mergeOptions({ predicate: predicateOrOptions }))
+      : findAll(node, this.mergeOptions({ ...predicateOrOptions }))
 
   // findIndexPath: Overloads<T>['findIndexPath'] = (
   //   node: T,

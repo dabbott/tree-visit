@@ -89,7 +89,20 @@ export function findAll<T, S extends T>(
   node: T,
   options: FindChildrenOptionsTyped<T, S>
 ): S[]
-export function findAll<T>(node: T, options: FindChildrenOptions<T>): T[] {
+export function findAll<T, PK extends PropertyKey>(
+  node: T,
+  options: FindEntriesOptions<T, PK>
+): T[]
+export function findAll<T, PK extends PropertyKey, S extends T>(
+  node: T,
+  options: FindEntriesOptionsTyped<T, PK, S>
+): S[]
+export function findAll<T, PK extends PropertyKey>(
+  node: T,
+  _options: FindChildrenOptions<T> | FindEntriesOptions<T, PK>
+): T[] {
+  const options = findOptionsInterop<T, PK>(_options)
+
   let found: T[] = []
 
   visit(node, {
@@ -98,7 +111,8 @@ export function findAll<T>(node: T, options: FindChildrenOptions<T>): T[] {
         found.push(child)
       }
     },
-    getChildren: options.getChildren,
+    getEntries: options.getEntries,
+    getChild: options.getChild,
   })
 
   return found

@@ -1,7 +1,7 @@
 import { Node, example } from '../__mocks__/node'
 import { access, accessPath } from '../access'
 import { defineTree } from '../defineTree'
-import { find } from '../find'
+import { find, findAll } from '../find'
 import { visit } from '../visit'
 
 const getEntries = (node: Node) =>
@@ -47,10 +47,21 @@ describe('keyed access', () => {
       })?.name
     ).toEqual('b2')
   })
+
+  it('finds all by key', () => {
+    expect(
+      findAll(example, {
+        getEntries,
+        predicate: (node) => node.name.startsWith('b'),
+      }).map((n) => n.name)
+    ).toEqual(['b', 'b1', 'b2'])
+  })
 })
 
 describe('keyed partially applied', () => {
-  const { diagram, access, find } = defineTree({ getEntries }).withOptions({
+  const { diagram, access, find, findAll } = defineTree({
+    getEntries,
+  }).withOptions({
     getLabel: (node, keyPath) =>
       node.name + ': ' + [example.name, ...keyPath].join('/'),
   })
@@ -71,5 +82,17 @@ describe('keyed partially applied', () => {
         predicate: (node) => node.name === 'b2',
       })?.name
     ).toEqual('b2')
+  })
+
+  it('finds all', () => {
+    expect(
+      findAll(example, (node) => node.name.startsWith('b')).map((n) => n.name)
+    ).toEqual(['b', 'b1', 'b2'])
+
+    expect(
+      findAll(example, {
+        predicate: (node) => node.name.startsWith('b'),
+      }).map((n) => n.name)
+    ).toEqual(['b', 'b1', 'b2'])
   })
 })
