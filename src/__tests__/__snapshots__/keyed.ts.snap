@@ -2,10 +2,10 @@
 
 exports[`keyed partially applied renders diagram 1`] = `
 "a: a
-├── a/b: b
-│   ├── a/b/b1: b1
-│   └── a/b/b2: b2
-└── a/c: c
-    ├── a/c/c1: c1
-    └── a/c/c2: c2"
+├── b: a/b
+│   ├── b1: a/b/b1
+│   └── b2: a/b/b2
+└── c: a/c
+    ├── c1: a/c/c1
+    └── c2: a/c/c2"
 `;

@@ -1,8 +1,8 @@
 import { access, accessPath } from '../access'
 import { DiagramChildrenOptions, diagram } from '../diagram'
 import {
-  FindOptions,
-  FindOptionsTyped,
+  FindChildrenOptions,
+  FindChildrenOptionsTyped,
   find,
   findAll,
   findAllIndexPaths,
@@ -34,7 +34,7 @@ type DiagramOptionalOptions<T> = Omit<
   DiagramOptionsWB<T>,
   ExtractRequiredKeys<DiagramOptionsWB<T>>
 >
-type FindOptionsWB<T> = WithoutBase<FindOptions<T>>
+type FindOptionsWB<T> = WithoutBase<FindChildrenOptions<T>>
 type VisitOptionsWB<T> = WithoutBase<VisitChildrenOptions<T>>
 type InsertOptionsWB<T> = WithoutBase<InsertOptions<T>>
 type RemoveOptionsWB<T> = WithoutBase<RemoveOptions<T>>
@@ -47,35 +47,35 @@ interface Overloads<T> {
   /**
    * Find a node matching a predicate function.
    */
-  find(node: T, predicate: FindOptions<T>['predicate']): T | undefined
+  find(node: T, predicate: FindChildrenOptions<T>['predicate']): T | undefined
 
   find(node: T, options: FindOptionsWB<T>): T | undefined
 
   find<S extends T>(
     node: T,
-    predicate: FindOptionsTyped<T, S>['predicate']
+    predicate: FindChildrenOptionsTyped<T, S>['predicate']
   ): S | undefined
 
   find<S extends T>(
     node: T,
-    options: WithoutBase<FindOptionsTyped<T, S>>
+    options: WithoutBase<FindChildrenOptionsTyped<T, S>>
   ): S | undefined
 
   /**
    * Find all nodes matching a predicate function.
    */
-  findAll(node: T, predicate: FindOptions<T>['predicate']): T[]
+  findAll(node: T, predicate: FindChildrenOptions<T>['predicate']): T[]
 
   findAll(node: T, options: FindOptionsWB<T>): T[]
 
   findAll<S extends T>(
     node: T,
-    predicate: FindOptionsTyped<T, S>['predicate']
+    predicate: FindChildrenOptionsTyped<T, S>['predicate']
   ): S[]
 
   findAll<S extends T>(
     node: T,
-    options: WithoutBase<FindOptionsTyped<T, S>>
+    options: WithoutBase<FindChildrenOptionsTyped<T, S>>
   ): S[]
 
   /**
@@ -83,7 +83,7 @@ interface Overloads<T> {
    */
   findIndexPath(
     node: T,
-    predicate: FindOptions<T>['predicate']
+    predicate: FindChildrenOptions<T>['predicate']
   ): IndexPath | undefined
 
   findIndexPath(node: T, options: FindOptionsWB<T>): IndexPath | undefined
@@ -93,7 +93,7 @@ interface Overloads<T> {
    */
   findAllIndexPaths(
     node: T,
-    predicate: FindOptions<T>['predicate']
+    predicate: FindChildrenOptions<T>['predicate']
   ): IndexPath[]
 
   findAllIndexPaths(node: T, options: FindOptionsWB<T>): IndexPath[]
@@ -172,7 +172,7 @@ export class ChildrenTree<
 
   find: Overloads<T>['find'] = (
     node: T,
-    predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
+    predicateOrOptions: FindChildrenOptions<T>['predicate'] | FindOptionsWB<T>
   ) =>
     typeof predicateOrOptions === 'function'
       ? find(node, this.mergeOptions({ predicate: predicateOrOptions }))
@@ -180,7 +180,7 @@ export class ChildrenTree<
 
   findAll: Overloads<T>['findAll'] = (
     node: T,
-    predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
+    predicateOrOptions: FindChildrenOptions<T>['predicate'] | FindOptionsWB<T>
   ) =>
     typeof predicateOrOptions === 'function'
       ? findAll(node, this.mergeOptions({ predicate: predicateOrOptions }))
@@ -188,7 +188,7 @@ export class ChildrenTree<
 
   findIndexPath: Overloads<T>['findIndexPath'] = (
     node: T,
-    predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
+    predicateOrOptions: FindChildrenOptions<T>['predicate'] | FindOptionsWB<T>
   ) =>
     typeof predicateOrOptions === 'function'
       ? findIndexPath(
@@ -199,7 +199,7 @@ export class ChildrenTree<
 
   findAllIndexPaths: Overloads<T>['findAllIndexPaths'] = (
     node: T,
-    predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
+    predicateOrOptions: FindChildrenOptions<T>['predicate'] | FindOptionsWB<T>
   ) =>
     typeof predicateOrOptions === 'function'
       ? findAllIndexPaths(

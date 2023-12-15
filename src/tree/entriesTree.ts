@@ -1,5 +1,6 @@
 import { access, accessPath } from '../access'
 import { DiagramEntriesOptions, diagram } from '../diagram'
+import { FindEntriesOptions, FindEntriesOptionsTyped, find } from '../find'
 import { BaseEntriesOptions } from '../options'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from '../types'
 import { VisitEntriesOptions, visit } from '../visit'
@@ -23,7 +24,10 @@ type DiagramOptionalOptions<T, PK extends PropertyKey> = Omit<
   DiagramOptionsWB<T, PK>,
   ExtractRequiredKeys<DiagramOptionsWB<T, PK>>
 >
-// type FindOptionsWB<T> = WithoutBase<FindOptions<T>>
+type FindOptionsWB<T, PK extends PropertyKey> = WithoutBase<
+  FindEntriesOptions<T, PK>,
+  PK
+>
 type VisitOptionsWB<T, PK extends PropertyKey> = WithoutBase<
   VisitEntriesOptions<T, PK>,
   PK
@@ -39,19 +43,22 @@ interface Overloads<T, PK extends PropertyKey> {
   /**
    * Find a node matching a predicate function.
    */
-  // find(node: T, predicate: FindOptions<T>['predicate']): T | undefined
+  find(
+    node: T,
+    predicate: FindEntriesOptions<T, PK>['predicate']
+  ): T | undefined
 
-  // find(node: T, options: FindOptionsWB<T>): T | undefined
+  find(node: T, options: FindOptionsWB<T, PK>): T | undefined
 
-  // find<S extends T>(
-  //   node: T,
-  //   predicate: FindOptionsTyped<T, S>['predicate']
-  // ): S | undefined
+  find<S extends T>(
+    node: T,
+    predicate: FindEntriesOptionsTyped<T, PK, S>['predicate']
+  ): S | undefined
 
-  // find<S extends T>(
-  //   node: T,
-  //   options: WithoutBase<FindOptionsTyped<T, S>>
-  // ): S | undefined
+  find<S extends T>(
+    node: T,
+    options: WithoutBase<FindEntriesOptionsTyped<T, PK, S>, PK>
+  ): S | undefined
 
   // /**
   //  * Find all nodes matching a predicate function.
@@ -165,13 +172,15 @@ export class EntriesTree<
       ? diagram(node, this.mergeOptions({ getLabel: options }))
       : diagram(node, this.mergeOptions(options))
 
-  // find: Overloads<T>['find'] = (
-  //   node: T,
-  //   predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
-  // ) =>
-  //   typeof predicateOrOptions === 'function'
-  //     ? find(node, this.mergeOptions({ predicate: predicateOrOptions }))
-  //     : find(node, this.mergeOptions({ ...predicateOrOptions }))
+  find: Overloads<T, PK>['find'] = (
+    node: T,
+    predicateOrOptions:
+      | FindEntriesOptions<T, PK>['predicate']
+      | FindOptionsWB<T, PK>
+  ) =>
+    typeof predicateOrOptions === 'function'
+      ? find(node, this.mergeOptions({ predicate: predicateOrOptions }))
+      : find(node, this.mergeOptions({ ...predicateOrOptions }))
 
   // findAll: Overloads<T>['findAll'] = (
   //   node: T,
