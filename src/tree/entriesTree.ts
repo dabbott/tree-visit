@@ -5,6 +5,8 @@ import {
   FindEntriesOptionsTyped,
   find,
   findAll,
+  findAllIndexPaths,
+  findIndexPath,
 } from '../find'
 import { BaseEntriesOptions } from '../options'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from '../types'
@@ -82,25 +84,25 @@ interface Overloads<T, PK extends PropertyKey> {
     options: WithoutBase<FindEntriesOptionsTyped<T, PK, S>, PK>
   ): S[]
 
-  // /**
-  //  * Find the `IndexPath` of a node matching a predicate function.
-  //  */
-  // findIndexPath(
-  //   node: T,
-  //   predicate: FindOptions<T>['predicate']
-  // ): IndexPath | undefined
+  /**
+   * Find the `IndexPath` of a node matching a predicate function.
+   */
+  findIndexPath(
+    node: T,
+    predicate: FindEntriesOptions<T, PK>['predicate']
+  ): PK[] | undefined
 
-  // findIndexPath(node: T, options: FindOptionsWB<T>): IndexPath | undefined
+  findIndexPath(node: T, options: FindOptionsWB<T, PK>): PK[] | undefined
 
-  // /**
-  //  * Find the `IndexPath` of all nodes matching a predicate function.
-  //  */
-  // findAllIndexPaths(
-  //   node: T,
-  //   predicate: FindOptions<T>['predicate']
-  // ): IndexPath[]
+  /**
+   * Find the `IndexPath` of all nodes matching a predicate function.
+   */
+  findAllIndexPaths(
+    node: T,
+    predicate: FindEntriesOptions<T, PK>['predicate']
+  ): PK[][]
 
-  // findAllIndexPaths(node: T, options: FindOptionsWB<T>): IndexPath[]
+  findAllIndexPaths(node: T, options: FindOptionsWB<T, PK>): PK[][]
 
   /**
    * Visit each node using preorder DFS traversal.
@@ -197,27 +199,31 @@ export class EntriesTree<
       ? findAll(node, this.mergeOptions({ predicate: predicateOrOptions }))
       : findAll(node, this.mergeOptions({ ...predicateOrOptions }))
 
-  // findIndexPath: Overloads<T>['findIndexPath'] = (
-  //   node: T,
-  //   predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
-  // ) =>
-  //   typeof predicateOrOptions === 'function'
-  //     ? findIndexPath(
-  //         node,
-  //         this.mergeOptions({ predicate: predicateOrOptions })
-  //       )
-  //     : findIndexPath(node, this.mergeOptions({ ...predicateOrOptions }))
+  findIndexPath: Overloads<T, PK>['findIndexPath'] = (
+    node: T,
+    predicateOrOptions:
+      | FindEntriesOptions<T, PK>['predicate']
+      | FindOptionsWB<T, PK>
+  ) =>
+    typeof predicateOrOptions === 'function'
+      ? findIndexPath(
+          node,
+          this.mergeOptions({ predicate: predicateOrOptions })
+        )
+      : findIndexPath(node, this.mergeOptions({ ...predicateOrOptions }))
 
-  // findAllIndexPaths: Overloads<T>['findAllIndexPaths'] = (
-  //   node: T,
-  //   predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
-  // ) =>
-  //   typeof predicateOrOptions === 'function'
-  //     ? findAllIndexPaths(
-  //         node,
-  //         this.mergeOptions({ predicate: predicateOrOptions })
-  //       )
-  //     : findAllIndexPaths(node, this.mergeOptions({ ...predicateOrOptions }))
+  findAllIndexPaths: Overloads<T, PK>['findAllIndexPaths'] = (
+    node: T,
+    predicateOrOptions:
+      | FindEntriesOptions<T, PK>['predicate']
+      | FindOptionsWB<T, PK>
+  ) =>
+    typeof predicateOrOptions === 'function'
+      ? findAllIndexPaths(
+          node,
+          this.mergeOptions({ predicate: predicateOrOptions })
+        )
+      : findAllIndexPaths(node, this.mergeOptions({ ...predicateOrOptions }))
 
   // /**
   //  * Returns an array containing the root node and all of its descendants.

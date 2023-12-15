@@ -106,13 +106,12 @@ export function findAll<T, PK extends PropertyKey>(
   let found: T[] = []
 
   visit(node, {
+    ...options,
     onEnter: (child, indexPath) => {
       if (options.predicate(child, indexPath)) {
         found.push(child)
       }
     },
-    getEntries: options.getEntries,
-    getChild: options.getChild,
   })
 
   return found
@@ -124,10 +123,21 @@ export function findAll<T, PK extends PropertyKey>(
 export function findIndexPath<T>(
   node: T,
   options: FindChildrenOptions<T>
-): IndexPath | undefined {
-  let found: IndexPath | undefined
+): IndexPath | undefined
+export function findIndexPath<T, PK extends PropertyKey>(
+  node: T,
+  options: FindEntriesOptions<T, PK>
+): PK[] | undefined
+export function findIndexPath<T, PK extends PropertyKey>(
+  node: T,
+  _options: FindChildrenOptions<T> | FindEntriesOptions<T, PK>
+): PK[] | undefined {
+  const options = findOptionsInterop<T, PK>(_options)
+
+  let found: PK[] | undefined
 
   visit(node, {
+    ...options,
     onEnter: (child, indexPath) => {
       if (options.predicate(child, indexPath)) {
         // Copy the indexPath, since indexPath may be mutated
@@ -135,7 +145,6 @@ export function findIndexPath<T>(
         return STOP
       }
     },
-    getChildren: options.getChildren,
   })
 
   return found
@@ -147,17 +156,27 @@ export function findIndexPath<T>(
 export function findAllIndexPaths<T>(
   node: T,
   options: FindChildrenOptions<T>
-): IndexPath[] {
-  let found: IndexPath[] = []
+): IndexPath[]
+export function findAllIndexPaths<T, PK extends PropertyKey>(
+  node: T,
+  options: FindEntriesOptions<T, PK>
+): PK[][]
+export function findAllIndexPaths<T, PK extends PropertyKey>(
+  node: T,
+  _options: FindChildrenOptions<T> | FindEntriesOptions<T, PK>
+): PK[][] {
+  const options = findOptionsInterop<T, PK>(_options)
+
+  let found: PK[][] = []
 
   visit(node, {
+    ...options,
     onEnter: (child, indexPath) => {
       if (options.predicate(child, indexPath)) {
         // Copy the indexPath, since indexPath may be mutated
         found.push([...indexPath])
       }
     },
-    getChildren: options.getChildren,
   })
 
   return found
