@@ -4,6 +4,7 @@ import { defineTree } from '../defineTree'
 import { find, findAll, findAllIndexPaths, findIndexPath } from '../find'
 import { flat } from '../flat'
 import { flatMap } from '../flatMap'
+import { map } from '../map'
 import { reduce } from '../reduce'
 import { visit } from '../visit'
 
@@ -108,6 +109,25 @@ describe('keyed access', () => {
       })
     ).toEqual('|a|b|b1|b2|c|c1|c2|')
   })
+
+  it('maps', () => {
+    type ResultNode = { id: string; items: ResultNode[] }
+
+    const result: ResultNode = map(example, {
+      getEntries,
+      transform: (node, transformedEntries) => ({
+        id: node.name + '*',
+        items: transformedEntries,
+      }),
+    })
+
+    expect(
+      flatMap(result, {
+        getChildren: (node) => node.items,
+        transform: (n) => [n.id],
+      })
+    ).toEqual(['a*', 'b*', 'b1*', 'b2*', 'c*', 'c1*', 'c2*'])
+  })
 })
 
 describe('keyed partially applied', () => {
@@ -121,6 +141,7 @@ describe('keyed partially applied', () => {
     flat,
     flatMap,
     reduce,
+    map,
   } = defineTree({
     getEntries,
   }).withOptions({
@@ -205,5 +226,21 @@ describe('keyed partially applied', () => {
     expect(
       reduce(example, (result, node) => result + node.name + '|', '|')
     ).toEqual('|a|b|b1|b2|c|c1|c2|')
+  })
+
+  it('maps', () => {
+    type ResultNode = { id: string; items: ResultNode[] }
+
+    const result: ResultNode = map(example, (node, transformedEntries) => ({
+      id: node.name + '*',
+      items: transformedEntries,
+    }))
+
+    expect(
+      defineTree({ getChildren: (node: ResultNode) => node.items }).flatMap(
+        result,
+        (n) => [n.id]
+      )
+    ).toEqual(['a*', 'b*', 'b1*', 'b2*', 'c*', 'c1*', 'c2*'])
   })
 })

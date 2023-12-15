@@ -12,7 +12,7 @@ import { flat } from '../flat'
 import { FlatMapChildrenOptions, flatMap } from '../flatMap'
 import { IndexPath } from '../indexPath'
 import { InsertOptions, insert } from '../insert'
-import { MapOptions, map } from '../map'
+import { MapChildrenOptions, map } from '../map'
 import { MoveOptions, move } from '../move'
 import { BaseChildrenOptions, MutationBaseOptions } from '../options'
 import { ReduceChildrenOptions, reduce } from '../reduce'
@@ -231,7 +231,7 @@ export class ChildrenTree<
     initialResult: R
   ): R => reduce(node, this.mergeOptions({ nextResult, initialResult }))
 
-  map = <R>(node: T, transform: MapOptions<T, R>['transform']): R =>
+  map = <R>(node: T, transform: MapChildrenOptions<T, R>['transform']): R =>
     map(node, this.mergeOptions({ transform }))
 
   visit: Overloads<T>['visit'] = (
