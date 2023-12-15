@@ -9,6 +9,7 @@ import {
   findIndexPath,
 } from '../find'
 import { flat } from '../flat'
+import { FlatMapEntriesOptions, flatMap } from '../flatMap'
 import { BaseEntriesOptions } from '../options'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from '../types'
 import { VisitEntriesOptions, visit } from '../visit'
@@ -233,13 +234,15 @@ export class EntriesTree<
    */
   flat = (node: T) => flat(node, this.mergeOptions({}))
 
-  // /**
-  //  * Map each node into an array of values, which are then flattened into a single array.
-  //  *
-  //  * This is analogous to `Array.prototype.flatMap` for arrays.
-  //  */
-  // flatMap = <R>(node: T, transform: FlatMapOptions<T, R>['transform']) =>
-  //   flatMap(node, this.mergeOptions({ transform }))
+  /**
+   * Map each node into an array of values, which are then flattened into a single array.
+   *
+   * This is analogous to `Array.prototype.flatMap` for arrays.
+   */
+  flatMap = <R>(
+    node: T,
+    transform: FlatMapEntriesOptions<T, PK, R>['transform']
+  ) => flatMap(node, this.mergeOptions({ transform }))
 
   // reduce = <R>(
   //   node: T,

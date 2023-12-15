@@ -1,4 +1,4 @@
-import { IndexPath, KeyPath } from './indexPath'
+import { IndexPath } from './indexPath'
 import {
   BaseChildrenOptions,
   BaseEntriesOptions,
@@ -31,7 +31,7 @@ export type ReduceEntriesOptions<
   /**
    * Return the next result value.
    */
-  nextResult: (result: R, node: T, keyPath: KeyPath) => R
+  nextResult: (result: R, node: T, keyPath: PK[]) => R
 }
 
 export type ReduceOptions<T, PK extends PropertyKey, R> =

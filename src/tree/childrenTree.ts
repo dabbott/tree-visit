@@ -9,7 +9,7 @@ import {
   findIndexPath,
 } from '../find'
 import { flat } from '../flat'
-import { FlatMapOptions, flatMap } from '../flatMap'
+import { FlatMapChildrenOptions, flatMap } from '../flatMap'
 import { IndexPath } from '../indexPath'
 import { InsertOptions, insert } from '../insert'
 import { MapOptions, map } from '../map'
@@ -220,8 +220,10 @@ export class ChildrenTree<
    *
    * This is analogous to `Array.prototype.flatMap` for arrays.
    */
-  flatMap = <R>(node: T, transform: FlatMapOptions<T, R>['transform']) =>
-    flatMap(node, this.mergeOptions({ transform }))
+  flatMap = <R>(
+    node: T,
+    transform: FlatMapChildrenOptions<T, R>['transform']
+  ) => flatMap(node, this.mergeOptions({ transform }))
 
   reduce = <R>(
     node: T,

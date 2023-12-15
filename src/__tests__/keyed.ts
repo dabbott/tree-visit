@@ -3,6 +3,7 @@ import { access, accessPath } from '../access'
 import { defineTree } from '../defineTree'
 import { find, findAll, findAllIndexPaths, findIndexPath } from '../find'
 import { flat } from '../flat'
+import { flatMap } from '../flatMap'
 import { visit } from '../visit'
 
 const getEntries = (node: Node) =>
@@ -87,6 +88,15 @@ describe('keyed access', () => {
       'c2',
     ])
   })
+
+  it('flatmaps', () => {
+    expect(
+      flatMap(example, {
+        getEntries,
+        transform: (node) => (node.name.startsWith('b') ? [node.name] : []),
+      })
+    ).toEqual(['b', 'b1', 'b2'])
+  })
 })
 
 describe('keyed partially applied', () => {
@@ -98,6 +108,7 @@ describe('keyed partially applied', () => {
     findIndexPath,
     findAllIndexPaths,
     flat,
+    flatMap,
   } = defineTree({
     getEntries,
   }).withOptions({
@@ -170,5 +181,11 @@ describe('keyed partially applied', () => {
       'c1',
       'c2',
     ])
+  })
+
+  it('flatmaps', () => {
+    expect(
+      flatMap(example, (node) => (node.name.startsWith('b') ? [node.name] : []))
+    ).toEqual(['b', 'b1', 'b2'])
   })
 })
