@@ -8,10 +8,10 @@ import {
 } from '../__mocks__/node'
 import { defineTree } from '../defineTree'
 import { diagram } from '../diagram'
-import { insert } from '../insert'
-import { move } from '../move'
-import { remove } from '../remove'
-import { replace } from '../replace'
+import { insert } from '../mutation/insert'
+import { move } from '../mutation/move'
+import { remove } from '../mutation/remove'
+import { replace } from '../mutation/replace'
 
 describe('insert', () => {
   it('inserts node at start', () => {

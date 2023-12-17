@@ -1,7 +1,7 @@
+import { IndexPath } from '../indexPath'
+import { map } from '../map'
+import { MutationBaseOptions } from '../options'
 import { ancestorIndexPaths } from './ancestors'
-import { IndexPath } from './indexPath'
-import { map } from './map'
-import { MutationBaseOptions } from './options'
 
 export type NodeOperation<T> =
   | {

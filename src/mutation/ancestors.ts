@@ -1,5 +1,5 @@
-import { IndexPath } from './indexPath'
-import { sortIndexPaths } from './sort'
+import { IndexPath } from '../indexPath'
+import { sortIndexPaths } from '../sort'
 
 /**
  * This function cleans up the `indexPaths` array by

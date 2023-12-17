@@ -1,12 +1,12 @@
-import { access } from './access'
+import { access } from '../access'
+import { IndexPath } from '../indexPath'
+import { MutationBaseOptions } from '../options'
 import { ancestorIndexPaths } from './ancestors'
-import { IndexPath } from './indexPath'
 import {
   applyOperations,
   getInsertionOperations,
   getRemovalOperations,
 } from './operation'
-import { MutationBaseOptions } from './options'
 
 export type MoveOptions<T> = MutationBaseOptions<T> & {
   indexPaths: IndexPath[]

@@ -1,6 +1,6 @@
-import { IndexPath } from './indexPath'
+import { IndexPath } from '../indexPath'
+import { MutationBaseOptions } from '../options'
 import { applyOperations, getInsertionOperations } from './operation'
-import { MutationBaseOptions } from './options'
 
 export type InsertOptions<T> = MutationBaseOptions<T> & {
   nodes: T[]

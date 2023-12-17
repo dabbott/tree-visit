@@ -1,6 +1,6 @@
-import { IndexPath } from './indexPath'
+import { IndexPath } from '../indexPath'
+import { MutationBaseOptions } from '../options'
 import { applyOperations, getRemovalOperations } from './operation'
-import { MutationBaseOptions } from './options'
 
 export type RemoveOptions<T> = MutationBaseOptions<T> & {
   indexPaths: IndexPath[]
