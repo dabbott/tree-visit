@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`displays json tree diagram 1`] = `
+"<Object> []
+├── null: null [null]
+├── boolean: true [boolean]
+├── number: 42 [number]
+├── string: \\"hello\\" [string]
+├── multilineString: \\"line1\\\\nline2\\" [multilineString]
+├── array: <Array> [array]
+│   ├── 0: 1 [array/0]
+│   ├── 1: 2 [array/1]
+│   └── 2: 3 [array/2]
+└── object: <Object> [object]
+    ├── foo: \\"bar\\" [object/foo]
+    └── baz: <Object> [object/baz]
+        └── qux: \\"quux\\" [object/baz/qux]"
+`;
