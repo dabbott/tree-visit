@@ -234,6 +234,11 @@ export class ChildrenTree<
   map = <R>(node: T, transform: MapChildrenOptions<T, R>['transform']): R =>
     map(node, this.mergeOptions({ transform }))
 
+  // mapEntries = <R>(
+  //   node: T,
+  //   transform: MapEntriesChildrenOptions<T, R>['transform']
+  // ): R => mapEntries(node, this.mergeOptions({ transform }))
+
   visit: Overloads<T>['visit'] = (
     node: T,
     onEnterOrOptions:

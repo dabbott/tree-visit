@@ -4,7 +4,7 @@ import { defineTree } from '../defineTree'
 import { find, findAll, findAllIndexPaths, findIndexPath } from '../find'
 import { flat } from '../flat'
 import { flatMap } from '../flatMap'
-import { map } from '../map'
+import { map, mapEntries } from '../map'
 import { reduce } from '../reduce'
 import { visit } from '../visit'
 
@@ -118,6 +118,25 @@ describe('keyed access', () => {
       transform: (node, transformedEntries) => ({
         id: node.name + '*',
         items: transformedEntries,
+      }),
+    })
+
+    expect(
+      flatMap(result, {
+        getChildren: (node) => node.items,
+        transform: (n) => [n.id],
+      })
+    ).toEqual(['a*', 'b*', 'b1*', 'b2*', 'c*', 'c1*', 'c2*'])
+  })
+
+  it('maps entries', () => {
+    type ResultNode = { id: string; items: ResultNode[] }
+
+    const result: ResultNode = mapEntries(example, {
+      getEntries,
+      transform: (node, transformedEntries) => ({
+        id: node.name + '*',
+        items: transformedEntries.map(([key, node]) => node),
       }),
     })
 

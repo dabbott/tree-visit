@@ -406,6 +406,25 @@ describe('map', () => {
       }).map((node) => node.id)
     ).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
   })
+
+  // Is this API useful for children trees?
+  // it('maps entries', () => {
+  //   type ResultNode = { id: string; items: ResultNode[] }
+
+  //   const result: ResultNode = mapEntries(example, {
+  //     getChildren,
+  //     transform: (node, children) => ({
+  //       id: node.name,
+  //       items: children.map((child) => child[1]),
+  //     }),
+  //   })
+
+  //   expect(
+  //     flat(result, {
+  //       getChildren: (node) => node.items,
+  //     }).map((node) => node.id)
+  //   ).toEqual(['a', 'b', 'b1', 'b2', 'c', 'c1', 'c2'])
+  // })
 })
 
 describe('diagram', () => {

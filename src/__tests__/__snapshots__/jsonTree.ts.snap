@@ -14,3 +14,14 @@ exports[`displays json tree diagram 1`] = `
 └── object: <Object>
     └── foo: \\"bar\\""
 `;
+
+exports[`renames keys and modifies values 1`] = `
+Object {
+  "BAZ": "qux",
+  "FOO": "bar",
+  "NESTED": Object {
+    "A": 2,
+    "B": 4,
+  },
+}
+`;

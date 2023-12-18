@@ -10,7 +10,12 @@ import {
 } from '../find'
 import { flat } from '../flat'
 import { FlatMapEntriesOptions, flatMap } from '../flatMap'
-import { MapEntriesOptions, map } from '../map'
+import {
+  MapEntriesEntriesOptions,
+  MapEntriesOptions,
+  map,
+  mapEntries,
+} from '../map'
 import { BaseEntriesOptions } from '../options'
 import { ReduceEntriesOptions, reduce } from '../reduce'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from '../types'
@@ -254,6 +259,11 @@ export class EntriesTree<
 
   map = <R>(node: T, transform: MapEntriesOptions<T, PK, R>['transform']): R =>
     map(node, this.mergeOptions({ transform }))
+
+  mapEntries = <R>(
+    node: T,
+    transform: MapEntriesEntriesOptions<T, PK, R>['transform']
+  ): R => mapEntries(node, this.mergeOptions({ transform }))
 
   visit: Overloads<T, PK>['visit'] = (
     node: T,
