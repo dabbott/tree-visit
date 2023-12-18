@@ -20,11 +20,21 @@ export type BaseEntriesOptions<T, PK extends PropertyKey> = CommonOptions & {
   getChild?: (parent: T, parentKeyPath: PK[], childKey: PK) => T
 }
 
-export type MutationBaseOptions<T> = BaseChildrenOptions<T> & {
+export type MutationBaseChildrenOptions<T> = BaseChildrenOptions<T> & {
   /**
    * Create a new node based on the original node and its new children
    */
   create: (node: T, children: T[], indexPath: IndexPath) => T
+}
+
+export type MutationBaseEntriesOptions<
+  T,
+  PK extends PropertyKey
+> = BaseEntriesOptions<T, PK> & {
+  /**
+   * Create a new node based on the original node and its new children
+   */
+  create: (node: T, entries: [PK, T][], keyPath: PK[]) => T
 }
 
 export function getChild<T, PK extends PropertyKey>(

@@ -12,18 +12,18 @@ import { flat } from '../flat'
 import { FlatMapChildrenOptions, flatMap } from '../flatMap'
 import { IndexPath } from '../indexPath'
 import { MapChildrenOptions, map } from '../map'
-import { InsertOptions, insert } from '../mutation/insert'
-import { MoveOptions, move } from '../mutation/move'
-import { RemoveOptions, remove } from '../mutation/remove'
-import { ReplaceOptions, replace } from '../mutation/replace'
-import { BaseChildrenOptions, MutationBaseOptions } from '../options'
+import { InsertChildrenOptions, insert } from '../mutation/insert'
+import { MoveChildrenOptions, move } from '../mutation/move'
+import { RemoveChildrenOptions, remove } from '../mutation/remove'
+import { ReplaceChildrenOptions, replace } from '../mutation/replace'
+import { BaseChildrenOptions, MutationBaseChildrenOptions } from '../options'
 import { ReduceChildrenOptions, reduce } from '../reduce'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from '../types'
 import { VisitChildrenOptions, visit } from '../visit'
 
 type WithoutBase<T> = Omit<T, keyof BaseChildrenOptions<T>>
 
-type MutationOptions<T> = WithoutBase<MutationBaseOptions<T>>
+type MutationOptions<T> = WithoutBase<MutationBaseChildrenOptions<T>>
 
 type DiagramOptionsWB<T> = WithoutBase<DiagramChildrenOptions<T>>
 type DiagramRequiredOptions<T> = Pick<
@@ -36,10 +36,10 @@ type DiagramOptionalOptions<T> = Omit<
 >
 type FindOptionsWB<T> = WithoutBase<FindChildrenOptions<T>>
 type VisitOptionsWB<T> = WithoutBase<VisitChildrenOptions<T>>
-type InsertOptionsWB<T> = WithoutBase<InsertOptions<T>>
-type RemoveOptionsWB<T> = WithoutBase<RemoveOptions<T>>
-type MoveOptionsWB<T> = WithoutBase<MoveOptions<T>>
-type ReplaceOptionsWB<T> = WithoutBase<ReplaceOptions<T>>
+type InsertOptionsWB<T> = WithoutBase<InsertChildrenOptions<T>>
+type RemoveOptionsWB<T> = WithoutBase<RemoveChildrenOptions<T>>
+type MoveOptionsWB<T> = WithoutBase<MoveChildrenOptions<T>>
+type ReplaceOptionsWB<T> = WithoutBase<ReplaceChildrenOptions<T>>
 
 type ApplyableOptions<T> = DiagramRequiredOptions<T> & MutationOptions<T>
 

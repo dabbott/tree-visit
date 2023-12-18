@@ -1,32 +1,31 @@
-import { IndexPath } from '../indexPath'
-import { map } from '../map'
-import { MutationBaseOptions } from '../options'
+import { mapEntries } from '../map'
+import { MutationBaseEntriesOptions } from '../options'
 import { ancestorIndexPaths } from './ancestors'
 
-export type NodeOperation<T> =
+export type NodeOperation<T, PK extends PropertyKey> =
   | {
       type: 'insert'
-      index: number
-      nodes: T[]
+      index: PK
+      nodes: [PK, T][]
     }
   | {
       type: 'remove'
-      indexes: number[]
+      indexes: PK[]
     }
   | {
       type: 'replace'
     }
   | {
       type: 'removeThenInsert'
-      removeIndexes: number[]
-      insertIndex: number
-      insertNodes: T[]
+      removeIndexes: PK[]
+      insertIndex: PK
+      insertNodes: [PK, T][]
     }
 
-export function insertOperation<T>(
-  index: number,
-  nodes: T[]
-): NodeOperation<T> {
+export function insertOperation<T, PK extends PropertyKey>(
+  index: PK,
+  nodes: [PK, T][]
+): NodeOperation<T, PK> {
   return {
     type: 'insert',
     index,
@@ -34,30 +33,35 @@ export function insertOperation<T>(
   }
 }
 
-export function removeOperation<T>(indexes: number[]): NodeOperation<T> {
+export function removeOperation<T, PK extends PropertyKey>(
+  indexes: PK[]
+): NodeOperation<T, PK> {
   return {
     type: 'remove',
     indexes,
   }
 }
 
-export function replaceOperation<T>(): NodeOperation<T> {
+export function replaceOperation<T, PK extends PropertyKey>(): NodeOperation<
+  T,
+  PK
+> {
   return {
     type: 'replace',
   }
 }
 
-type OperationMap<T> = Map<string, NodeOperation<T>>
+type OperationMap<T, PK extends PropertyKey> = Map<string, NodeOperation<T, PK>>
 
-function splitIndexPath(indexPath: IndexPath): [IndexPath, number] {
+function splitIndexPath<PK extends PropertyKey>(indexPath: PK[]): [PK[], PK] {
   return [indexPath.slice(0, -1), indexPath[indexPath.length - 1]]
 }
 
-export function getInsertionOperations<T>(
-  indexPath: IndexPath,
-  nodes: T[],
-  operations: OperationMap<T> = new Map()
-) {
+export function getInsertionOperations<T, PK extends PropertyKey>(
+  indexPath: PK[],
+  nodes: [PK, T][],
+  operations: OperationMap<T, PK> = new Map()
+): OperationMap<T, PK> {
   const [parentIndexPath, index] = splitIndexPath(indexPath)
 
   // Mark all parents for replacing
@@ -91,10 +95,12 @@ export function getInsertionOperations<T>(
   return operations
 }
 
-export function getRemovalOperations<T>(indexPaths: IndexPath[]) {
+export function getRemovalOperations<T, PK extends PropertyKey>(
+  indexPaths: PK[][]
+) {
   const _ancestorIndexPaths = ancestorIndexPaths(indexPaths)
 
-  const indexesToRemove = new Map<string, number[]>()
+  const indexesToRemove = new Map<string, PK[]>()
 
   for (const indexPath of _ancestorIndexPaths) {
     const parentKey = indexPath.slice(0, -1).join()
@@ -106,7 +112,7 @@ export function getRemovalOperations<T>(indexPaths: IndexPath[]) {
     indexesToRemove.set(parentKey, value)
   }
 
-  const operations: OperationMap<T> = new Map()
+  const operations: OperationMap<T, PK> = new Map()
 
   // Mark all parents for replacing
   for (const indexPath of _ancestorIndexPaths) {
@@ -130,8 +136,11 @@ export function getRemovalOperations<T>(indexPaths: IndexPath[]) {
   return operations
 }
 
-export function getReplaceOperations<T>(indexPath: IndexPath, node: T) {
-  const operations: OperationMap<T> = new Map()
+export function getReplaceOperations<T, PK extends PropertyKey>(
+  indexPath: PK[],
+  node: [PK, T]
+) {
+  const operations: OperationMap<T, PK> = new Map()
   const [parentIndexPath, index] = splitIndexPath(indexPath)
 
   // Mark all parents for replacing
@@ -151,16 +160,16 @@ export function getReplaceOperations<T>(indexPath: IndexPath, node: T) {
   return operations
 }
 
-export function applyOperations<T>(
+export function applyOperations<T, PK extends PropertyKey>(
   node: T,
-  operations: OperationMap<T>,
-  options: MutationBaseOptions<T>
+  operations: OperationMap<T, PK>,
+  options: MutationBaseEntriesOptions<T, PK>
 ) {
-  return map(node, {
+  return mapEntries(node, {
     ...options,
     // Avoid calling `getChildren` for every node in the tree.
     // Return [] if we're just going to return the original node anyway.
-    getChildren: (node, indexPath) => {
+    getEntries: (node, indexPath) => {
       const key = indexPath.join()
       const operation = operations.get(key)
 
@@ -169,30 +178,35 @@ export function applyOperations<T>(
         case 'remove':
         case 'removeThenInsert':
         case 'insert':
-          return options.getChildren(node, indexPath)
+          return options.getEntries(node, indexPath)
         default:
           return []
       }
     },
-    transform: (node, children: T[], indexPath) => {
+    transform: (node, entries: [PK, T][], indexPath) => {
       const key = indexPath.join()
       const operation = operations.get(key)
 
       switch (operation?.type) {
-        case 'remove':
+        case 'remove': {
           return options.create(
             node,
-            children.filter((_, index) => !operation.indexes.includes(index)),
+            entries.filter(([pk, _]) => !operation.indexes.includes(pk)),
             indexPath
           )
+        }
         case 'removeThenInsert':
-          const updatedChildren = children.filter(
-            (_, index) => !operation.removeIndexes.includes(index)
+          const updatedChildren = entries.filter(
+            ([pk, _]) => !operation.removeIndexes.includes(pk)
           )
 
-          const adjustedIndex = operation.removeIndexes.reduce(
+          const removeIndexes = operation.removeIndexes.map((index) =>
+            entries.findIndex(([pk, _]) => pk === index)
+          )
+
+          const adjustedIndex: number = removeIndexes.reduce(
             (index, removedIndex) => (removedIndex < index ? index - 1 : index),
-            operation.insertIndex
+            entries.findIndex(([pk, _]) => pk === operation.insertIndex)
           )
 
           return options.create(
@@ -200,14 +214,23 @@ export function applyOperations<T>(
             splice(updatedChildren, adjustedIndex, 0, ...operation.insertNodes),
             indexPath
           )
-        case 'insert':
+        case 'insert': {
+          let insertionIndex = entries.findIndex(
+            ([pk, _]) => pk === operation.index
+          )
+
+          if (insertionIndex === -1) {
+            insertionIndex = entries.length
+          }
+
           return options.create(
             node,
-            splice(children, operation.index, 0, ...operation.nodes),
+            splice(entries, insertionIndex, 0, ...operation.nodes),
             indexPath
           )
+        }
         case 'replace':
-          return options.create(node, children, indexPath)
+          return options.create(node, entries, indexPath)
         default:
           return node
       }
