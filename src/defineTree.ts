@@ -112,7 +112,7 @@ interface Overloads<T> {
 class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
   constructor(
     getChildrenOrBaseOptions: BaseOptions<T> | ((node: T) => T[]),
-    private appliedOptions: AppliedOptions
+    public appliedOptions: AppliedOptions
   ) {
     this.baseOptions =
       typeof getChildrenOrBaseOptions === 'function'
@@ -129,9 +129,9 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
    */
   getChildren: BaseOptions<T>['getChildren']
 
-  private baseOptions: BaseOptions<T>
+  baseOptions: BaseOptions<T>
 
-  private mergeOptions = <T extends Record<string, any>>(options: T) => ({
+  mergeOptions = <T extends Record<string, any>>(options: T) => ({
     ...this.baseOptions,
     ...this.appliedOptions,
     ...options,
