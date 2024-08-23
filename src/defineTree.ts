@@ -1,25 +1,25 @@
 import { access, accessPath } from './access'
-import { DiagramOptions, diagram } from './diagram'
+import { diagram, DiagramOptions } from './diagram'
 import {
-  FindOptions,
-  FindOptionsTyped,
   find,
   findAll,
   findAllIndexPaths,
   findIndexPath,
+  FindOptions,
+  FindOptionsTyped,
 } from './find'
 import { flat } from './flat'
-import { FlatMapOptions, flatMap } from './flatMap'
+import { flatMap, FlatMapOptions } from './flatMap'
 import { IndexPath } from './indexPath'
-import { InsertOptions, insert } from './insert'
-import { MapOptions, map } from './map'
-import { MoveOptions, move } from './move'
+import { insert, InsertOptions } from './insert'
+import { map, MapOptions } from './map'
+import { move, MoveOptions } from './move'
 import { BaseOptions, MutationBaseOptions } from './options'
-import { ReduceOptions, reduce } from './reduce'
-import { RemoveOptions, remove } from './remove'
-import { ReplaceOptions, replace } from './replace'
+import { reduce, ReduceOptions } from './reduce'
+import { remove, RemoveOptions } from './remove'
+import { replace, ReplaceOptions } from './replace'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from './types'
-import { VisitOptions, visit } from './visit'
+import { visit, VisitOptions } from './visit'
 
 type WithoutBase<T> = Omit<T, keyof BaseOptions<T>>
 
@@ -111,7 +111,7 @@ interface Overloads<T> {
 
 class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
   constructor(
-    getChildrenOrBaseOptions: BaseOptions<T> | ((node: T) => T[]),
+    getChildrenOrBaseOptions: BaseOptions<T> | BaseOptions<T>['getChildren'],
     public appliedOptions: AppliedOptions
   ) {
     this.baseOptions =
@@ -299,7 +299,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
 }
 
 export function defineTree<T>(
-  getChildren: BaseOptions<T> | ((node: T) => T[])
+  getChildren: BaseOptions<T> | BaseOptions<T>['getChildren']
 ) {
   return new Tree(getChildren, {})
 }
