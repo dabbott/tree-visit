@@ -44,10 +44,13 @@ type NodeWrapper<T> = {
  * - return `"stop"` to end traversal
  */
 export function visit<T>(node: T, options: VisitOptions<T>): void {
-  const { onEnter, onLeave, getChildren } = options
+  const { onEnter, onLeave, getChildren, onDetectCycle, getIdentifier } =
+    options
 
   let indexPath: IndexPath = []
   let stack: NodeWrapper<T>[] = [{ node }]
+
+  const visited = onDetectCycle ? new Set<unknown>() : undefined
 
   const context: TraversalContext<T> | undefined =
     options.includeTraversalContext
@@ -73,6 +76,26 @@ export function visit<T>(node: T, options: VisitOptions<T>): void {
 
     // Visit the wrapped node
     if (wrapper.state === undefined) {
+      // Add cycle detection before visiting node
+      if (visited) {
+        const id = getIdentifier ? getIdentifier(wrapper.node) : wrapper.node
+        if (visited.has(id)) {
+          const action =
+            typeof onDetectCycle === 'function'
+              ? onDetectCycle(wrapper.node, getIndexPath(), context)
+              : onDetectCycle
+
+          if (action === 'error') {
+            throw new Error('Cycle detected in tree')
+          } else {
+            // action === 'skip'
+            wrapper.state = -1 // Mark as skipped
+            continue
+          }
+        }
+        visited.add(id)
+      }
+
       const enterResult = onEnter?.(wrapper.node, getIndexPath())
 
       if (enterResult === STOP) return
@@ -104,6 +127,12 @@ export function visit<T>(node: T, options: VisitOptions<T>): void {
       const leaveResult = onLeave?.(wrapper.node, getIndexPath())
 
       if (leaveResult === STOP) return
+    }
+
+    // Remove node from visited set when leaving
+    if (visited) {
+      const id = getIdentifier ? getIdentifier(wrapper.node) : wrapper.node
+      visited.delete(id)
     }
 
     indexPath.pop()

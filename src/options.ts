@@ -6,6 +6,18 @@ export type TraversalContext<T> = {
   getAncestors(): T[]
 }
 
+export type CycleHandling<T> =
+  /** Throw an error when a cycle is detected */
+  | 'error'
+  /** Skip the node that would create the cycle and continue traversal */
+  | 'skip'
+  /** Custom handler for cycle detection */
+  | ((
+      node: T,
+      indexPath: IndexPath,
+      context?: TraversalContext<T>
+    ) => 'error' | 'skip')
+
 export type BaseOptions<T> = {
   getChildren: (
     node: T,
@@ -26,6 +38,18 @@ export type BaseOptions<T> = {
    * If true, the `context` object will be included in the callback.
    */
   includeTraversalContext?: boolean
+
+  /**
+   * How to handle cycles when detected.
+   * If undefined, cycle detection is disabled.
+   */
+  onDetectCycle?: CycleHandling<T>
+
+  /**
+   * Get the identifier of a node.
+   * Used for cycle detection.
+   */
+  getIdentifier?: (node: T) => unknown
 }
 
 export type MutationBaseOptions<T> = BaseOptions<T> & {
