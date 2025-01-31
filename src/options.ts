@@ -1,7 +1,17 @@
 import { IndexPath } from './indexPath'
 
+export type TraversalContext<T> = {
+  getRoot(): T
+  getParent(): T | undefined
+  getAncestors(): T[]
+}
+
 export type BaseOptions<T> = {
-  getChildren: (node: T, indexPath: IndexPath) => T[]
+  getChildren: (
+    node: T,
+    indexPath: IndexPath,
+    context?: TraversalContext<T>
+  ) => T[]
 
   /**
    * By default, a new IndexPath array is allocated on every callback.
@@ -11,6 +21,11 @@ export type BaseOptions<T> = {
    * clone the IndexPath array if you store it for later use.
    */
   reuseIndexPath?: boolean
+
+  /**
+   * If true, the `context` object will be included in the callback.
+   */
+  includeTraversalContext?: boolean
 }
 
 export type MutationBaseOptions<T> = BaseOptions<T> & {

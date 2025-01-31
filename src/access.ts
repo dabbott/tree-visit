@@ -1,5 +1,5 @@
 import { IndexPath } from './indexPath'
-import { BaseOptions } from './options'
+import { BaseOptions, TraversalContext } from './options'
 
 /**
  * Returns a node by its `IndexPath`.
@@ -11,6 +11,11 @@ export function access<T>(
   indexPath: IndexPath,
   options: BaseOptions<T>
 ): T {
+  if (options.includeTraversalContext) {
+    const accessed = accessPath(node, indexPath, options)
+    return accessed[accessed.length - 1]
+  }
+
   let path = indexPath.slice()
 
   while (path.length > 0) {
@@ -36,7 +41,17 @@ export function accessPath<T>(
 
   while (path.length > 0) {
     let index = path.shift()!
-    node = options.getChildren(node, path)[index]
+
+    const context: TraversalContext<T> | undefined =
+      options.includeTraversalContext
+        ? {
+            getRoot: () => result[0],
+            getParent: () => result[result.length - 2],
+            getAncestors: () => result.slice(0, -1),
+          }
+        : undefined
+
+    node = options.getChildren(node, path, context)[index]
     result.push(node)
   }
 

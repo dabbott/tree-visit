@@ -14,7 +14,7 @@ import { IndexPath } from './indexPath'
 import { insert, InsertOptions } from './insert'
 import { map, MapOptions } from './map'
 import { move, MoveOptions } from './move'
-import { BaseOptions, MutationBaseOptions } from './options'
+import { BaseOptions, MutationBaseOptions, TraversalContext } from './options'
 import { reduce, ReduceOptions } from './reduce'
 import { remove, RemoveOptions } from './remove'
 import { replace, ReplaceOptions } from './replace'
@@ -119,15 +119,23 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
         ? { getChildren: getChildrenOrBaseOptions }
         : getChildrenOrBaseOptions
 
-    this.getChildren = this.baseOptions.getChildren
+    this._getChildren = this.baseOptions.getChildren
   }
+
+  _getChildren: BaseOptions<T>['getChildren']
 
   /**
    * Returns the node's children.
    *
    * This is the same as the `getChildren` option passed to `defineTree`, included here for convenience.
    */
-  getChildren: BaseOptions<T>['getChildren']
+  getChildren = (
+    node: T,
+    indexPath: IndexPath,
+    context?: TraversalContext<T>
+  ) => {
+    return this._getChildren(node, indexPath, context)
+  }
 
   baseOptions: BaseOptions<T>
 

@@ -1,5 +1,5 @@
 import { IndexPath } from './indexPath'
-import { BaseOptions } from './options'
+import { BaseOptions, TraversalContext } from './options'
 
 export const SKIP = 'skip'
 export const STOP = 'stop'
@@ -49,6 +49,21 @@ export function visit<T>(node: T, options: VisitOptions<T>): void {
   let indexPath: IndexPath = []
   let stack: NodeWrapper<T>[] = [{ node }]
 
+  const context: TraversalContext<T> | undefined =
+    options.includeTraversalContext
+      ? {
+          getRoot() {
+            return node
+          },
+          getParent() {
+            return stack[stack.length - 2]?.node
+          },
+          getAncestors() {
+            return stack.slice(0, -1).map((wrapper) => wrapper.node)
+          },
+        }
+      : undefined
+
   const getIndexPath = options.reuseIndexPath
     ? () => indexPath
     : () => indexPath.slice()
@@ -66,7 +81,7 @@ export function visit<T>(node: T, options: VisitOptions<T>): void {
     }
 
     const children =
-      wrapper.children || getChildren(wrapper.node, getIndexPath())
+      wrapper.children || getChildren(wrapper.node, getIndexPath(), context)
 
     if (!wrapper.children) {
       wrapper.children = children
