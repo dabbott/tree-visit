@@ -1,5 +1,5 @@
 import { access } from './access'
-import { ancestorIndexPaths } from './ancestors'
+import { ancestorPaths } from './ancestors'
 import { IndexPath } from './indexPath'
 import {
   applyOperations,
@@ -26,7 +26,7 @@ export function move<T>(node: T, options: MoveOptions<T>) {
     throw new Error(`Can't move nodes to the root`)
   }
 
-  const _ancestorIndexPaths = ancestorIndexPaths(options.indexPaths)
+  const _ancestorIndexPaths = ancestorPaths(options.indexPaths)
 
   const nodesToInsert = _ancestorIndexPaths.map((indexPath) =>
     access(node, indexPath, options)

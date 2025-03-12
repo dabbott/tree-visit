@@ -1,4 +1,4 @@
-import { ancestorIndexPaths } from './ancestors'
+import { ancestorPaths } from './ancestors'
 import { IndexPath } from './indexPath'
 import { map } from './map'
 import { MutationBaseOptions } from './options'
@@ -92,7 +92,7 @@ export function getInsertionOperations<T>(
 }
 
 export function getRemovalOperations<T>(indexPaths: IndexPath[]) {
-  const _ancestorIndexPaths = ancestorIndexPaths(indexPaths)
+  const _ancestorIndexPaths = ancestorPaths(indexPaths)
 
   const indexesToRemove = new Map<string, number[]>()
 
