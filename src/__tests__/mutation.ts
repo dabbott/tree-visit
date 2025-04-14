@@ -389,12 +389,52 @@ describe('partially applied', () => {
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
   })
 
+  it('inserts node with path tracking', () => {
+    const result = Tree.insertWithPathTracking(example, {
+      at: [1, 1],
+      nodes: [{ name: 'x', indexPath: [] }],
+      track: [[0], [1], [1, 0], [1, 1]],
+    })
+
+    expect(result.paths).toEqual([[0], [1], [1, 0], [1, 2]])
+  })
+
   it('removes node', () => {
     const result = Tree.remove(example, {
       paths: [[1]],
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('removes node with path tracking', () => {
+    const result = Tree.removeWithPathTracking(example, {
+      paths: [[1, 0]],
+      track: [[0], [1], [1, 0], [1, 1], [1, 1, 1]],
+    })
+
+    expect(result.paths).toEqual([[0], [1], undefined, [1, 0], [1, 0, 1]])
+  })
+
+  it('splices node', () => {
+    const result = Tree.splice(example, {
+      path: [0],
+      deleteCount: 1,
+      nodes: [{ name: 'x', indexPath: [] }],
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('splices node with path tracking', () => {
+    const result = Tree.spliceWithPathTracking(example, {
+      path: [0],
+      deleteCount: 1,
+      nodes: [{ name: 'x', indexPath: [] }],
+      track: [[0], [1], [1, 0]],
+    })
+
+    expect(result.paths).toEqual([undefined, [1], [1, 0]])
   })
 
   it('moves node', () => {

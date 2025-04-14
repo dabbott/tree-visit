@@ -160,6 +160,14 @@ exports[`partially applied splices node 1`] = `
     └── c2"
 `;
 
+exports[`partially applied splices node 2`] = `
+"a
+├── x
+└── c
+    ├── c1
+    └── c2"
+`;
+
 exports[`remove removes multiple nodes 1`] = `
 "a
 └── b"

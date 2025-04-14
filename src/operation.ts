@@ -2,6 +2,7 @@ import { ancestorPaths } from './ancestors'
 import { IndexPath } from './indexPath'
 import { map } from './map'
 import { MutationBaseOptions } from './options'
+import { transformPath } from './transformPath'
 
 export type NodeOperation<T> =
   | {
@@ -151,6 +152,13 @@ export function getReplaceOperations<T>(indexPath: IndexPath, node: T) {
   return operations
 }
 
+function adjustInsertIndex(index: number, removeIndexes: number[]) {
+  return removeIndexes.reduce(
+    (index, removedIndex) => (removedIndex < index ? index - 1 : index),
+    index
+  )
+}
+
 export function applyOperations<T>(
   node: T,
   operations: OperationMap<T>,
@@ -190,9 +198,9 @@ export function applyOperations<T>(
             (_, index) => !operation.removeIndexes.includes(index)
           )
 
-          const adjustedIndex = operation.removeIndexes.reduce(
-            (index, removedIndex) => (removedIndex < index ? index - 1 : index),
-            operation.insertIndex
+          const adjustedIndex = adjustInsertIndex(
+            operation.insertIndex,
+            operation.removeIndexes
           )
 
           return options.create(
@@ -231,4 +239,74 @@ export function arraySplice<T>(
     ...items,
     ...array.slice(start + deleteCount),
   ]
+}
+
+export function transformPathsByOperations<T>(
+  paths: IndexPath[],
+  operations: OperationMap<T>
+): (IndexPath | undefined)[] {
+  let transformedPaths: (IndexPath | undefined)[] = paths
+
+  for (const [parentKey, operation] of operations.entries()) {
+    const parentPath = parentKey ? parentKey.split(',').map(Number) : []
+
+    transformedPaths = transformByOperation(
+      transformedPaths,
+      parentPath,
+      operation
+    )
+  }
+
+  return transformedPaths
+}
+
+function transformByOperation<T>(
+  transformedPaths: (IndexPath | undefined)[],
+  parentPath: IndexPath,
+  operation: NodeOperation<T>
+): (IndexPath | undefined)[] {
+  switch (operation.type) {
+    case 'insert': {
+      const otherPath = parentPath.concat(operation.index)
+
+      return transformedPaths.map((path) =>
+        path
+          ? transformPath(path, 'insert', otherPath, operation.nodes.length)
+          : undefined
+      )
+    }
+    case 'remove': {
+      const otherPaths = [...operation.indexes]
+        .reverse()
+        .map((index) => parentPath.concat(index))
+
+      return transformedPaths.map((path) => {
+        for (const otherPath of otherPaths) {
+          path = path ? transformPath(path, 'remove', otherPath) : undefined
+        }
+
+        return path
+      })
+    }
+    case 'removeThenInsert': {
+      const result = transformByOperation(transformedPaths, parentPath, {
+        type: 'remove',
+        indexes: operation.removeIndexes,
+      })
+
+      const insertIndex = adjustInsertIndex(
+        operation.insertIndex,
+        operation.removeIndexes
+      )
+
+      return transformByOperation(result, parentPath, {
+        type: 'insert',
+        index: insertIndex,
+        nodes: operation.insertNodes,
+      })
+    }
+    case 'replace': {
+      return transformedPaths
+    }
+  }
 }

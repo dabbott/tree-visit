@@ -10,14 +10,29 @@ import {
 } from './find'
 import { flat } from './flat'
 import { IndexPath } from './indexPath'
-import { insert, InsertOptions } from './insert'
+import {
+  insert,
+  InsertOptions,
+  insertWithPathTracking,
+  InsertWithPathTrackingOptions,
+} from './insert'
 import { flatMap, FlatMapOptions, map, MapOptions } from './map'
 import { move, MoveOptions } from './move'
 import { BaseOptions, MutationBaseOptions, TraversalContext } from './options'
 import { reduce, ReduceOptions } from './reduce'
-import { remove, RemoveOptions } from './remove'
+import {
+  remove,
+  RemoveOptions,
+  removeWithPathTracking,
+  RemoveWithPathTrackingOptions,
+} from './remove'
 import { replace, ReplaceOptions } from './replace'
-import { splice, SpliceOptions } from './splice'
+import {
+  splice,
+  SpliceOptions,
+  spliceWithPathTracking,
+  SpliceWithPathTrackingOptions,
+} from './splice'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from './types'
 import { visit, VisitOptions } from './visit'
 
@@ -37,10 +52,19 @@ type DiagramOptionalOptions<T> = Omit<
 type FindOptionsWB<T> = WithoutBase<FindOptions<T>>
 type VisitOptionsWB<T> = WithoutBase<VisitOptions<T>>
 type InsertOptionsWB<T> = WithoutBase<InsertOptions<T>>
+type InsertWithPathTrackingOptionsWB<T> = WithoutBase<
+  InsertWithPathTrackingOptions<T>
+>
 type RemoveOptionsWB<T> = WithoutBase<RemoveOptions<T>>
+type RemoveWithPathTrackingOptionsWB<T> = WithoutBase<
+  RemoveWithPathTrackingOptions<T>
+>
 type MoveOptionsWB<T> = WithoutBase<MoveOptions<T>>
 type ReplaceOptionsWB<T> = WithoutBase<ReplaceOptions<T>>
 type SpliceOptionsWB<T> = WithoutBase<SpliceOptions<T>>
+type SpliceWithPathTrackingOptionsWB<T> = WithoutBase<
+  SpliceWithPathTrackingOptions<T>
+>
 
 type ApplyableOptions<T> = DiagramRequiredOptions<T> & MutationOptions<T>
 
@@ -276,6 +300,25 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
   ) => insert(node, this.mergeOptions(options) as InsertOptions<T>)
 
   /**
+   * Insert nodes at a given `IndexPath`.
+   */
+  insertWithPathTracking = (
+    node: T,
+    options: Prettify<
+      OptionCheck<
+        AppliedOptions,
+        'create',
+        InsertWithPathTrackingOptionsWB<T>
+      > &
+        Omit<InsertWithPathTrackingOptionsWB<T>, 'create'>
+    >
+  ) =>
+    insertWithPathTracking(
+      node,
+      this.mergeOptions(options) as InsertWithPathTrackingOptions<T>
+    )
+
+  /**
    * Remove nodes at the given `IndexPath`s.
    */
   remove = (
@@ -285,6 +328,25 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
         Omit<RemoveOptionsWB<T>, 'create'>
     >
   ) => remove(node, this.mergeOptions(options) as RemoveOptions<T>)
+
+  /**
+   * Remove nodes at the given `IndexPath`s.
+   */
+  removeWithPathTracking = (
+    node: T,
+    options: Prettify<
+      OptionCheck<
+        AppliedOptions,
+        'create',
+        RemoveWithPathTrackingOptionsWB<T>
+      > &
+        Omit<RemoveWithPathTrackingOptionsWB<T>, 'create'>
+    >
+  ) =>
+    removeWithPathTracking(
+      node,
+      this.mergeOptions(options) as RemoveWithPathTrackingOptions<T>
+    )
 
   /**
    * Move nodes from one `IndexPath` to another.
@@ -307,6 +369,25 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
         Omit<SpliceOptionsWB<T>, 'create'>
     >
   ) => splice(node, this.mergeOptions(options) as SpliceOptions<T>)
+
+  /**
+   * Replace nodes at the given `IndexPath`s with another node.
+   */
+  spliceWithPathTracking = (
+    node: T,
+    options: Prettify<
+      OptionCheck<
+        AppliedOptions,
+        'create',
+        SpliceWithPathTrackingOptionsWB<T>
+      > &
+        Omit<SpliceWithPathTrackingOptionsWB<T>, 'create'>
+    >
+  ) =>
+    spliceWithPathTracking(
+      node,
+      this.mergeOptions(options) as SpliceWithPathTrackingOptions<T>
+    )
 
   /**
    * Replace the node at the given `IndexPath` with another

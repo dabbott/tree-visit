@@ -1,12 +1,30 @@
 import { transformPath } from '../transformPath'
 
-it('handles insert', () => {
+it('handles insert before', () => {
   const result = transformPath([1], 'insert', [0])
 
   expect(result).toEqual([2])
 })
 
-it('handles nested insert', () => {
+it('handles insert at same index', () => {
+  const result = transformPath([1], 'insert', [1])
+
+  expect(result).toEqual([2])
+})
+
+it('handles insert at ancestor', () => {
+  const result = transformPath([1, 2], 'insert', [1])
+
+  expect(result).toEqual([2, 2])
+})
+
+it('handles insert of ancestor sibling', () => {
+  const result = transformPath([1, 1, 1], 'insert', [1, 0])
+
+  expect(result).toEqual([1, 2, 1])
+})
+
+it('handles nested insert before', () => {
   const result = transformPath([0, 1], 'insert', [0, 0])
 
   expect(result).toEqual([0, 2])
@@ -48,6 +66,12 @@ it('handles nested remove', () => {
   const result = transformPath([0, 1], 'remove', [0, 0])
 
   expect(result).toEqual([0, 0])
+})
+
+it('handles remove of ancestor sibling', () => {
+  const result = transformPath([1, 1, 1], 'remove', [1, 0])
+
+  expect(result).toEqual([1, 0, 1])
 })
 
 it('ignores remove when the other path is longer', () => {

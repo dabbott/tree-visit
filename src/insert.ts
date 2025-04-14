@@ -1,5 +1,9 @@
 import { IndexPath } from './indexPath'
-import { applyOperations, getInsertionOperations } from './operation'
+import {
+  applyOperations,
+  getInsertionOperations,
+  transformPathsByOperations,
+} from './operation'
 import { MutationBaseOptions } from './options'
 
 export type InsertOptions<T> = MutationBaseOptions<T> & {
@@ -7,11 +11,36 @@ export type InsertOptions<T> = MutationBaseOptions<T> & {
   at: IndexPath
 }
 
+export type InsertWithPathTrackingOptions<T> = MutationBaseOptions<T> & {
+  nodes: T[]
+  at: IndexPath
+  track: IndexPath[]
+}
+
 /**
  * Insert nodes at a given `IndexPath`.
  */
 export function insert<T>(node: T, options: InsertOptions<T>) {
-  const { nodes, at } = options
+  return _insertWithPathTracking(node, options).node
+}
+
+/**
+ * Insert nodes at a given `IndexPath`.
+ */
+export function insertWithPathTracking<T>(
+  node: T,
+  options: InsertWithPathTrackingOptions<T>
+) {
+  return _insertWithPathTracking(node, options)
+}
+
+function _insertWithPathTracking<T>(
+  node: T,
+  options: Omit<InsertWithPathTrackingOptions<T>, 'track'> & {
+    track?: IndexPath[]
+  }
+) {
+  const { nodes, at, track } = options
 
   if (at.length === 0) {
     throw new Error(`Can't insert nodes at the root`)
@@ -19,5 +48,10 @@ export function insert<T>(node: T, options: InsertOptions<T>) {
 
   const state = getInsertionOperations(at, nodes)
 
-  return applyOperations(node, state, options)
+  const transformedPaths = track ? transformPathsByOperations(track, state) : []
+
+  return {
+    node: applyOperations(node, state, options),
+    paths: transformedPaths,
+  }
 }
