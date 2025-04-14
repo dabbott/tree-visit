@@ -16,6 +16,28 @@ export type MapOptions<T, U> = BaseOptions<T> & {
  * filtering them out of the `transformedChildren` argument. The root can't be omitted.
  */
 export function map<T, U>(node: T, options: MapOptions<T, U>): U {
+  return flatMap(node, {
+    ...options,
+    transform: (node, transformedChildren, indexPath) => [
+      options.transform(node, transformedChildren, indexPath),
+    ],
+  })
+}
+
+export type FlatMapOptions<T, U> = BaseOptions<T> & {
+  /**
+   * Transform the node into an array of new nodes.
+   */
+  transform: (node: T, transformedChildren: U[], indexPath: IndexPath) => U[]
+}
+
+/**
+ * Map each node into an array of new nodes.
+ *
+ * You can omit nodes from the tree by returning an empty array from the `transform` function.
+ * The first element of the returned top-level array will be the new root.
+ */
+export function flatMap<T, U>(node: T, options: FlatMapOptions<T, U>): U {
   const childrenMap: Record<string, U[]> = {}
 
   visit(node, {
@@ -36,7 +58,7 @@ export function map<T, U>(node: T, options: MapOptions<T, U>): U {
 
       const parentChildren = childrenMap[parentKey] ?? []
 
-      parentChildren.push(transformed)
+      parentChildren.push(...transformed)
 
       childrenMap[parentKey] = parentChildren
     },

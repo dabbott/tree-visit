@@ -3,9 +3,8 @@ import { defineTree } from '../defineTree'
 import { diagram } from '../diagram'
 import { find, findAll, findAllPaths, findPath } from '../find'
 import { flat } from '../flat'
-import { flatMap } from '../flatMap'
 import { IndexPath, visit } from '../index'
-import { map } from '../map'
+import { flatMap, map } from '../map'
 import { reduce } from '../reduce'
 
 type Node = {
@@ -321,20 +320,35 @@ describe('flat', () => {
 
 describe('flatMap', () => {
   it('flatMaps a tree', () => {
+    const x = { name: 'x' }
+
     const items = flatMap(example, {
       getChildren,
-      transform: (node) => [{ name: node.name, depth: node.indexPath.length }],
+      transform: (node, transformedChildren, indexPath) => {
+        if (node.name.includes('1')) return []
+
+        return [
+          {
+            ...node,
+            ...(transformedChildren.length > 0 && {
+              children: transformedChildren,
+            }),
+          },
+          x,
+        ]
+      },
     })
 
-    expect(items).toEqual([
-      { depth: 0, name: 'a' },
-      { depth: 1, name: 'b' },
-      { depth: 2, name: 'b1' },
-      { depth: 2, name: 'b2' },
-      { depth: 1, name: 'c' },
-      { depth: 2, name: 'c1' },
-      { depth: 2, name: 'c2' },
-    ])
+    expect(items).toEqual({
+      children: [
+        { children: [b2, x], indexPath: [0], name: 'b' },
+        x,
+        { children: [c2, x], indexPath: [1], name: 'c' },
+        x,
+      ],
+      indexPath: [],
+      name: 'a',
+    })
   })
 })
 
@@ -636,19 +650,32 @@ describe('withOptions', () => {
       )
     ).toEqual('a b b1 b2 c c1 c2')
 
-    expect(flatMap(example, (node) => node.name.split(''))).toEqual([
-      'a',
-      'b',
-      'b',
-      '1',
-      'b',
-      '2',
-      'c',
-      'c',
-      '1',
-      'c',
-      '2',
-    ])
+    const x = { name: 'x' }
+
+    const items = flatMap(example, (node, transformedChildren, indexPath) => {
+      if (node.name.includes('1')) return []
+
+      return [
+        {
+          ...node,
+          ...(transformedChildren.length > 0 && {
+            children: transformedChildren,
+          }),
+        },
+        x,
+      ]
+    })
+
+    expect(items).toEqual({
+      children: [
+        { children: [b2, x], indexPath: [0], name: 'b' },
+        x,
+        { children: [c2, x], indexPath: [1], name: 'c' },
+        x,
+      ],
+      indexPath: [],
+      name: 'a',
+    })
 
     expect(
       map<{ id: string }>(example, (node, transformedChildren) => ({

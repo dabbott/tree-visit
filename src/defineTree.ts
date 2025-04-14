@@ -9,10 +9,9 @@ import {
   findPath,
 } from './find'
 import { flat } from './flat'
-import { flatMap, FlatMapOptions } from './flatMap'
 import { IndexPath } from './indexPath'
 import { insert, InsertOptions } from './insert'
-import { map, MapOptions } from './map'
+import { flatMap, FlatMapOptions, map, MapOptions } from './map'
 import { move, MoveOptions } from './move'
 import { BaseOptions, MutationBaseOptions, TraversalContext } from './options'
 import { reduce, ReduceOptions } from './reduce'
@@ -241,14 +240,6 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
    */
   flat = (node: T) => flat(node, this.mergeOptions({}))
 
-  /**
-   * Map each node into an array of values, which are then flattened into a single array.
-   *
-   * This is analogous to `Array.prototype.flatMap` for arrays.
-   */
-  flatMap = <R>(node: T, transform: FlatMapOptions<T, R>['transform']) =>
-    flatMap(node, this.mergeOptions({ transform }))
-
   reduce = <R>(
     node: T,
     nextResult: ReduceOptions<T, R>['nextResult'],
@@ -257,6 +248,9 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
 
   map = <R>(node: T, transform: MapOptions<T, R>['transform']): R =>
     map(node, this.mergeOptions({ transform }))
+
+  flatMap = <R>(node: T, transform: FlatMapOptions<T, R>['transform']) =>
+    flatMap(node, this.mergeOptions({ transform }))
 
   visit: Overloads<T>['visit'] = (
     node: T,
