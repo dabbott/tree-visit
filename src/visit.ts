@@ -1,5 +1,5 @@
 import { IndexPath } from './indexPath'
-import { BaseOptions, TraversalContext } from './options'
+import { BaseOptions, TraversalContext, TraversalDirection } from './options'
 
 export const SKIP = 'skip'
 export const STOP = 'stop'
@@ -9,6 +9,7 @@ export type LeaveReturnValue = void | 'stop'
 export type VisitOptions<T> = BaseOptions<T> & {
   onEnter?(node: T, indexPath: IndexPath): EnterReturnValue
   onLeave?(node: T, indexPath: IndexPath): LeaveReturnValue
+  direction?: TraversalDirection
 }
 
 type NodeWrapper<T> = {
@@ -44,8 +45,23 @@ type NodeWrapper<T> = {
  * - return `"stop"` to end traversal
  */
 export function visit<T>(node: T, options: VisitOptions<T>): void {
-  const { onEnter, onLeave, getChildren, onDetectCycle, getIdentifier } =
-    options
+  const {
+    onEnter,
+    onLeave,
+    getChildren: originalGetChildren,
+    onDetectCycle,
+    getIdentifier,
+    direction = 'forward',
+  } = options
+
+  const getChildren = (
+    node: T,
+    indexPath: IndexPath,
+    context?: TraversalContext<T>
+  ) => {
+    const children = originalGetChildren(node, indexPath, context)
+    return direction === 'forward' ? children : children.slice().reverse()
+  }
 
   let indexPath: IndexPath = []
   let stack: NodeWrapper<T>[] = [{ node }]
@@ -116,7 +132,12 @@ export function visit<T>(node: T, options: VisitOptions<T>): void {
       if (wrapper.state < children.length) {
         let currentIndex = wrapper.state
 
-        indexPath.push(currentIndex)
+        indexPath.push(
+          direction === 'forward'
+            ? currentIndex
+            : children.length - currentIndex - 1
+        )
+
         stack.push({ node: children[currentIndex] })
 
         wrapper.state = currentIndex + 1

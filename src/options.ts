@@ -6,6 +6,8 @@ export type TraversalContext<T> = {
   getAncestors(): T[]
 }
 
+export type TraversalDirection = 'forward' | 'backward'
+
 export type CycleHandling<T> =
   /** Throw an error when a cycle is detected */
   | 'error'

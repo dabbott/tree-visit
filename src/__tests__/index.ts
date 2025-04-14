@@ -101,6 +101,34 @@ it('traverses normally', () => {
   expect(leaveNames).toEqual(['b1', 'b2', 'b', 'c1', 'c2', 'c', 'a'])
 })
 
+it('traverses in reverse', () => {
+  let enterNames: string[] = []
+  let leaveNames: string[] = []
+  let getChildrenCount = 0
+
+  let countGetChildren = (node: Node) => {
+    getChildrenCount++
+    return getChildren(node)
+  }
+
+  visit(example, {
+    getChildren: countGetChildren,
+    onEnter: (child, indexPath) => {
+      expect(indexPath).toEqual(child.indexPath)
+      enterNames.push(child.name)
+    },
+    onLeave: (child, indexPath) => {
+      expect(indexPath).toEqual(child.indexPath)
+      leaveNames.push(child.name)
+    },
+    direction: 'backward',
+  })
+
+  expect(getChildrenCount).toEqual(7)
+  expect(enterNames).toEqual(['a', 'c', 'c2', 'c1', 'b', 'b2', 'b1'])
+  expect(leaveNames).toEqual(['c2', 'c1', 'c', 'b2', 'b1', 'b', 'a'])
+})
+
 describe('reuseIndexPath option', () => {
   it('allocates new index paths', () => {
     let indexPaths: IndexPath[] = []
@@ -297,6 +325,31 @@ describe('find', () => {
     )
 
     expect(nodes.map((node) => node.name)).toEqual(['b', 'b1', 'b2'])
+  })
+
+  it('finds node in reverse', () => {
+    const node = find(example, {
+      getChildren,
+      predicate: (node) => /c\d$/.test(node.name),
+    })
+
+    expect(node?.name).toEqual('c1')
+
+    const nodeForward = find(example, {
+      getChildren,
+      predicate: (node) => /c\d$/.test(node.name),
+      direction: 'forward',
+    })
+
+    expect(nodeForward?.name).toEqual('c1')
+
+    const nodeBackward = find(example, {
+      getChildren,
+      predicate: (node) => /c\d$/.test(node.name),
+      direction: 'backward',
+    })
+
+    expect(nodeBackward?.name).toEqual('c2')
   })
 })
 
