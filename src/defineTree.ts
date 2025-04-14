@@ -18,6 +18,7 @@ import { BaseOptions, MutationBaseOptions, TraversalContext } from './options'
 import { reduce, ReduceOptions } from './reduce'
 import { remove, RemoveOptions } from './remove'
 import { replace, ReplaceOptions } from './replace'
+import { splice, SpliceOptions } from './splice'
 import { ExtractRequiredKeys, OptionCheck, Prettify } from './types'
 import { visit, VisitOptions } from './visit'
 
@@ -40,6 +41,7 @@ type InsertOptionsWB<T> = WithoutBase<InsertOptions<T>>
 type RemoveOptionsWB<T> = WithoutBase<RemoveOptions<T>>
 type MoveOptionsWB<T> = WithoutBase<MoveOptions<T>>
 type ReplaceOptionsWB<T> = WithoutBase<ReplaceOptions<T>>
+type SpliceOptionsWB<T> = WithoutBase<SpliceOptions<T>>
 
 type ApplyableOptions<T> = DiagramRequiredOptions<T> & MutationOptions<T>
 
@@ -309,6 +311,17 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
         Omit<MoveOptionsWB<T>, 'create'>
     >
   ) => move(node, this.mergeOptions(options) as MoveOptions<T>)
+
+  /**
+   * Replace nodes at the given `IndexPath`s with another node.
+   */
+  splice = (
+    node: T,
+    options: Prettify<
+      OptionCheck<AppliedOptions, 'create', SpliceOptionsWB<T>> &
+        Omit<SpliceOptionsWB<T>, 'create'>
+    >
+  ) => splice(node, this.mergeOptions(options) as SpliceOptions<T>)
 
   /**
    * Replace the node at the given `IndexPath` with another

@@ -12,6 +12,7 @@ import { insert } from '../insert'
 import { move } from '../move'
 import { remove } from '../remove'
 import { replace } from '../replace'
+import { splice } from '../splice'
 
 describe('insert', () => {
   it('inserts node at start', () => {
@@ -165,6 +166,65 @@ describe('replace', () => {
     const result = replace(example, {
       at: [0, 1],
       node: { name: 'x', indexPath: [] },
+      create: createNode,
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+})
+
+describe('splice', () => {
+  it('splices at start', () => {
+    const result = splice(example, {
+      at: [0],
+      nodes: [{ name: 'x', indexPath: [] }],
+      create: createNode,
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('splices at start with delete count', () => {
+    const result = splice(example, {
+      at: [0],
+      deleteCount: 1,
+      nodes: [{ name: 'x', indexPath: [] }],
+      create: createNode,
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('splices at start with large delete count', () => {
+    const result = splice(example, {
+      at: [0],
+      deleteCount: 100,
+      nodes: [{ name: 'x', indexPath: [] }],
+      create: createNode,
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('splices in middle', () => {
+    const result = splice(example, {
+      at: [1],
+      nodes: [{ name: 'x', indexPath: [] }],
+      create: createNode,
+      getChildren,
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('splices at end', () => {
+    const result = splice(example, {
+      at: [2],
+      nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
       getChildren,
     })
@@ -341,6 +401,16 @@ describe('partially applied', () => {
     const result = Tree.move(example, {
       indexPaths: [[1, 1]],
       to: [0],
+    })
+
+    expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
+  })
+
+  it('splices node', () => {
+    const result = Tree.splice(example, {
+      at: [0],
+      deleteCount: 1,
+      nodes: [{ name: 'x', indexPath: [] }],
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()

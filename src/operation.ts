@@ -197,13 +197,18 @@ export function applyOperations<T>(
 
           return options.create(
             node,
-            splice(updatedChildren, adjustedIndex, 0, ...operation.insertNodes),
+            arraySplice(
+              updatedChildren,
+              adjustedIndex,
+              0,
+              ...operation.insertNodes
+            ),
             indexPath
           )
         case 'insert':
           return options.create(
             node,
-            splice(children, operation.index, 0, ...operation.nodes),
+            arraySplice(children, operation.index, 0, ...operation.nodes),
             indexPath
           )
         case 'replace':
@@ -215,7 +220,7 @@ export function applyOperations<T>(
   })
 }
 
-export function splice<T>(
+export function arraySplice<T>(
   array: T[],
   start: number,
   deleteCount: number,

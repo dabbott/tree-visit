@@ -152,6 +152,14 @@ exports[`partially applied replaces node 1`] = `
 └── x"
 `;
 
+exports[`partially applied splices node 1`] = `
+"a
+├── x
+└── c
+    ├── c1
+    └── c2"
+`;
+
 exports[`remove removes multiple nodes 1`] = `
 "a
 └── b"
@@ -206,6 +214,52 @@ exports[`replace replaces nested 1`] = `
 `;
 
 exports[`replace replaces root 1`] = `"x"`;
+
+exports[`splice splices at end 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+├── c
+│   ├── c1
+│   └── c2
+└── x"
+`;
+
+exports[`splice splices at start 1`] = `
+"a
+├── x
+├── b
+│   ├── b1
+│   └── b2
+└── c
+    ├── c1
+    └── c2"
+`;
+
+exports[`splice splices at start with delete count 1`] = `
+"a
+├── x
+└── c
+    ├── c1
+    └── c2"
+`;
+
+exports[`splice splices at start with large delete count 1`] = `
+"a
+└── x"
+`;
+
+exports[`splice splices in middle 1`] = `
+"a
+├── b
+│   ├── b1
+│   └── b2
+├── x
+└── c
+    ├── c1
+    └── c2"
+`;
 
 exports[`tree with no options inserts node 1`] = `
 "a
