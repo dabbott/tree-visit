@@ -17,7 +17,7 @@ import { splice } from '../splice'
 describe('insert', () => {
   it('inserts node at start', () => {
     const result = insert(example, {
-      at: [0],
+      path: [0],
       nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
       getChildren,
@@ -28,7 +28,7 @@ describe('insert', () => {
 
   it('inserts node in middle', () => {
     const result = insert(example, {
-      at: [1],
+      path: [1],
       nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
       getChildren,
@@ -39,7 +39,7 @@ describe('insert', () => {
 
   it('inserts node at end', () => {
     const result = insert(example, {
-      at: [2],
+      path: [2],
       nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
       getChildren,
@@ -50,7 +50,7 @@ describe('insert', () => {
 
   it('inserts nested node', () => {
     const result = insert(example, {
-      at: [1, 1],
+      path: [1, 1],
       nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
       getChildren,
@@ -63,7 +63,7 @@ describe('insert', () => {
     const { getChildrenWithCount, getCount } = createCountGetChildren()
 
     const result = insert(example, {
-      at: [0, 1],
+      path: [0, 1],
       nodes: [
         { name: 'x', indexPath: [] },
         { name: 'y', indexPath: [] },
@@ -356,7 +356,7 @@ describe('tree with no options', () => {
 
   it('inserts node', () => {
     const result = Tree.insert(example, {
-      at: [1],
+      path: [1],
       nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
     })
@@ -368,7 +368,7 @@ describe('tree with no options', () => {
     expect(() => {
       // @ts-expect-error
       Tree.insert(example, {
-        at: [1],
+        path: [1],
         nodes: [{ name: 'x', indexPath: [] }],
       })
     }).toThrow()
@@ -382,7 +382,7 @@ describe('partially applied', () => {
 
   it('inserts node', () => {
     const result = Tree.insert(example, {
-      at: [1],
+      path: [1],
       nodes: [{ name: 'x', indexPath: [] }],
     })
 
@@ -391,7 +391,7 @@ describe('partially applied', () => {
 
   it('inserts node with path tracking', () => {
     const result = Tree.insertWithPathTracking(example, {
-      at: [1, 1],
+      path: [1, 1],
       nodes: [{ name: 'x', indexPath: [] }],
       track: [[0], [1], [1, 0], [1, 1]],
     })
@@ -474,7 +474,7 @@ describe('partially applied', () => {
     expect(clone).toEqual(example)
 
     const result = insert(clone, {
-      at: [1],
+      path: [1],
       nodes: [{ name: 'x', indexPath: [] }],
       getChildren,
       create: (node: Node, children: Node[]) => {

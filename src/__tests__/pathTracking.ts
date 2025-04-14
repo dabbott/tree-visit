@@ -8,7 +8,7 @@ const x = { name: 'x', indexPath: [] }
 describe('insert', () => {
   it('insert before', () => {
     const result = insertWithPathTracking(example, {
-      at: [0],
+      path: [0],
       nodes: [x],
       create: createNode,
       getChildren,
@@ -20,7 +20,7 @@ describe('insert', () => {
 
   it('insert multiple nodes', () => {
     const result = insertWithPathTracking(example, {
-      at: [0],
+      path: [0],
       nodes: [x, x],
       create: createNode,
       getChildren,
@@ -32,7 +32,7 @@ describe('insert', () => {
 
   it('insert nested', () => {
     const result = insertWithPathTracking(example, {
-      at: [1, 0],
+      path: [1, 0],
       nodes: [x],
       create: createNode,
       getChildren,

@@ -3,7 +3,7 @@ import { defineTree } from '../defineTree'
 import { diagram } from '../diagram'
 import { find, findAll, findAllPaths, findPath } from '../find'
 import { flat } from '../flat'
-import { IndexPath, visit } from '../index'
+import { entries, IndexPath, visit } from '../index'
 import { flatMap, map } from '../map'
 import { reduce } from '../reduce'
 
@@ -367,6 +367,22 @@ describe('flat', () => {
       'c',
       'c1',
       'c2',
+    ])
+  })
+})
+
+describe('entries', () => {
+  it('returns entries', () => {
+    const result = entries(example, { getChildren })
+
+    expect(result).toEqual([
+      [a.indexPath, a],
+      [b.indexPath, b],
+      [b1.indexPath, b1],
+      [b2.indexPath, b2],
+      [c.indexPath, c],
+      [c1.indexPath, c1],
+      [c2.indexPath, c2],
     ])
   })
 })

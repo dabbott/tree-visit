@@ -8,12 +8,12 @@ import { MutationBaseOptions } from './options'
 
 export type InsertOptions<T> = MutationBaseOptions<T> & {
   nodes: T[]
-  at: IndexPath
+  path: IndexPath
 }
 
 export type InsertWithPathTrackingOptions<T> = MutationBaseOptions<T> & {
   nodes: T[]
-  at: IndexPath
+  path: IndexPath
   track: IndexPath[]
 }
 
@@ -40,7 +40,7 @@ function _insertWithPathTracking<T>(
     track?: IndexPath[]
   }
 ) {
-  const { nodes, at, track } = options
+  const { nodes, path: at, track } = options
 
   if (at.length === 0) {
     throw new Error(`Can't insert nodes at the root`)

@@ -1,5 +1,6 @@
 import { access, accessPath, ancestors, get } from './access'
 import { diagram, DiagramOptions } from './diagram'
+import { entries } from './entries'
 import {
   find,
   findAll,
@@ -256,6 +257,11 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
     typeof predicateOrOptions === 'function'
       ? findAllPaths(node, this.mergeOptions({ predicate: predicateOrOptions }))
       : findAllPaths(node, this.mergeOptions({ ...predicateOrOptions }))
+
+  /**
+   * Returns an array of every [IndexPath, Node] pair in the tree.
+   */
+  entries = (node: T) => entries(node, this.mergeOptions({}))
 
   /**
    * Returns an array containing the root node and all of its descendants.
