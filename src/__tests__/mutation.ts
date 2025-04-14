@@ -311,7 +311,7 @@ describe('tree with no options', () => {
         at: [1],
         nodes: [{ name: 'x', indexPath: [] }],
       })
-    }).toThrowError()
+    }).toThrow()
   })
 })
 
