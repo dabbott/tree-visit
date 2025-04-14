@@ -139,7 +139,9 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
 
   baseOptions: BaseOptions<T>
 
-  mergeOptions = <T extends Record<string, any>>(options: T) => ({
+  mergeOptions = <O extends Record<string, any>>(
+    options: O
+  ): BaseOptions<T> & AppliedOptions & O => ({
     ...this.baseOptions,
     ...this.appliedOptions,
     ...options,
@@ -185,7 +187,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
   ) =>
     typeof options === 'function'
       ? diagram(node, this.mergeOptions({ getLabel: options }))
-      : diagram(node, this.mergeOptions(options))
+      : diagram(node, this.mergeOptions(options) as DiagramOptions<T>)
 
   find: Overloads<T>['find'] = (
     node: T,
@@ -270,7 +272,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
       OptionCheck<AppliedOptions, 'create', InsertOptionsWB<T>> &
         Omit<InsertOptionsWB<T>, 'create'>
     >
-  ) => insert(node, this.mergeOptions(options))
+  ) => insert(node, this.mergeOptions(options) as InsertOptions<T>)
 
   /**
    * Remove nodes at the given `IndexPath`s.
@@ -281,7 +283,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
       OptionCheck<AppliedOptions, 'create', RemoveOptionsWB<T>> &
         Omit<RemoveOptionsWB<T>, 'create'>
     >
-  ) => remove(node, this.mergeOptions(options))
+  ) => remove(node, this.mergeOptions(options) as RemoveOptions<T>)
 
   /**
    * Move nodes from one `IndexPath` to another.
@@ -292,7 +294,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
       OptionCheck<AppliedOptions, 'create', MoveOptionsWB<T>> &
         Omit<MoveOptionsWB<T>, 'create'>
     >
-  ) => move(node, this.mergeOptions(options))
+  ) => move(node, this.mergeOptions(options) as MoveOptions<T>)
 
   /**
    * Replace the node at the given `IndexPath` with another
@@ -303,7 +305,7 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
       OptionCheck<AppliedOptions, 'create', ReplaceOptionsWB<T>> &
         Omit<ReplaceOptionsWB<T>, 'create'>
     >
-  ) => replace(node, this.mergeOptions(options))
+  ) => replace(node, this.mergeOptions(options) as ReplaceOptions<T>)
 }
 
 export function defineTree<T>(

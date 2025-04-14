@@ -711,12 +711,12 @@ describe('withOptions', () => {
     expect(() => {
       // @ts-expect-error
       Tree.diagram(example)
-    }).toThrowError()
+    }).toThrow()
 
     expect(() => {
       // @ts-expect-error
       Tree.diagram(example, {})
-    }).toThrowError()
+    }).toThrow()
 
     TreeWithOptions.diagram(example)
     TreeWithOptions.diagram(example, {})
