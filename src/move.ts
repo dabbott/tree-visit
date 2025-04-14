@@ -9,14 +9,14 @@ import {
 import { MutationBaseOptions } from './options'
 
 export type MoveOptions<T> = MutationBaseOptions<T> & {
-  indexPaths: IndexPath[]
+  paths: IndexPath[]
   to: IndexPath
 }
 
 export function move<T>(node: T, options: MoveOptions<T>) {
-  if (options.indexPaths.length === 0) return node
+  if (options.paths.length === 0) return node
 
-  for (const indexPath of options.indexPaths) {
+  for (const indexPath of options.paths) {
     if (indexPath.length === 0) {
       throw new Error(`Can't move the root node`)
     }
@@ -26,7 +26,7 @@ export function move<T>(node: T, options: MoveOptions<T>) {
     throw new Error(`Can't move nodes to the root`)
   }
 
-  const _ancestorIndexPaths = ancestorPaths(options.indexPaths)
+  const _ancestorIndexPaths = ancestorPaths(options.paths)
 
   const nodesToInsert = _ancestorIndexPaths.map((indexPath) =>
     access(node, indexPath, options)

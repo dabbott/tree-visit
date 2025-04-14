@@ -81,7 +81,7 @@ describe('insert', () => {
 describe('remove', () => {
   it('removes node at start', () => {
     const result = remove(example, {
-      indexPaths: [[0]],
+      paths: [[0]],
       create: createNode,
       getChildren,
     })
@@ -91,7 +91,7 @@ describe('remove', () => {
 
   it('removes node at end', () => {
     const result = remove(example, {
-      indexPaths: [[1]],
+      paths: [[1]],
       create: createNode,
       getChildren,
     })
@@ -103,7 +103,7 @@ describe('remove', () => {
     const { getChildrenWithCount, getCount } = createCountGetChildren()
 
     const result = remove(example, {
-      indexPaths: [[1, 1]],
+      paths: [[1, 1]],
       create: createNode,
       getChildren: getChildrenWithCount,
     })
@@ -116,7 +116,7 @@ describe('remove', () => {
     const { getChildrenWithCount, getCount } = createCountGetChildren()
 
     const result = remove(example, {
-      indexPaths: [[1], [0, 1], [0, 0]],
+      paths: [[1], [0, 1], [0, 0]],
       create: createNode,
       getChildren: getChildrenWithCount,
     })
@@ -129,7 +129,7 @@ describe('remove', () => {
     const { getChildrenWithCount, getCount } = createCountGetChildren()
 
     const result = remove(example, {
-      indexPaths: [[0, 1], [0]],
+      paths: [[0, 1], [0]],
       create: createNode,
       getChildren: getChildrenWithCount,
     })
@@ -142,7 +142,7 @@ describe('remove', () => {
 describe('replace', () => {
   it('replaces root', () => {
     const result = replace(example, {
-      at: [],
+      path: [],
       node: { name: 'x', indexPath: [] },
       create: createNode,
       getChildren,
@@ -153,7 +153,7 @@ describe('replace', () => {
 
   it('replaces child', () => {
     const result = replace(example, {
-      at: [1],
+      path: [1],
       node: { name: 'x', indexPath: [] },
       create: createNode,
       getChildren,
@@ -164,7 +164,7 @@ describe('replace', () => {
 
   it('replaces nested', () => {
     const result = replace(example, {
-      at: [0, 1],
+      path: [0, 1],
       node: { name: 'x', indexPath: [] },
       create: createNode,
       getChildren,
@@ -177,7 +177,7 @@ describe('replace', () => {
 describe('splice', () => {
   it('splices at start', () => {
     const result = splice(example, {
-      at: [0],
+      path: [0],
       nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
       getChildren,
@@ -188,7 +188,7 @@ describe('splice', () => {
 
   it('splices at start with delete count', () => {
     const result = splice(example, {
-      at: [0],
+      path: [0],
       deleteCount: 1,
       nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
@@ -200,7 +200,7 @@ describe('splice', () => {
 
   it('splices at start with large delete count', () => {
     const result = splice(example, {
-      at: [0],
+      path: [0],
       deleteCount: 100,
       nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
@@ -212,7 +212,7 @@ describe('splice', () => {
 
   it('splices in middle', () => {
     const result = splice(example, {
-      at: [1],
+      path: [1],
       nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
       getChildren,
@@ -223,7 +223,7 @@ describe('splice', () => {
 
   it('splices at end', () => {
     const result = splice(example, {
-      at: [2],
+      path: [2],
       nodes: [{ name: 'x', indexPath: [] }],
       create: createNode,
       getChildren,
@@ -236,7 +236,7 @@ describe('splice', () => {
 describe('move', () => {
   it('moves node to the same place', () => {
     const result1 = move(example, {
-      indexPaths: [[0]],
+      paths: [[0]],
       to: [0],
       create: createNode,
       getChildren,
@@ -245,7 +245,7 @@ describe('move', () => {
     expect(result1).toEqual(example)
 
     const result2 = move(example, {
-      indexPaths: [[1]],
+      paths: [[1]],
       to: [1],
       create: createNode,
       getChildren,
@@ -258,7 +258,7 @@ describe('move', () => {
     const { getChildrenWithCount, getCount } = createCountGetChildren()
 
     const result = move(example, {
-      indexPaths: [[1]],
+      paths: [[1]],
       to: [0],
       create: createNode,
       getChildren: getChildrenWithCount,
@@ -270,7 +270,7 @@ describe('move', () => {
 
   it('moves node from 0 to 1', () => {
     const result = move(example, {
-      indexPaths: [[0]],
+      paths: [[0]],
       to: [1],
       create: createNode,
       getChildren,
@@ -281,7 +281,7 @@ describe('move', () => {
 
   it('moves node from 0.0 to 1', () => {
     const result = move(example, {
-      indexPaths: [[0, 0]],
+      paths: [[0, 0]],
       to: [1],
       create: createNode,
       getChildren,
@@ -292,7 +292,7 @@ describe('move', () => {
 
   it('moves node from 0.0 to 1.0', () => {
     const result = move(example, {
-      indexPaths: [[0, 0]],
+      paths: [[0, 0]],
       to: [1, 0],
       create: createNode,
       getChildren,
@@ -330,7 +330,7 @@ describe('move', () => {
     }
 
     const result = move(example, {
-      indexPaths: [[0], [1]],
+      paths: [[0], [1]],
       to: [3],
       create: createNode,
       getChildren,
@@ -341,7 +341,7 @@ describe('move', () => {
 
   it('moves node to non-existent index', () => {
     const result = move(example, {
-      indexPaths: [[0, 1]],
+      paths: [[0, 1]],
       to: [1, 7],
       create: createNode,
       getChildren,
@@ -391,7 +391,7 @@ describe('partially applied', () => {
 
   it('removes node', () => {
     const result = Tree.remove(example, {
-      indexPaths: [[1]],
+      paths: [[1]],
     })
 
     expect(diagram(result, { getChildren, getLabel })).toMatchSnapshot()
@@ -399,7 +399,7 @@ describe('partially applied', () => {
 
   it('moves node', () => {
     const result = Tree.move(example, {
-      indexPaths: [[1, 1]],
+      paths: [[1, 1]],
       to: [0],
     })
 
@@ -408,7 +408,7 @@ describe('partially applied', () => {
 
   it('splices node', () => {
     const result = Tree.splice(example, {
-      at: [0],
+      path: [0],
       deleteCount: 1,
       nodes: [{ name: 'x', indexPath: [] }],
     })
@@ -418,7 +418,7 @@ describe('partially applied', () => {
 
   it('replaces node', () => {
     const result = Tree.replace(example, {
-      at: [1],
+      path: [1],
       node: { name: 'x', indexPath: [] },
     })
 

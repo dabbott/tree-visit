@@ -3,10 +3,10 @@ import { diagram, DiagramOptions } from './diagram'
 import {
   find,
   findAll,
-  findAllIndexPaths,
-  findIndexPath,
+  findAllPaths,
   FindOptions,
   FindOptionsTyped,
+  findPath,
 } from './find'
 import { flat } from './flat'
 import { flatMap, FlatMapOptions } from './flatMap'
@@ -83,22 +83,19 @@ interface Overloads<T> {
   /**
    * Find the `IndexPath` of a node matching a predicate function.
    */
-  findIndexPath(
+  findPath(
     node: T,
     predicate: FindOptions<T>['predicate']
   ): IndexPath | undefined
 
-  findIndexPath(node: T, options: FindOptionsWB<T>): IndexPath | undefined
+  findPath(node: T, options: FindOptionsWB<T>): IndexPath | undefined
 
   /**
    * Find the `IndexPath` of all nodes matching a predicate function.
    */
-  findAllIndexPaths(
-    node: T,
-    predicate: FindOptions<T>['predicate']
-  ): IndexPath[]
+  findAllPaths(node: T, predicate: FindOptions<T>['predicate']): IndexPath[]
 
-  findAllIndexPaths(node: T, options: FindOptionsWB<T>): IndexPath[]
+  findAllPaths(node: T, options: FindOptionsWB<T>): IndexPath[]
 
   /**
    * Visit each node using preorder DFS traversal.
@@ -221,27 +218,21 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
       ? findAll(node, this.mergeOptions({ predicate: predicateOrOptions }))
       : findAll(node, this.mergeOptions({ ...predicateOrOptions }))
 
-  findIndexPath: Overloads<T>['findIndexPath'] = (
+  findPath: Overloads<T>['findPath'] = (
     node: T,
     predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
   ) =>
     typeof predicateOrOptions === 'function'
-      ? findIndexPath(
-          node,
-          this.mergeOptions({ predicate: predicateOrOptions })
-        )
-      : findIndexPath(node, this.mergeOptions({ ...predicateOrOptions }))
+      ? findPath(node, this.mergeOptions({ predicate: predicateOrOptions }))
+      : findPath(node, this.mergeOptions({ ...predicateOrOptions }))
 
-  findAllIndexPaths: Overloads<T>['findAllIndexPaths'] = (
+  findAllPaths: Overloads<T>['findAllPaths'] = (
     node: T,
     predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
   ) =>
     typeof predicateOrOptions === 'function'
-      ? findAllIndexPaths(
-          node,
-          this.mergeOptions({ predicate: predicateOrOptions })
-        )
-      : findAllIndexPaths(node, this.mergeOptions({ ...predicateOrOptions }))
+      ? findAllPaths(node, this.mergeOptions({ predicate: predicateOrOptions }))
+      : findAllPaths(node, this.mergeOptions({ ...predicateOrOptions }))
 
   /**
    * Returns an array containing the root node and all of its descendants.

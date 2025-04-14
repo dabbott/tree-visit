@@ -1,7 +1,7 @@
 import { access, accessPath, ancestors, get } from '../access'
 import { defineTree } from '../defineTree'
 import { diagram } from '../diagram'
-import { find, findAll, findAllIndexPaths, findIndexPath } from '../find'
+import { find, findAll, findAllPaths, findPath } from '../find'
 import { flat } from '../flat'
 import { flatMap } from '../flatMap'
 import { IndexPath, visit } from '../index'
@@ -277,7 +277,7 @@ describe('find', () => {
   })
 
   it('finds a node index path', () => {
-    const indexPath = findIndexPath(example, {
+    const indexPath = findPath(example, {
       getChildren,
       predicate: (node, indexPath) => indexPath.join() === [0, 1].join(),
     })
@@ -286,7 +286,7 @@ describe('find', () => {
   })
 
   it('finds all node index paths', () => {
-    const indexPaths = findAllIndexPaths(example, {
+    const indexPaths = findAllPaths(example, {
       getChildren,
       predicate: (node) => node.name.startsWith('b'),
     })
@@ -674,8 +674,13 @@ describe('withOptions', () => {
   })
 
   it('supports overloaded calls', () => {
-    const { find, findAllIndexPaths, visit, diagram, flat } =
-      defineTree(getChildren)
+    const {
+      find,
+      findAllPaths: findAllIndexPaths,
+      visit,
+      diagram,
+      flat,
+    } = defineTree(getChildren)
 
     let enterNames: string[] = []
 

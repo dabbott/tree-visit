@@ -66,7 +66,7 @@ export function findAll<T>(node: T, options: FindOptions<T>): T[] {
 /**
  * Find the `IndexPath` of a node matching a predicate function.
  */
-export function findIndexPath<T>(
+export function findPath<T>(
   node: T,
   options: FindOptions<T>
 ): IndexPath | undefined {
@@ -89,10 +89,7 @@ export function findIndexPath<T>(
 /**
  * Find the `IndexPath` of all nodes matching a predicate function.
  */
-export function findAllIndexPaths<T>(
-  node: T,
-  options: FindOptions<T>
-): IndexPath[] {
+export function findAllPaths<T>(node: T, options: FindOptions<T>): IndexPath[] {
   let found: IndexPath[] = []
 
   visit(node, {
