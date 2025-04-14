@@ -1,4 +1,4 @@
-import { access, accessPath } from './access'
+import { access, accessPath, ancestors, get } from './access'
 import { diagram, DiagramOptions } from './diagram'
 import {
   find,
@@ -166,6 +166,20 @@ class Tree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
    */
   accessPath = (node: T, indexPath: IndexPath) =>
     accessPath(node, indexPath, this.mergeOptions({}))
+
+  /**
+   * Returns a node by its `IndexPath`.
+   *
+   * The first node is implicitly included in the `IndexPath` (i.e. no need to pass a `0` first in every `IndexPath`).
+   */
+  get = (node: T, indexPath: IndexPath) =>
+    get(node, indexPath, this.mergeOptions({}))
+
+  /**
+   * Returns the ancestors of a node.
+   */
+  ancestors = (node: T, indexPath: IndexPath) =>
+    ancestors(node, indexPath, this.mergeOptions({}))
 
   /**
    * Generate a diagram of the tree, as a string.

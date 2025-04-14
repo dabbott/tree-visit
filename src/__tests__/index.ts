@@ -1,4 +1,4 @@
-import { access, accessPath } from '../access'
+import { access, accessPath, ancestors, get } from '../access'
 import { defineTree } from '../defineTree'
 import { diagram } from '../diagram'
 import { find, findAll, findAllIndexPaths, findIndexPath } from '../find'
@@ -23,28 +23,14 @@ function getChildrenUnstable(node: Node): Node[] {
   return getChildren(node).map((item) => ({ ...item }))
 }
 
-const example: Node = {
-  name: 'a',
-  children: [
-    {
-      name: 'b',
-      indexPath: [0],
-      children: [
-        { name: 'b1', indexPath: [0, 0] },
-        { name: 'b2', indexPath: [0, 1] },
-      ],
-    },
-    {
-      name: 'c',
-      indexPath: [1],
-      children: [
-        { name: 'c1', indexPath: [1, 0] },
-        { name: 'c2', indexPath: [1, 1] },
-      ],
-    },
-  ],
-  indexPath: [],
-}
+const b1: Node = { name: 'b1', indexPath: [0, 0] }
+const b2: Node = { name: 'b2', indexPath: [0, 1] }
+const c1: Node = { name: 'c1', indexPath: [1, 0] }
+const c2: Node = { name: 'c2', indexPath: [1, 1] }
+const b: Node = { name: 'b', indexPath: [0], children: [b1, b2] }
+const c: Node = { name: 'c', indexPath: [1], children: [c1, c2] }
+const a: Node = { name: 'a', children: [b, c], indexPath: [] }
+const example = a
 
 type TypeA = Node & {
   type: 'a'
@@ -232,6 +218,22 @@ describe('access', () => {
     expect(
       accessPath(example, [0, 1], { getChildren }).map((node) => node.name)
     ).toEqual(['a', 'b', 'b2'])
+  })
+})
+
+describe('get', () => {
+  it('returns node', () => {
+    expect(get(example, [0, 1], { getChildren })).toEqual(b2)
+  })
+
+  it('returns undefined if node is not found', () => {
+    expect(get(example, [0, 1, 0, 2], { getChildren })).toEqual(undefined)
+  })
+})
+
+describe('ancestors', () => {
+  it('returns ancestors', () => {
+    expect(ancestors(example, [0, 1], { getChildren })).toEqual([a, b])
   })
 })
 
@@ -621,6 +623,10 @@ describe('withOptions', () => {
     ).toEqual('b1')
 
     expect(access(example, [0, 0]).name).toEqual('b1')
+
+    expect(Tree.get(example, [0, 0])).toEqual(b1)
+
+    expect(Tree.ancestors(example, [0, 0])).toEqual([a, b])
 
     expect(
       reduce(
