@@ -1,5 +1,5 @@
 import { ApplyableOptions, FindOptionsWB } from './defineTree'
-import { find, FindOptions, FindOptionsTyped } from './find'
+import { find, findAll, FindOptions, FindOptionsTyped } from './find'
 import { IndexPath } from './indexPath'
 import { BaseOptions, TraversalContext } from './options'
 
@@ -15,6 +15,19 @@ type Overloads<T> = {
       array: T[],
       predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
     ): S | undefined
+  }
+
+  findAll: {
+    (array: T[], predicate: FindOptions<T>['predicate']): T[]
+    (array: T[], options: FindOptionsWB<T>): T[]
+    <S extends T>(
+      array: T[],
+      predicate: FindOptionsTyped<T, S>['predicate']
+    ): S[]
+    <S extends T>(
+      array: T[],
+      predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
+    ): S[]
   }
 }
 
@@ -66,6 +79,9 @@ class ArrayTree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
     ...options,
   })
 
+  /**
+   * Find a node matching a predicate function.
+   */
   find: Overloads<T>['find'] = (
     array: T[],
     predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
@@ -84,7 +100,31 @@ class ArrayTree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
       },
     })
 
-    return found as T | undefined
+    return found
+  }
+
+  /**
+   * Find all nodes matching a predicate function.
+   */
+  findAll: Overloads<T>['findAll'] = (
+    array: T[],
+    predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
+  ) => {
+    const options =
+      typeof predicateOrOptions === 'function'
+        ? this.mergeOptions({ predicate: predicateOrOptions })
+        : this.mergeOptions(predicateOrOptions)
+
+    const found = findAll(this.root as T, {
+      ...options,
+      getChildren: this.createGetChildren(array),
+      predicate: (node, indexPath) => {
+        if (this._isRoot(node)) return false
+        return options.predicate(node, indexPath)
+      },
+    })
+
+    return found
   }
 }
 
