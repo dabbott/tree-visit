@@ -1,68 +1,95 @@
-import { FindOptionsWB, WithoutBase } from './defineTree'
+import { ApplyableOptions, FindOptionsWB } from './defineTree'
 import { find, FindOptions, FindOptionsTyped } from './find'
 import { IndexPath } from './indexPath'
 import { BaseOptions, TraversalContext } from './options'
 
-export const defineArrayTree = <T>(
-  getChildren: BaseOptions<T> | BaseOptions<T>['getChildren']
-) => {
-  const root = Symbol('root')
+type Overloads<T> = {
+  find: {
+    (array: T[], predicate: FindOptions<T>['predicate']): T | undefined
+    (array: T[], options: FindOptionsWB<T>): T | undefined
+    <S extends T>(
+      array: T[],
+      predicate: FindOptionsTyped<T, S>['predicate']
+    ): S | undefined
+    <S extends T>(
+      array: T[],
+      predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
+    ): S | undefined
+  }
+}
 
-  type TreeNode = T | typeof root
+class ArrayTree<T, AppliedOptions extends Partial<ApplyableOptions<T>>> {
+  root = Symbol('root')
 
-  const baseOptions: BaseOptions<T> =
-    typeof getChildren === 'function' ? { getChildren } : getChildren
+  get _t(): T | typeof this.root {
+    throw new Error('Not implemented')
+  }
 
-  const createGetChildren =
+  _isRoot(node: T | typeof this.root): node is typeof this.root {
+    return node === this.root
+  }
+
+  constructor(
+    getChildrenOrBaseOptions: BaseOptions<T> | BaseOptions<T>['getChildren'],
+    public appliedOptions: AppliedOptions
+  ) {
+    const baseOptions: BaseOptions<T> =
+      typeof getChildrenOrBaseOptions === 'function'
+        ? { getChildren: getChildrenOrBaseOptions }
+        : getChildrenOrBaseOptions
+
+    this.baseOptions = baseOptions
+  }
+
+  createGetChildren =
     (array: T[]) =>
     (
-      node: TreeNode,
+      node: typeof this._t,
       indexPath: IndexPath,
-      context?: TraversalContext<TreeNode>
-    ): TreeNode[] =>
-      node === root
+      context?: TraversalContext<T>
+    ): T[] =>
+      this._isRoot(node)
         ? array
-        : baseOptions.getChildren(
+        : this.baseOptions.getChildren(
             node,
             indexPath,
             context as TraversalContext<T>
           )
 
-  function arrayTreeFind(
-    array: T[],
-    predicate: FindOptions<T>['predicate']
-  ): T | undefined
-  function arrayTreeFind(array: T[], options: FindOptionsWB<T>): T | undefined
-  function arrayTreeFind<S extends T>(
-    array: T[],
-    predicate: FindOptionsTyped<T, S>['predicate']
-  ): S | undefined
-  function arrayTreeFind<S extends T>(
-    array: T[],
-    options: WithoutBase<FindOptionsTyped<T, S>>
-  ): S | undefined
-  function arrayTreeFind(
+  baseOptions: BaseOptions<T>
+
+  mergeOptions = <O extends Record<string, any>>(
+    options: O
+  ): BaseOptions<T> & AppliedOptions & O => ({
+    ...this.baseOptions,
+    ...this.appliedOptions,
+    ...options,
+  })
+
+  find: Overloads<T>['find'] = (
     array: T[],
     predicateOrOptions: FindOptions<T>['predicate'] | FindOptionsWB<T>
-  ): T | undefined {
-    const { predicate, ...options } =
+  ) => {
+    const options =
       typeof predicateOrOptions === 'function'
-        ? { predicate: predicateOrOptions }
-        : predicateOrOptions
+        ? this.mergeOptions({ predicate: predicateOrOptions })
+        : this.mergeOptions(predicateOrOptions)
 
-    const found = find(root, {
+    const found = find(this.root as T, {
       ...options,
-      getChildren: createGetChildren(array),
+      getChildren: this.createGetChildren(array),
       predicate: (node, indexPath) => {
-        if (node === root) return false
-        return predicate(node, indexPath)
+        if (this._isRoot(node)) return false
+        return options.predicate(node, indexPath)
       },
     })
 
     return found as T | undefined
   }
+}
 
-  return {
-    find: arrayTreeFind,
-  }
+export const defineArrayTree = <T>(
+  getChildren: BaseOptions<T> | BaseOptions<T>['getChildren']
+) => {
+  return new ArrayTree(getChildren, {})
 }

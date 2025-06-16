@@ -67,7 +67,7 @@ type SpliceWithPathTrackingOptionsWB<T> = WithoutBase<
   SpliceWithPathTrackingOptions<T>
 >
 
-type ApplyableOptions<T> = DiagramRequiredOptions<T> & MutationOptions<T>
+export type ApplyableOptions<T> = DiagramRequiredOptions<T> & MutationOptions<T>
 
 interface Overloads<T> {
   /**

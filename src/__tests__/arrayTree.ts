@@ -3,12 +3,24 @@ import { defineArrayTree } from '../defineArrayTree'
 
 const exampleArray = example.children!
 
-it('finds node', () => {
-  const Tree = defineArrayTree(getChildren)
+describe('find', () => {
+  it('ignores root node', () => {
+    const Tree = defineArrayTree(getChildren)
 
-  const result = Tree.find(exampleArray, {
-    predicate: (node) => node.name === 'b1',
+    const result = Tree.find(exampleArray, {
+      predicate: () => true,
+    })
+
+    expect(result).toBe(example.children![0])
   })
 
-  expect(result?.name).toEqual('b1')
+  it('finds node', () => {
+    const Tree = defineArrayTree(getChildren)
+
+    const result = Tree.find(exampleArray, {
+      predicate: (node) => node.name === 'b1',
+    })
+
+    expect(result?.name).toEqual('b1')
+  })
 })
