@@ -37,7 +37,7 @@ import {
 import { ExtractRequiredKeys, OptionCheck, Prettify } from './types'
 import { visit, VisitOptions } from './visit'
 
-type WithoutBase<T> = Omit<T, keyof BaseOptions<T>>
+export type WithoutBase<T> = Omit<T, keyof BaseOptions<T>>
 
 type MutationOptions<T> = WithoutBase<MutationBaseOptions<T>>
 
@@ -50,7 +50,7 @@ type DiagramOptionalOptions<T> = Omit<
   DiagramOptionsWB<T>,
   ExtractRequiredKeys<DiagramOptionsWB<T>>
 >
-type FindOptionsWB<T> = WithoutBase<FindOptions<T>>
+export type FindOptionsWB<T> = WithoutBase<FindOptions<T>>
 type VisitOptionsWB<T> = WithoutBase<VisitOptions<T>>
 type InsertOptionsWB<T> = WithoutBase<InsertOptions<T>>
 type InsertWithPathTrackingOptionsWB<T> = WithoutBase<
