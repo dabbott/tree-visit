@@ -2,14 +2,18 @@
   "name": "tree-visit",
   "version": "0.5.1",
   "description": "A tree traversal library.",
-  "main": "lib/index.js",
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
   "files": [
     "lib"
   ],
-  "types": "lib/index.d.ts",
+  "types": "lib/types/index.d.ts",
   "scripts": {
-    "build": "rm -rf ./lib && tsc --declaration",
-    "build:watch": "rm -rf ./lib && tsc --declaration --watch",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:watch": "npm run clean && (tsc -p tsconfig.cjs.json --watch & tsc -p tsconfig.esm.json --watch & wait)",
+    "typecheck": "tsc -p tsconfig.json",
     "test": "jest",
     "test:watch": "jest --watch",
     "prepublishOnly": "npm run test && npm run build",
@@ -39,5 +43,14 @@
     "testPathIgnorePatterns": [
       "lib"
     ]
+  },
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/esm/index.js",
+      "require": "./lib/cjs/index.js",
+      "default": "./lib/esm/index.js"
+    },
+    "./package.json": "./package.json"
   }
 }
