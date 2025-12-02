@@ -32,7 +32,7 @@ jobs:
           console.log('CJS consumer OK')
           NODE
           node --input-type=module - <<'NODE'
-          const mod = await import('tree-visit')
+          import * as mod from 'tree-visit'
           if (typeof mod.visit !== 'function') {
             throw new Error('Expected visit export in ESM bundle')
           }
