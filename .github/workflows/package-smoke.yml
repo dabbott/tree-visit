@@ -1,0 +1,36 @@
+name: Package smoke
+
+on: [push, pull_request]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20.x', '22.x', '24.x']
+    name: Package smoke (Node ${{ matrix.node-version }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: yarn
+      - run: yarn build
+      - name: Verify CJS entrypoint
+        run: |
+          node - <<'NODE'
+          const pkg = require('.');
+          if (typeof pkg.visit !== 'function') {
+            throw new Error('Expected visit export in CJS bundle');
+          }
+          console.log('CJS entry OK');
+          NODE
+      - name: Verify ESM entrypoint
+        run: |
+          node --input-type=module - <<'NODE'
+          const mod = await import('./');
+          if (typeof mod.visit !== 'function') {
+            throw new Error('Expected visit export in ESM bundle');
+          }
+          console.log('ESM entry OK');
+          NODE
