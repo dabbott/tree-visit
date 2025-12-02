@@ -16,21 +16,27 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: yarn
       - run: yarn build
-      - name: Verify CJS entrypoint
+      - name: Verify packaged exports
         run: |
+          set -euo pipefail
+          TGZ=$(npm pack)
+          TMPDIR=$(mktemp -d)
+          pushd "$TMPDIR" >/dev/null
+          npm init -y >/dev/null
+          npm install --silent "$GITHUB_WORKSPACE/$TGZ" >/dev/null
           node - <<'NODE'
-          const pkg = require('.');
+          const pkg = require('tree-visit')
           if (typeof pkg.visit !== 'function') {
-            throw new Error('Expected visit export in CJS bundle');
+            throw new Error('Expected visit export in CJS bundle')
           }
-          console.log('CJS entry OK');
+          console.log('CJS consumer OK')
           NODE
-      - name: Verify ESM entrypoint
-        run: |
           node --input-type=module - <<'NODE'
-          const mod = await import('./');
+          const mod = await import('tree-visit')
           if (typeof mod.visit !== 'function') {
-            throw new Error('Expected visit export in ESM bundle');
+            throw new Error('Expected visit export in ESM bundle')
           }
-          console.log('ESM entry OK');
+          console.log('ESM consumer OK')
           NODE
+          popd >/dev/null
+          rm "$GITHUB_WORKSPACE/$TGZ"
