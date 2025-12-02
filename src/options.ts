@@ -1,4 +1,4 @@
-import { IndexPath } from './indexPath'
+import { IndexPath } from './indexPath.js'
 
 export type TraversalContext<T> = {
   getRoot(): T

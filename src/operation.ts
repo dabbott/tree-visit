@@ -1,8 +1,8 @@
-import { ancestorPaths } from './ancestors'
-import { IndexPath } from './indexPath'
-import { map } from './map'
-import { MutationBaseOptions } from './options'
-import { transformPath } from './transformPath'
+import { ancestorPaths } from './ancestors.js'
+import { IndexPath } from './indexPath.js'
+import { map } from './map.js'
+import { MutationBaseOptions } from './options.js'
+import { transformPath } from './transformPath.js'
 
 export type NodeOperation<T> =
   | {

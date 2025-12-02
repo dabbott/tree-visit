@@ -1,6 +1,6 @@
-import { IndexPath } from './indexPath'
-import { BaseOptions, TraversalDirection } from './options'
-import { STOP, visit } from './visit'
+import { IndexPath } from './indexPath.js'
+import { BaseOptions, TraversalDirection } from './options.js'
+import { STOP, visit } from './visit.js'
 
 export type FindOptions<T> = BaseOptions<T> & {
   /**

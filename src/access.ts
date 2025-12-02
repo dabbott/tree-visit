@@ -1,5 +1,5 @@
-import { IndexPath } from './indexPath'
-import { BaseOptions, TraversalContext } from './options'
+import { IndexPath } from './indexPath.js'
+import { BaseOptions, TraversalContext } from './options.js'
 
 /**
  * Returns a node by its `IndexPath`.

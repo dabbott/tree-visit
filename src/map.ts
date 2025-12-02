@@ -1,6 +1,6 @@
-import { IndexPath } from './indexPath'
-import { BaseOptions } from './options'
-import { visit } from './visit'
+import { IndexPath } from './indexPath.js'
+import { BaseOptions } from './options.js'
+import { visit } from './visit.js'
 
 export type MapOptions<T, U> = BaseOptions<T> & {
   /**

@@ -1,5 +1,5 @@
-import { BaseOptions } from './options'
-import { reduce } from './reduce'
+import { BaseOptions } from './options.js'
+import { reduce } from './reduce.js'
 
 /**
  * Returns an array containing the root node and all of its descendants.

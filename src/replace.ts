@@ -1,6 +1,6 @@
-import { IndexPath } from './indexPath'
-import { applyOperations, getReplaceOperations } from './operation'
-import { MutationBaseOptions } from './options'
+import { IndexPath } from './indexPath.js'
+import { applyOperations, getReplaceOperations } from './operation.js'
+import { MutationBaseOptions } from './options.js'
 
 export type ReplaceOptions<T> = MutationBaseOptions<T> & {
   path: IndexPath

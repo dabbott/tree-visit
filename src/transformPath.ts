@@ -1,5 +1,5 @@
-import { IndexPath } from './indexPath'
-import { comparePathsByComponent } from './sort'
+import { IndexPath } from './indexPath.js'
+import { comparePathsByComponent } from './sort.js'
 
 type TransformPathOperation = 'insert' | 'remove'
 

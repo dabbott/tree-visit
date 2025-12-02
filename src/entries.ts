@@ -1,6 +1,6 @@
-import { IndexPath } from './indexPath'
-import { BaseOptions } from './options'
-import { visit } from './visit'
+import { IndexPath } from './indexPath.js'
+import { BaseOptions } from './options.js'
+import { visit } from './visit.js'
 
 export function entries<T>(node: T, options: BaseOptions<T>): [IndexPath, T][] {
   let result: [IndexPath, T][] = []
