@@ -1,6 +1,6 @@
-import { IndexPath } from './indexPath'
-import { comparePathsByComponent } from './sort'
-import { KeyPath } from './types'
+import { IndexPath } from './indexPath.js'
+import { comparePathsByComponent } from './sort.js'
+import { KeyPath } from './types.js'
 
 type AncestorPathsOptions<TPath extends KeyPath | IndexPath> = {
   /**

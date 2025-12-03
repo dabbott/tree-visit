@@ -1,0 +1,62 @@
+name: Package smoke
+
+on: [push, pull_request]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20.x', '22.x', '24.x']
+    name: Package smoke (Node ${{ matrix.node-version }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: yarn
+      - run: yarn build
+      - name: Verify packaged exports
+        run: |
+          set -euo pipefail
+          TGZ=$(npm pack)
+          TMPDIR=$(mktemp -d)
+          pushd "$TMPDIR" >/dev/null
+          npm init -y >/dev/null
+          npm install --silent "$GITHUB_WORKSPACE/$TGZ" typescript >/dev/null
+          node - <<'NODE'
+          const pkg = require('tree-visit')
+          if (typeof pkg.visit !== 'function') {
+            throw new Error('Expected visit export in CJS bundle')
+          }
+          console.log('CJS consumer OK')
+          NODE
+          node --input-type=module - <<'NODE'
+          import * as mod from 'tree-visit'
+          if (typeof mod.visit !== 'function') {
+            throw new Error('Expected visit export in ESM bundle')
+          }
+          console.log('ESM consumer OK')
+          NODE
+          cat <<'TS' > smoke.ts
+          import type { VisitOptions } from 'tree-visit'
+          import { visit } from 'tree-visit'
+
+          type Node = { value: number; children?: Node[] }
+
+          const tree: Node = { value: 1, children: [{ value: 2 }] }
+
+          visit<Node>(
+            tree,
+            {
+              includeTraversalContext: true,
+              getChildren: (node) => node.children ?? [],
+              onEnter(node) {
+                console.log(node.value)
+              },
+            } satisfies VisitOptions<Node>
+          )
+          TS
+          npx tsc smoke.ts --moduleResolution nodenext --module nodenext --target es2020 --noEmit
+          popd >/dev/null
+          rm "$GITHUB_WORKSPACE/$TGZ"

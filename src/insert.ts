@@ -1,10 +1,10 @@
-import { IndexPath } from './indexPath'
+import { IndexPath } from './indexPath.js'
 import {
   applyOperations,
   getInsertionOperations,
   transformPathsByOperations,
-} from './operation'
-import { MutationBaseOptions } from './options'
+} from './operation.js'
+import { MutationBaseOptions } from './options.js'
 
 export type InsertOptions<T> = MutationBaseOptions<T> & {
   nodes: T[]

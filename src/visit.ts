@@ -1,5 +1,5 @@
-import { IndexPath } from './indexPath'
-import { BaseOptions, TraversalContext, TraversalDirection } from './options'
+import { IndexPath } from './indexPath.js'
+import { BaseOptions, TraversalContext, TraversalDirection } from './options.js'
 
 export const SKIP = 'skip'
 export const STOP = 'stop'

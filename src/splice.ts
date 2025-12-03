@@ -1,11 +1,11 @@
-import { IndexPath } from './indexPath'
+import { IndexPath } from './indexPath.js'
 import {
   applyOperations,
   getInsertionOperations,
   getRemovalOperations,
   transformPathsByOperations,
-} from './operation'
-import { MutationBaseOptions } from './options'
+} from './operation.js'
+import { MutationBaseOptions } from './options.js'
 
 export type SpliceOptions<T> = MutationBaseOptions<T> & {
   path: IndexPath

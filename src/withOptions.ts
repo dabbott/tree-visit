@@ -1,4 +1,4 @@
-import { defineTree } from './defineTree'
+import { defineTree } from './defineTree.js'
 
 /**
  * Return every tree utility function with options partially applied.

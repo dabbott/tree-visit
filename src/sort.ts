@@ -1,5 +1,5 @@
-import { IndexPath } from './indexPath'
-import { KeyPath } from './types'
+import { IndexPath } from './indexPath.js'
+import { KeyPath } from './types.js'
 
 export function comparePathsByComponent<TPath extends IndexPath | KeyPath>(
   a: TPath,

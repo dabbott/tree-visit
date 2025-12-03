@@ -42,7 +42,10 @@
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "lib"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    }
   },
   "exports": {
     ".": {
