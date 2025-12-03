@@ -19,7 +19,11 @@ import {
 } from './insert.js'
 import { flatMap, FlatMapOptions, map, MapOptions } from './map.js'
 import { move, MoveOptions } from './move.js'
-import { BaseOptions, MutationBaseOptions, TraversalContext } from './options.js'
+import {
+  BaseOptions,
+  MutationBaseOptions,
+  TraversalContext,
+} from './options.js'
 import { reduce, ReduceOptions } from './reduce.js'
 import {
   remove,
@@ -34,7 +38,7 @@ import {
   spliceWithPathTracking,
   SpliceWithPathTrackingOptions,
 } from './splice.js'
-import { ExtractRequiredKeys, OptionCheck, Prettify } from './types.js'
+import { OptionCheck, Prettify } from './types.js'
 import { visit, VisitOptions } from './visit.js'
 
 type WithoutBase<T> = Omit<T, keyof BaseOptions<T>>
@@ -42,13 +46,12 @@ type WithoutBase<T> = Omit<T, keyof BaseOptions<T>>
 type MutationOptions<T> = WithoutBase<MutationBaseOptions<T>>
 
 type DiagramOptionsWB<T> = WithoutBase<DiagramOptions<T>>
-type DiagramRequiredOptions<T> = Pick<
-  DiagramOptionsWB<T>,
-  ExtractRequiredKeys<DiagramOptionsWB<T>>
->
+type DiagramRequiredOptions<T> = {
+  getLabel: DiagramOptionsWB<T>['getLabel']
+}
 type DiagramOptionalOptions<T> = Omit<
   DiagramOptionsWB<T>,
-  ExtractRequiredKeys<DiagramOptionsWB<T>>
+  keyof DiagramRequiredOptions<T>
 >
 type FindOptionsWB<T> = WithoutBase<FindOptions<T>>
 type VisitOptionsWB<T> = WithoutBase<VisitOptions<T>>
