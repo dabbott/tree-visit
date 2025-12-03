@@ -1,6 +1,6 @@
 {
   "name": "tree-visit",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "A tree traversal library.",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
